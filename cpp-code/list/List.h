@@ -157,10 +157,12 @@ T& List<T>::back() const
 { return _->_prev->_data;
 }
 
+// return the an iterator pointing at the the first element
 template <typename T>
 typename List<T>::Iterator List<T>::begin() {
   return Iterator(_->_next);
 }
+// return the an iterator pointing at the element after the last
 template <typename T>
 typename List<T>::Iterator List<T>::end () {
   return Iterator(_);
@@ -168,22 +170,34 @@ typename List<T>::Iterator List<T>::end () {
 
 template <typename T>
 void List<T>::push_front(const T& x) {
-
+    _->_next = _->_next->_prev = new Node ( x , _ , _->_next );
+    ++_size;
 }
+// add one element x to the back of this List
 template <typename T>
 void List<T>::push_back (const T& x )
 { _->_prev = _->_prev->_next = new Node (x,_->_prev,_);
   ++_size;
 }
-
+// remove the first element from this List
 template <typename T>
 void List<T>::pop_front()
+{ Node* p = _-> _next;
+  p->_next->_prev = _;
+  _->_next = p->_next;
+  delete p;
+  --_size;
+}
+// remove the last element from this List
+template <typename T>
+void List<T>::pop_back()
 { Node* p = _->_prev;
-  _->prev = p->_prev;
+  _->_prev = p->_prev;
   p->_prev->_next = _;
   delete p;
   --_size;
 }
+
 
 template <typename T>
 typename List<T>::Iterator List<T>::insert(Iterator& it, const T& x)
