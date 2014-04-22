@@ -1,10 +1,11 @@
-<project name="jarclassloader" basedir="." default="all">
+<project name="test" basedir="." >
   <property environment="env"/>
   <property name="build.dir" value="build"/>
   <property name="jars.dir" value="${build.dir}/jars"/>
   <property name="classes.dir" value="${build.dir}/classes"/>
   <property name="src.dir" value="src"/>
   <property name="deps.dir" value="deps"/>
+  <property name="javac-compiler" value="${env.JAVAC_COMPILER}" />
 
   <path id="core-libs">
     <fileset dir="${deps.dir}">
@@ -13,6 +14,7 @@
     </fileset>
   </path>
 
+  
   <target name="clean">
     <delete dir="${build.dir}"/>
   </target>
@@ -30,9 +32,34 @@
          includes="com/package2/*.class"/>
   </target>
 
+  <target name="test-javac">
+
+    <condition property="javac-compiler.set" else="classic">
+        <isset property="javac-compiler" />
+    </condition>
+    
+ 
+ </target>
+
+ <target name="javac-echo">
+   <echo message="javac  set to  ${javac-compiler}"/>
+   <echo message="java.home  set to  ${java.home}"/>
+   <echo message="javac.version  set to  ${java.version}"/>
+   <echo message="java.compiler set to ${javac-compiler}"/>
+ </target>
+
+
   <target name="compile">
     <mkdir dir="${classes.dir}"/>
+
+    <condition property="javac-compiler" value="classic">
+      <not>
+        <isset property="javac-compiler" />
+      </not>
+    </condition>
+    
     <javac srcdir="${src.dir}"
+           compiler="${javac-compiler}"
            destdir="${classes.dir}"
            debug="on"
            failonerror="true"
