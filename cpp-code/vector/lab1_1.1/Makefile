@@ -14,7 +14,7 @@ CFLAGS=-std=c++11 -Wall
 	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f .depend *.o
+	rm -f .depend *.o hello
 
 .PHONY: clean
 
