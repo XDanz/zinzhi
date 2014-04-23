@@ -1,8 +1,8 @@
-# ./tests Make file
+# ./date/tests Make file
 CC = g++
 CFLAGS = -Wall -std=c++11 -I../../includes
 SRC = $(wildcard *.cpp)
-DIRS = test1 experiment
+DIRS = $(shell ls -d */)
 
 all: build test
 
