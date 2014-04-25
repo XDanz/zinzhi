@@ -1,0 +1,527 @@
+<?xml version="1.0"?>
+<project name="Buildfile for Additonal Test" default="compile" basedir=".">
+  <property environment="env"/>
+  <property name="confapi.dir"       value="${env.W}/lib/java_conf_api" />
+  <property name="jars.dir"          value="${confapi.dir}/build/jar" />
+  <property name="deps.dir"          value="${confapi.dir}/deps" />
+
+
+  <!-- <property name="conf.dir"         value="${env.W}/java/jar" /> -->
+  <!-- <property name="conf.jar"        value="${env.W}/lib/java_conf_api" /> -->
+
+  <property name="getopt.jar"      value="java-getopt-1.0.13.jar" />
+  <property name="getopt.jar"      value="java-getopt-1.0.13.jar" />
+
+
+  <property name="build.dir"       value="build" />
+  <property name="classes.dir"     value="${build.dir}/classes" />
+  <property name="src.dir"         value="src" />
+
+  <path id="jars-libs">
+    <fileset dir="${jars.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <path id="deps-libs">
+    <fileset dir="${deps.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="clean" description="Remove the ./build directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- Test target for debugging paths -->
+  <target name="print-path" description="debug">
+    <property name="myproperty" refid="confd-libs"/>
+    <echo message="${confd_dir}" />
+    <echo message="${conf-api-jar}" />
+    <property name="cp1" refid="compile-libs"/>
+    <echo message="compile-libs = ${cp1}" />
+    <property name="cp1" refid="confd-libs"/>
+    <echo message="confd-libs = ${cp2}" />
+  </target>
+
+  <target name="init"
+          description="Creates the ./build and ./build/classes directory" >
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${classes.dir}" />
+  </target>
+
+
+  <!-- Compile all test and support classes -->
+  <target name="compile"
+          description="Compile the source test codes"
+          depends="init">
+    <javac
+        includeantruntime="false"
+        srcdir="${src.dir}"
+        destdir="${classes.dir}"
+        debug="on"
+        includes="**/*.java"
+        debuglevel="lines,vars,source">
+      <classpath>
+        <path refid="jars-libs" />
+        <path refid="deps-libs" />
+        <path location="${getopt.jar}" />
+      </classpath>
+    </javac>
+    <copy tofile="${classes.dir}/log4j.xml" file="log4j.xml" />
+  </target>
+
+
+  <!-- Run the all the test cases  -->
+  <target name="test"
+          description="Run Tests -Dfrom(int) -Dto=(int)"
+          depends="compile">
+    <java
+        classname="com.tailf.test.maapi1.test"
+       fork="true"
+       failonerror="true">
+      <arg line="${from}" />
+      <arg line="${to}" />
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+  <!-- some extra test -->
+   <target name="extra"
+           description="Run Addtional Test 1"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.TestExtra"
+         failonerror="true"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+   <target name="test12"
+           description="Start of Test 12"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.Test12"
+         failonerror="true"
+         fork="true">
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+   <target name="testipv6"
+           description="IPv6 Probl"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.TestSetIPv6"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+   <target name="saveconfig"
+           description="SaveConfig -Darg"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.SaveConfig"
+         fork="true"
+         failonerror="true">
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+       <arg line = "${arg}" />
+     </java>
+   </target>
+
+   <target name="loadconfig"
+           description="LoadConfig"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.LoadConfig"
+         fork="true">
+       <arg line="${file}"  />
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+   <target name="rq"
+           description="Simple Navigation"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.Rq"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+       <arg line="${arg}" />
+     </java>
+   </target>
+
+
+
+   <target name="query"
+              description="DiffIterate test"
+              depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.TestQuery"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+   <target name="testmoved"
+           description="Moved"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.TestMoved"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+
+   </target>
+
+
+
+   <target name="testbinary"
+           description="Binary Test"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.TestBinary"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+       <jvmarg value="-Xdebug"/>
+       <!-- <jvmarg value="-Xrunjdwp:transport=dt_socket,address=9000,server=y,suspend=y"/> -->
+     </java>
+   </target>
+
+
+  <!--  <target name="testleafref"  -->
+  <!--          description="Test leaf ref" -->
+  <!--          depends="compile"> -->
+  <!--   <java  -->
+  <!--       classname="com.tailf.test.maapi1.SetInstanceIdentifier" -->
+  <!--       fork="true"> -->
+
+  <!--     <classpath> -->
+  <!--       <pathelement path="${classes.dir}"/> -->
+  <!--       <path refid="compile-libs" /> -->
+  <!--       <path refid="confd-libs" /> -->
+  <!--     </classpath> -->
+  <!--   </java> -->
+  <!-- </target> -->
+
+
+
+  <target name="test17"
+          description="Start of Test 12"
+          depends="compile">
+    <java
+        classname="com.tailf.test.maapi1.Test17"
+        fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=9000,server=y,suspend=y"/>
+    </java>
+  </target>
+
+   <target name="testpath"
+          description="Start of Test 12"
+          depends="compile">
+    <java
+        classname="com.tailf.test.maapi1.TestPath"
+        fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=9000,server=y,suspend=y"/>
+    </java>
+  </target>
+
+  <target name="test6"
+          description="xpath2path test run"
+          depends="compile">
+    <java
+        classname="com.tailf.test.maapi1.Test6"
+        fork="true">
+      <arg value="${level}" />
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="test13"
+          description="Start of Test 13"
+          depends="compile">
+    <java
+       classname="com.tailf.test.maapi1.Test13"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="testoref"
+          description="ObjectREf"
+          depends="compile">
+    <java
+        classname="com.tailf.test.maapi1.TestObjRef"
+        fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+      <!-- <jvmarg value="-Xdebug"/> -->
+      <!-- <jvmarg value="-Xrunjdwp:transport=dt_socket,address=9000,server=y,suspend=y"/> -->
+    </java>
+  </target>
+
+
+
+  <target name="getusersessions"
+          description="Start of Test 5"
+          depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.TestGetUserSessions"
+         fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+       <jvmarg value="-Xdebug"/>
+       <jvmarg value="-Xrunjdwp:transport=dt_socket,address=9000,server=y,suspend=y"/>
+     </java>
+
+   </target>
+
+  <target name="getcase"
+          description="Get case"
+          depends="compile">
+    <java
+       classname="com.tailf.test.maapi1.TestGetCase"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+   <target name="stuff"
+          description="Get case"
+          depends="compile">
+     <java
+        classname="com.tailf.test.maapi1.Stuff"
+        fork="true">
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+   <target name="test48"
+          description="Start of Test 13"
+          depends="compile">
+    <java
+       classname="com.tailf.test.maapi1.Test48"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+   </target>
+
+   <target name="test51"
+           description="Start of Test 51 (xpathEval()"
+           depends="compile">
+     <java
+        classname="com.tailf.test.maapi1.Test51"
+        fork="true">
+
+       <arg value="${expr}" />
+       <arg value="${ctx}" />
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+    <target name="testsetvalues"
+            description=" Test setValues"
+            depends="compile">
+      <java
+         classname="com.tailf.test.maapi1.TestSetValues"
+        fork="true">
+
+       <arg value="${level}" />
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+    <target name="testgetvalues"
+            description=" Test setValues"
+            depends="compile">
+      <java
+         classname="com.tailf.test.maapi1.TestGetValues"
+         fork="true">
+
+        <arg value="${level}" />
+        <classpath>
+          <pathelement path="${classes.dir}"/>
+          <path refid="compile-libs" />
+          <path refid="confd-libs" />
+        </classpath>
+      </java>
+    </target>
+
+
+
+    <target name="findnode"
+            description="Find a node"
+            depends="compile">
+      <java
+         classname="com.tailf.test.maapi1.FindInSchema"
+         fork="true">
+
+        <arg value="${tag}" />
+
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+    <target name="testsch"
+           description="Some schema testing.."
+           depends="compile">
+     <java
+        classname="com.tailf.test.maapi1.Testsch"
+        fork="true">
+
+       <arg value="${level}" />
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+
+ <target name="testsetobj"
+         description="Test maapi.setObject()"
+         depends="compile">
+     <java
+        classname="com.tailf.test.maapi1.TestSetObj"
+        fork="true">
+
+       <arg value="${level}" />
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="compile-libs" />
+         <path refid="confd-libs" />
+       </classpath>
+     </java>
+   </target>
+
+
+<!-- start the Callback demons -->
+   <target name="startcb"
+           description="Start the Action Callback deamon"
+           depends="compile">
+     <java
+         classname="com.tailf.test.maapi1.CallPointDeamon"
+         failonerror="true"
+         fork="true">
+       <classpath>
+         <pathelement path="${classes.dir}"/>
+         <path refid="jars-libs" />
+         <path refid="deps-libs" />
+       </classpath>
+     </java>
+   </target>
+</project>

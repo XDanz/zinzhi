@@ -1,0 +1,99 @@
+module buzz {
+  namespace "http://org.baz/buzz";
+  prefix "bzz";
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import mtest {
+    prefix mtest;
+  }
+  augment "/mtest:mtest/mtest:aggetest/mtest:serviceagge/mtest:agge/" +
+    "mtest:service-type-choice" {
+    case buzz-case {
+      container buzz {
+        container servers {
+          list server {
+            key "srv-name";
+            max-elements "64";
+            leaf srv-name {
+              type string;
+            }
+            leaf ip {
+              type inet:host;
+              mandatory true;
+            }
+            leaf port {
+              type inet:port-number;
+              default "80";
+            }
+            container foo {
+              leaf bar {
+                type int64;
+                default "42";
+              }
+              leaf baz {
+                type int64;
+                default "7";
+              }
+            }
+            list interface {
+              key "if-name";
+              max-elements "8";
+              leaf if-name {
+                type string;
+              }
+              leaf mtu {
+                type int64;
+                default "1500";
+              }
+            }
+          }
+        }
+        container stats {
+          config false;
+          tailf:cdb-oper;
+          list sutate {
+            key "srv-name";
+            leaf srv-name {
+              type string;
+            }
+            leaf ip {
+              type inet:host;
+              mandatory true;
+            }
+            leaf port {
+              type inet:port-number;
+              default "80";
+            }
+            container spink {
+              leaf bar {
+                type int64;
+                default "42";
+              }
+              leaf baz {
+                type int64;
+                default "7";
+              }
+            }
+            list interface {
+              key "if-name";
+              max-elements "8";
+              leaf if-name {
+                type string;
+              }
+              leaf mtu {
+                type int64;
+                default "1500";
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
