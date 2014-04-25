@@ -1,0 +1,173 @@
+TAIL-F-TEST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    TimeTicks, Counter32, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp, RowStatus, TruthValue,
+    MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+
+tailfTestMIB MODULE-IDENTITY
+    LAST-UPDATED "9511090000Z"
+    ORGANIZATION "Tail-F Systems AB"
+    CONTACT-INFO
+            "        Ola Samuelsson
+             E-mail: ola@tail-f.com"
+    DESCRIPTION
+            "Basic test objects for CONFD-SNMP integration."
+    REVISION      "9304010000Z"
+    DESCRIPTION
+            "First version."
+    ::= { enterprises 24961 1 }
+
+
+
+-- Administrative assignments ++++---------------------------------
+
+tailfTestMIBObjects	OBJECT IDENTIFIER ::= { tailfTestMIB 1 }
+tailfTestMIBConformance OBJECT IDENTIFIER ::= { tailfTestMIB 2 }
+
+-- ----------------------------------------------------------------
+
+
+-- The Servers group
+--
+
+simpleVariables   OBJECT IDENTIFIER ::= { tailfTestMIBObjects 1 }
+simpleTables      OBJECT IDENTIFIER ::= { tailfTestMIBObjects 2 }
+
+
+
+--
+-- The serverTable contains a database of servers
+--
+
+serverTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF ServerEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The table of servers."
+    ::= { simpleTables 1 }
+
+serverEntry OBJECT-TYPE
+    SYNTAX       ServerEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a server."
+    INDEX       { serverName }
+    ::= { serverTable 1 }
+
+ServerEntry ::= SEQUENCE { 
+    serverName		       DisplayString,
+    serverIP		       IpAddress,
+    serverPortNumber           INTEGER (0..65535),
+    serverMacAddress           MacAddress,
+    serverObjectId	       OBJECT IDENTIFIER,
+    serverPrefixMask           OCTET STRING,
+    serverRowStatus	       RowStatus
+}
+
+serverName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique index value 2 of a row in this table."
+    ::= { serverEntry 1 }
+
+serverIP OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The IP Address of this server."	
+    ::= { serverEntry 2 }
+
+serverPortNumber OBJECT-TYPE
+    SYNTAX       INTEGER (0..65535)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The port number."
+    ::= { serverEntry 3 }
+
+serverMacAddress     OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION    "The Mac address"
+    ::= { serverEntry 4 }
+
+serverObjectId     OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION    "The object identifier"
+    ::= { serverEntry 5 }
+
+serverPrefixMask    OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION    "The prefix mask"
+    ::= { serverEntry 6 }
+
+serverRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The status of this conceptual row in the serverTable."
+    ::= { serverEntry 7 }
+
+
+
+-- Conformance ----------------------------------------------------
+tailfTestMIBCompliances OBJECT IDENTIFIER ::= { tailfTestMIBConformance 1 }
+tailfTestMIBGroups      OBJECT IDENTIFIER ::= { tailfTestMIBConformance 2 }
+
+
+-- compliance statements
+
+tailfTestMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMPv2 entities which
+            implement the SNMPv2 MIB."
+    MODULE  -- this module
+        -- MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+        --                   snmpBasicNotificationsGroup }
+
+        GROUP   serversGroup
+        DESCRIPTION
+            "This group is mandatory for SNMPv2 entities which
+            support community-based authentication."
+
+    ::= { tailfTestMIBCompliances 2 }
+
+
+-- units of conformance
+
+serversGroup OBJECT-GROUP
+    OBJECTS { --serverTable: serverName
+              serverIP,
+	      serverPortNumber,
+	      serverMacAddress,
+	      serverObjectId,
+	      serverPrefixMask,
+	      serverRowStatus	      
+	     }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic instrumentation and
+            control of Servers."
+    ::= { tailfTestMIBGroups 1 }
+
+
+END

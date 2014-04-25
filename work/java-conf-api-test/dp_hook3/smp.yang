@@ -1,0 +1,61 @@
+module smp {
+  namespace "http://tail-f.com/test/smp";
+  prefix smp;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  leaf diff-set {
+    tailf:hidden full;
+    type string;
+  }
+
+
+  container servers {
+    tailf:callpoint simplecp {
+      tailf:transaction-hook subtree {
+        tailf:invocation-mode per-transaction;
+      }
+    }
+
+    leaf flag {
+      type int32;
+      default 0;
+    }
+
+
+    list server {
+      key name;
+      max-elements 64;
+      leaf name {
+        type string;
+      }
+
+      container top {
+        leaf zz { type string;}
+        choice xxx {
+          case xxx {
+            leaf haha {type string;}
+          }
+          case b {
+            leaf bbb {type string;}
+            leaf bb {type string;}
+          }
+        }
+      }
+
+      container top2 {
+        leaf bbb {type string;}
+        leaf bb {type string;}
+      }
+
+
+    }
+  }
+}
+
+

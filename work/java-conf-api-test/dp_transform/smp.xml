@@ -1,0 +1,11 @@
+
+   <servers_cdb xmlns="http://tail-f.com/test/smp">
+      <server>
+        <name>www</name>
+        <ip>2.3.4.5</ip>
+        <port>66</port>
+        <macaddr>00:12:3f:7d:b0:32</macaddr>
+        <snmpref>1.2</snmpref>
+        <prefixmask>22</prefixmask>
+      </server>
+    </servers_cdb>

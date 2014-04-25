@@ -1,0 +1,173 @@
+aaa authentication users user admin
+ uid        1000
+ gid        100
+ password   $1$fB$0w68PmacQ4VmE3/M3nK3Ug==
+ ssh_keydir /var/confd/homes/admin/.ssh
+ homedir    /var/confd/homes/admin
+!
+aaa authentication users user dummy
+ uid        1000
+ gid        100
+ password   $1$Ft$9zTEc79NWFE0E8v7I2RxVQ==
+ ssh_keydir /var/confd/homes/public/.ssh
+ homedir    /var/confd/homes/public
+!
+aaa authentication users user oper
+ uid        1000
+ gid        100
+ password   $1$S6$brGZW9wSDifHoU7Rf5KSHA==
+ ssh_keydir /var/confd/homes/oper/.ssh
+ homedir    /var/confd/homes/oper
+!
+aaa authentication users user private
+ uid        1000
+ gid        100
+ password   $1$L4$YcCoIivO4mrzoj8vCrEjlw==
+ ssh_keydir /var/confd/homes/private/.ssh
+ homedir    /var/confd/homes/private
+!
+aaa authentication users user public
+ uid        1000
+ gid        100
+ password   $1$Ft$9zTEc79NWFE0E8v7I2RxVQ==
+ ssh_keydir /var/confd/homes/public/.ssh
+ homedir    /var/confd/homes/public
+!
+aaa authentication groups group admin
+ users "admin private"
+!
+aaa authentication groups group oper
+ users "oper public"
+!
+aaa authorization cmdrules cmdrule 1
+ context netconf
+ command edit-config
+ group   oper
+ ops     x
+ action  reject
+!
+aaa authorization cmdrules cmdrule 2
+ context netconf
+ command delete
+ group   oper
+ ops     x
+ action  reject
+!
+aaa authorization cmdrules cmdrule 3
+ context netconf
+ command *
+ group   admin
+ ops     rx
+ action  accept
+!
+aaa authorization cmdrules cmdrule 150
+ context cli
+ command *
+ group   *
+ ops     rx
+ action  accept
+!
+aaa authorization datarules datarule 101
+ namespace http://tail-f.com/ns/aaa/1.1
+ context   *
+ keypath   /
+ group     oper
+ ops       w
+ action    reject
+!
+aaa authorization datarules datarule 203
+ namespace *
+ context   *
+ keypath   *
+ group     *
+ ops       rwx
+ action    accept
+!
+system computer fred
+!
+mtest ilist [ 1 2 3 ]
+mtest slist [ The Grey Fox ]
+mtest firstname George
+mtest a_number 42
+mtest b_number 7
+mtest types c_int8 77
+mtest types c_int16 77
+mtest types c_int32 77
+mtest types c_int64 77
+mtest types c_uint8 77
+mtest types c_uint16 77
+mtest types c_uint32 77
+mtest types c_uint64 77
+mtest types b true
+mtest types f 4.660000000000000
+mtest types c_ipv4 1.2.3.4
+mtest types c_ipv6 fe80::
+mtest types datetime 2001-10-16T21:32:52+02:00
+mtest types date 2001-10-26+02:00
+mtest types gyearmonth 2001-10Z
+mtest types gyear 2001Z
+mtest types time 21:32:52
+mtest types gday ---01
+mtest types gmonthday --05-01
+mtest types gmonth --01
+mtest types duration 1Y
+mtest types enum 15-mins
+mtest types objectref "/mtest/servers/server[name=\"smtp\"]/ip"
+mtest types bits turboMode
+mtest types ipv4Prefix 192.168.0.0/16
+mtest types ipv6Prefix 2001:db8::1428:57a8/125
+mtest indexes index 1
+ port 110
+!
+mtest indexes index 2
+ port 110
+!
+mtest indexes index 8
+ port 110
+!
+mtest movables movable 1 2
+!
+mtest servers server smtp
+ ip   192.168.128.1
+ port 25
+ foo bar 42
+ foo baz 7
+!
+mtest servers server www
+ ip   1.2.3.4
+ port 6666
+ foo bar 42
+ foo baz 7
+ interface eth0
+  mtu 1500
+ !
+ interface eth1
+  mtu 1500
+ !
+!
+mtest servers server x100
+ ip   1.2.3.4
+ port 80
+ foo bar 42
+ foo baz 7
+ interface eth0
+  mtu 1500
+ !
+ interface eth1
+  mtu 1500
+ !
+!
+mtest servers server xx
+ ip 1.1.1.1
+!
+mtest dks dk zapp 66.77.7.7
+ luckyday 1990-05-05
+!
+mtest ints int 3
+ type  a
+ color green
+!
+mtest ints int 5
+ type  b
+ color blue
+!

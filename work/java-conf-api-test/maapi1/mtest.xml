@@ -1,0 +1,121 @@
+    <mtest:mtest xmlns:mtest="http://tail-f.com/test/mtest/1.0">
+      <mtest:ilist>123</mtest:ilist>
+      <mtest:slist>The Grey Fox</mtest:slist>
+      <mtest:firstname>George</mtest:firstname>
+      <mtest:a_number>42</mtest:a_number>
+      <mtest:b_number>7</mtest:b_number>
+      <mtest:indexes>
+        <mtest:index>
+          <mtest:x>1</mtest:x>
+        </mtest:index>
+        <mtest:index>
+          <mtest:x>2</mtest:x>
+        </mtest:index>
+        <mtest:index>
+          <mtest:x>8</mtest:x>
+        </mtest:index>
+      </mtest:indexes>
+      <mtest:movables>
+        <mtest:movable>
+          <mtest:a>1</mtest:a>
+          <mtest:b>2</mtest:b>
+        </mtest:movable>
+      </mtest:movables>
+      <mtest:servers>
+        <mtest:server>
+          <mtest:name>smtp</mtest:name>
+          <mtest:ip>192.168.128.1</mtest:ip>
+          <mtest:port>25</mtest:port>
+          <mtest:foo>
+            <mtest:bar>42</mtest:bar>
+            <mtest:baz>7</mtest:baz>
+          </mtest:foo>
+        </mtest:server>
+        <mtest:server>
+          <mtest:name>www</mtest:name>
+          <mtest:ip>1.2.3.4</mtest:ip>
+          <mtest:port>80</mtest:port>
+          <mtest:foo>
+            <mtest:bar>42</mtest:bar>
+            <mtest:baz>7</mtest:baz>
+          </mtest:foo>
+          <mtest:interface>
+            <mtest:name>eth0</mtest:name>
+            <mtest:mtu>1500</mtest:mtu>
+          </mtest:interface>
+          <mtest:interface>
+            <mtest:name>eth1</mtest:name>
+            <mtest:mtu>1500</mtest:mtu>
+          </mtest:interface>
+        </mtest:server>
+        <mtest:server>
+          <mtest:name>x100</mtest:name>
+          <mtest:ip>1.2.3.4</mtest:ip>
+          <mtest:port>80</mtest:port>
+          <mtest:foo>
+            <mtest:bar>42</mtest:bar>
+            <mtest:baz>7</mtest:baz>
+          </mtest:foo>
+          <mtest:interface>
+            <mtest:name>eth0</mtest:name>
+            <mtest:mtu>1500</mtest:mtu>
+          </mtest:interface>
+          <mtest:interface>
+            <mtest:name>eth1</mtest:name>
+            <mtest:mtu>1500</mtest:mtu>
+          </mtest:interface>
+        </mtest:server>
+      </mtest:servers>
+      <mtest:dks>
+        <mtest:dk>
+          <mtest:name>zapp</mtest:name>
+          <mtest:ip>66.77.7.7</mtest:ip>
+          <mtest:luckyday>1990-05-05</mtest:luckyday>
+        </mtest:dk>
+      </mtest:dks>
+      <mtest:forest/>
+      <mtest:types>
+        <mtest:c_int8>77</mtest:c_int8>
+        <mtest:c_int16>77</mtest:c_int16>
+        <mtest:c_int32>77</mtest:c_int32>
+        <mtest:c_int64>77</mtest:c_int64>
+
+        <mtest:c_uint8>77</mtest:c_uint8>
+        <mtest:c_uint16>77</mtest:c_uint16>
+        <mtest:c_uint32>77</mtest:c_uint32>
+        <mtest:c_uint64>77</mtest:c_uint64>
+
+        <mtest:b>true</mtest:b>
+        <mtest:f>4.66</mtest:f>
+
+        <mtest:c_ipv4>1.2.3.4</mtest:c_ipv4>
+        <mtest:c_ipv6>fe80::</mtest:c_ipv6>
+        <mtest:datetime>2001-10-16T21:32:52+02:00</mtest:datetime>
+        <mtest:date>2001-10-26+02:00</mtest:date>
+        <!-- <mtest:gyearmonth>2001-10+00:00</mtest:gyearmonth> -->
+        <!-- <mtest:gyear>2001Z</mtest:gyear> -->
+        <mtest:time>21:32:52</mtest:time>
+        <!-- <mtest:gday>---01</mtest:gday> -->
+        <!-- <mtest:gmonthday>--05-01</mtest:gmonthday> -->
+        <!-- <mtest:gmonth>--01</mtest:gmonth> -->
+        <mtest:duration>P1Y</mtest:duration>
+        <mtest:enum>15-mins</mtest:enum>
+        <mtest:objectref>/mtest/servers/server[name="smtp"]/ip</mtest:objectref>
+        <mtest:bits>turboMode</mtest:bits>
+        <mtest:ipv4Prefix>192.168.0.0/16</mtest:ipv4Prefix>
+        <mtest:ipv6Prefix>2001:DB8::1428:57A8/125</mtest:ipv6Prefix>
+      </mtest:types>
+      <mtest:ints>
+        <mtest:int>
+          <mtest:i>3</mtest:i>
+          <mtest:type>a</mtest:type>
+          <mtest:color>green</mtest:color>
+        </mtest:int>
+        <mtest:int>
+          <mtest:i>5</mtest:i>
+          <mtest:type>b</mtest:type>
+          <mtest:color>blue</mtest:color>
+        </mtest:int>
+      </mtest:ints>
+    </mtest:mtest>
+

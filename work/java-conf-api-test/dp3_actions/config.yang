@@ -1,0 +1,101 @@
+
+module config {
+  namespace "http://tail-f.com/config";
+  prefix config;
+  tailf:id "";
+
+  import tailf-common {
+    prefix tailf;
+  }
+
+  container config {
+    container system {
+      leaf sysName {
+        type string;
+        default tst;
+      }
+      tailf:action reboot {
+        tailf:actionpoint reboot-point;
+        input {
+        }
+        output {
+        }
+      }
+      tailf:action restart {
+        tailf:actionpoint reboot-point;
+        input {
+          leaf mode {
+            type string;
+            mandatory true;
+          }
+          leaf debug {
+            type empty;
+          }
+          container foo {
+            presence "";
+            leaf debug {
+              type empty;
+            }
+          }
+        }
+        output {
+          leaf time {
+            type string;
+            mandatory true;
+          }
+        }
+      }//restart
+
+      tailf:action actiontest2{
+        tailf:actionpoint test2-point;
+        input {
+          container cont1{
+            list lista1{
+              leaf ll1{
+                type string;
+              }
+            }
+          }
+        }
+        output{
+          choice choice1{
+            container outc1{
+              leaf leaf1{
+                type string;
+              }
+            }
+            container outc2{
+              leaf leaf2{
+                type string;
+              }
+            }
+          }
+        }
+      }
+
+
+    }//system
+    list server {
+      key name;
+      max-elements 64;
+      leaf name {
+        type string;
+      }
+      tailf:action reset {
+        tailf:actionpoint reboot-point;
+        input {
+          leaf when {
+            type string;
+            mandatory true;
+          }
+        }
+        output {
+          leaf time {
+            type string;
+            mandatory true;
+          }
+        }
+      }
+    }
+  }
+}

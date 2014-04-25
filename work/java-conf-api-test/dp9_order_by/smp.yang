@@ -1,0 +1,44 @@
+module smp {
+    namespace "http://tail-f.com/test/smp";
+    prefix smp;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+    import tailf-common {
+        prefix tailf;
+    }
+
+
+/*    A set of server structures  */
+    container servers {
+        tailf:callpoint simplecp {
+            tailf:opaque "OPAQUE_TEST_DATA_CB";
+        }
+        list server {
+                tailf:action reboot {
+                        tailf:actionpoint reboot-point {
+                                tailf:opaque "OPAQUE_TEST_ACTION_CB";
+                        }
+                }
+            ordered-by user;
+            key name;
+            max-elements 64;
+            leaf name {
+                type string;
+            }
+            leaf ip {
+                type inet:ip-address;
+                mandatory true;
+            }
+            leaf port {
+                tailf:validate valp {
+                        tailf:opaque "OPAQUE_TEST_VALPOINT_CB";
+                }
+                type inet:port-number;
+                mandatory true;
+            }
+        }
+    }
+}
+

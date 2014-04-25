@@ -1,0 +1,125 @@
+[doc check operation move on ConfInternal.diffIterate with SelectionKey ]
+[config require=MAKE]
+[global fail_pattern=[Ee][Rr][Rr][Oo][Rr]]
+# [include common.luxinc]
+
+# [invoke start-confd-noipc]
+
+# [shell output]
+#      !$MAKE jstart
+#      !echo ==$$?==
+#      ?Connect\(\"2phase\"\) --> OK
+
+[shell cli]
+    !confd_cli -u admin
+    ?admin connected from
+    ?admin@.*>
+    !configure
+
+    !delete zconfigzub buzz-interfaces buzz servers server daniel0
+    ?\[ok\]
+    !commit
+
+    ?\[ok\]
+    !set zconfigzub buzz-interfaces buzz servers server daniel0
+    ?\[ok\]
+
+    !commit
+    ?\[ok\]
+
+
+# [shell output]
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0} --> MOP_CREATED
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/srv-name --> MOP_VALUE_SET
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/srv-name --> from null to test
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/ip --> MOP_VALUE_SET
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/ip --> from null to 1.2.3.4
+#     ?4/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/port --> MOP_VALUE_SET
+#     ?4/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/port --> from null to 0
+#     ?5/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/foo/bar --> MOP_VALUE_SET
+#     ?5/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/foo/bar --> from null to 42
+#     ?6/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/foo/baz --> MOP_VALUE_SET
+#     ?6/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0}/foo/baz --> from null to 7
+
+# [shell cli]
+#     !set zconfigzub buzz-interfaces buzz servers-3keys server test 1.2.3.4 1
+#     ?\[ok\]
+#     !commit
+
+# [shell output]
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1} --> MOP_CREATED
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/srv-name --> MOP_VALUE_SET
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/srv-name --> from null to test
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/ip --> MOP_VALUE_SET
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/ip --> from null to 1.2.3.4
+#     ?4/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/port --> MOP_VALUE_SET
+#     ?4/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/port --> from null to 1
+#     ?5/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/foo/bar --> MOP_VALUE_SET
+#     ?5/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/foo/bar --> from null to 42
+#     ?6/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/foo/baz --> MOP_VALUE_SET
+#     ?6/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1}/foo/baz --> from null to 7
+
+# [shell cli]
+#     !set zconfigzub buzz-interfaces buzz servers-3keys server test 1.2.3.4 2
+#     ?\[ok\]
+#     !commit
+
+# [shell output]
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2} --> MOP_CREATED
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/srv-name --> MOP_VALUE_SET
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/srv-name --> from null to test
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/ip --> MOP_VALUE_SET
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/ip --> from null to 1.2.3.4
+#     ?4/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/port --> MOP_VALUE_SET
+#     ?4/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/port --> from null to 2
+#     ?5/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/foo/bar --> MOP_VALUE_SET
+#     ?5/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/foo/bar --> from null to 42
+#     ?6/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/foo/baz --> MOP_VALUE_SET
+#     ?6/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2}/foo/baz --> from null to 7
+
+# [shell cli]
+#     !show zconfigzub buzz-interfaces buzz servers-3keys server
+#     """?
+#     server test 1\.2\.3\.4 0\;
+#     server test 1\.2\.3\.4 1\;
+#     server test 1\.2\.3\.4 2\;
+#     """
+#     !move zconfigzub buzz-interfaces buzz servers-3keys server test 1.2.3.4 2 first
+#     ?\[ok\]
+#     !commit
+
+# [shell output]
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2} --> MOP_MOVED_AFTER
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2} --> from null to null
+
+# [shell cli]
+#     !move zconfigzub buzz-interfaces buzz servers-3keys server test 1.2.3.4 1 before test 1.2.3.4 0
+#     ?\[ok\]
+#     !commit
+
+# [shell output]
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1} --> MOP_MOVED_AFTER
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1} --> from null to {test 1.2.3.4 2}
+
+# [shell cli]
+#     !show zconfigzub buzz-interfaces buzz servers-3keys server
+#     """?
+#     server test 1\.2\.3\.4 2\;
+#     server test 1\.2\.3\.4 1\;
+#     server test 1\.2\.3\.4 0\;
+#     """
+#     ?\[ok\]
+#     !delete zconfigzub buzz-interfaces buzz servers-3keys server
+#     ?\[ok\]
+#     !commit
+
+# [shell output]
+#     ?1/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 2} --> MOP_DELETED
+#     ?2/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 1} --> MOP_DELETED
+#     ?3/zb:zconfigzub/buzz-interfaces/buzz/servers-3keys/server{test 1.2.3.4 0} --> MOP_DELETED
+
+
+
+# [cleanup]
+#     [invoke stop-confd-noipc]
+#     [include ../include/confd_errchk.luxinc]

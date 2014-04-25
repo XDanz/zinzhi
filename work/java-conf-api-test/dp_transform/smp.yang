@@ -1,0 +1,79 @@
+module smp {
+    namespace "http://tail-f.com/test/smp";
+    prefix smp;
+    import ietf-yang-types {
+        prefix yang;
+    }
+    import ietf-inet-types {
+        prefix inet;
+    }
+    import tailf-common {
+        prefix tailf;
+    }
+    import tailf-xsd-types {
+        prefix xs;
+    }
+/*    A set of server structures  */
+    container servers {
+        tailf:callpoint simplecp {
+            tailf:transform true;
+        }
+        list server {
+            key name;
+            max-elements 64;
+            leaf name {
+                type string;
+            }
+            leaf ip {
+                type inet:ip-address;
+                mandatory true;
+            }
+            leaf port {
+                type inet:port-number;
+                mandatory true;
+            }
+            leaf macaddr {
+                type tailf:hex-list;
+                mandatory true;
+            }
+            leaf snmpref {
+                type yang:object-identifier;
+                mandatory true;
+            }
+            leaf prefixmask {
+                type tailf:octet-list;
+                mandatory true;
+            }
+        }
+    }
+    container servers_cdb {
+        list server {
+            key name;
+            max-elements 64;
+            leaf name {
+                type string;
+            }
+            leaf ip {
+                type inet:ip-address;
+                mandatory true;
+            }
+            leaf port {
+                type inet:port-number;
+                mandatory true;
+            }
+            leaf macaddr {
+                type tailf:hex-list;
+                mandatory true;
+            }
+            leaf snmpref {
+                type yang:object-identifier;
+                mandatory true;
+            }
+            leaf prefixmask {
+                type tailf:octet-list;
+                mandatory true;
+            }
+        }
+
+    }
+}

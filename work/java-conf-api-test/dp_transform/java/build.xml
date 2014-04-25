@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+
+<project name="Buildfile for Dp 1 Test"
+         default="compile" basedir=".">
+  <property environment="env"/>
+  <property name="confd_dir"       value="${env.CONFD_DIR}" />
+  <property name="lib.dir"         value="${env.CONFD_DIR}/java/jar" />
+
+  <property name="conf-api-jar"    value="${confd_dir}/java/jar/conf-api.jar" />
+  <property name="log4j.jar"       value="${confd_dir}/java/jar/log4j-1.2.16.jar" />
+  <property name="build.dir"       value="build" />
+  <property name="confd.jar.dir"   value="${env.CONFD_DIR}/java/jar" />
+  <property name="classes.dir"     value="${build.dir}/classes" />
+  <property name="src.dir"         value="src" />
+
+  <path id="compile-libs">
+    <fileset dir="${lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <path id="confd-libs">
+    <fileset dir="${confd.jar.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="clean" description="Remove the ./build directory">
+    <delete dir="${build.dir}"/>
+    <delete file="src/com/tailf/test/dp1/namespaces/smp.java" />
+  </target>
+
+  <target name="print-path" description="debug">
+    <property name="myproperty" refid="confd-libs"/>
+
+    <echo message="${confd_dir}" />
+    <echo message="${conf-api-jar}" />
+
+    <property name="cp1" refid="compile-libs"/>
+    <echo message="compile-libs = ${cp1}" />
+
+    <property name="cp1" refid="confd-libs"/>
+    <echo message="confd-libs = ${cp2}" />
+
+
+  </target>
+
+  <target name="init"
+          description="Creates the ./build and ./build/classes directory" >
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${classes.dir}" />
+  </target>
+
+
+  <!-- Compile all test classes -->
+  <target name="compile"
+          description="Compile the source test codes"
+          depends="init">
+
+    <javac
+       includeantruntime="false"
+       srcdir="${src.dir}"
+       destdir="${classes.dir}"
+       includes="**/*.java"
+       debuglevel="lines,vars,source"
+       >
+      <classpath>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </javac>
+
+    <copy tofile="${classes.dir}/log4j.properties" file="log4j.properties" />
+
+  </target>
+
+
+
+
+  <!-- Run the test cases  -->
+  <target name="test" description="Run Tests -Dfrom(int) -Dto=(int)"
+          depends="compile">
+    <java
+       classname="com.tailf.test.dp1.test"
+       fork="true">
+      <arg line="${from}" />
+      <arg line="${to}" />
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+
+
+      </classpath>
+    </java>
+  </target>
+
+
+  <target name="reqmath" description="Test the invocation of action RT:7095"
+          depends="compile">
+    <java
+       classname="com.tailf.test.dp.action.SimpleActionRequestMath"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="test1"
+          description="Start of Test 1"
+          depends="compile">
+    <java
+       classname="com.tailf.test.dp1.Test1"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+
+  <target name="test2"
+          description="Start of Test 2"
+          depends="compile">
+    <java
+       classname="com.tailf.test.dp1.Test2"
+       fork="true">
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="test13"
+          description="Start of Test 13"
+          depends="compile">
+    <java
+       classname="com.tailf.test.maapi1.Test13"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="getcase"
+          description="Get case"
+          depends="compile">
+    <java
+       classname="com.tailf.test.maapi1.TestGetCase"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+
+   <target name="startcb"
+           description="Start the Action Callback deamon"
+           depends="compile">
+    <java
+        classname="com.tailf.test.dp.transform.SimpleTransform"
+       fork="true">
+
+      <classpath>
+        <pathelement path="${classes.dir}"/>
+        <path refid="compile-libs" />
+        <path refid="confd-libs" />
+      </classpath>
+    </java>
+  </target>
+
+
+
+
+</project>
