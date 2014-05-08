@@ -6,9 +6,17 @@ import java.util.ArrayList;
 import java.net.Socket;
 import java.net.InetAddress;
 
+import java.io.IOException;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.tailf.cdb.Cdb;
 import com.tailf.cdb.CdbSession;
 import com.tailf.cdb.CdbDBType;
+import com.tailf.cdb.CdbTxId;
+
+
 import com.tailf.conf.ConfIP;
 import com.tailf.conf.ConfNoExists;
 import com.tailf.conf.ConfXMLParamValue;
@@ -22,6 +30,8 @@ import com.tailf.conf.ConfBuf;
 import com.tailf.conf.ConfObject;
 import com.tailf.conf.ConfPath;
 import com.tailf.conf.ConfHaNode;
+import com.tailf.conf.ConfException;
+
 import com.tailf.notif.HaNotification;
 import com.tailf.notif.NotificationType;
 
@@ -35,9 +45,8 @@ public class HAController {
 
     private static HAController haControllerInstance;
     private HAConfiguration configurationData;
-    private HAStatus status;
     private ExecutorService pool = 
-        ExecutorService.newSingleThreadExecutor();
+        Executors.newSingleThreadExecutor();
     
 
 
@@ -53,11 +62,15 @@ public class HAController {
     }
 
     private HAController () throws Exception {
+        log.debug ( " xxx initializing HAController xxx ");
+
         this.configurationData = this.readInitData();
+        this.configurationData.recognizeNodeByInterfaces();
 
         // start the HA Acceptor thread 
         final HANode localHaNode = this.configurationData.getLocalHANode ( );
-
+        log.info ( " localHaNode:" + localHaNode );
+        log.info ( " starting acceptor ");
         pool.execute (  new Runnable () {
                 HAControllerAcceptor acceptor = null;
                 public void run () {
@@ -66,7 +79,7 @@ public class HAController {
                             new HAControllerAcceptor ( localHaNode.getPort() );
                     } catch ( Exception e ) {
                         log.error("",e );
-                        acceptor.excutionService().shutDownNow();
+                        acceptor.executorService().shutdownNow();
                     }
                 }
             }
@@ -77,8 +90,9 @@ public class HAController {
         HANode remoteHaNode = this.configurationData.getRemoteHANode();
         
         HAControllerSender sender = 
-            new HAControllerSender ( remoteNode.getAddress() , 
-                                     remoteNode.getPort());
+            new HAControllerSender ( remoteHaNode.getAddress().
+                                     getAddress(), 
+                                     remoteHaNode.getPort());
 
         boolean exception = false;
         try {
@@ -104,7 +118,7 @@ public class HAController {
 
             } else if ( haResponse.equals("none")) {
 
-                if ( localNode.isPreferredMaster() ) {
+                if ( localHaNode.isPreferredMaster() ) {
                     try {
                         localBeMaster() ;
                     } catch ( Exception e ) {
@@ -163,6 +177,7 @@ public class HAController {
     }
 
     public HAConfiguration readInitData() throws Exception {
+        log.debug ( " readInitData() => ");
         NcsMain ncsMain = NcsMain.getInstance();
         Socket sock = new Socket (ncsMain.getNcsHost(),
                                   ncsMain.getNcsPort());
@@ -196,7 +211,7 @@ public class HAController {
         for  (int i = 0; i < n; i++ ) {
 
             inParam.add  ( new ConfXMLParamLeaf("thc", "name"));
-            inParam.add  ( new ConfXMLParamLeaf("thc", "preferred-master"));
+            // inParam.add  ( new ConfXMLParamLeaf("thc", "preferred-master"));
             inParam.add  ( new ConfXMLParamLeaf("thc", "ip-address"));
             inParam.add  ( new ConfXMLParamLeaf("thc", "port"));
 
@@ -214,9 +229,6 @@ public class HAController {
             ConfXMLParamValue valueName =
                 (ConfXMLParamValue)outParam[indx++];
 
-            ConfXMLParamValue valuePreferredMaster = 
-                (ConfXMLParamValue)outParam[indx++];
-
             ConfXMLParamValue valueIPAddress =
                 (ConfXMLParamValue)outParam[indx++];
 
@@ -225,10 +237,15 @@ public class HAController {
 
             ConfIP ipAddress = (ConfIP)valueIPAddress.getValue();
 
-            boolean preferredMaster = true;
-            if ( valuePreferredMaster.getValue() instanceof ConfNoExists ) {
-                preferredMaster = false;
-            }
+            boolean preferredMaster = false;
+            ConfPath prefMasterPath = 
+                new ConfPath ("/thc:ha-controller/ha-nodes/ha-node[" + i + 
+                              "]/preferred-master");
+                
+            log.info ( " path :" + prefMasterPath );
+            if ( session.exists(prefMasterPath ) ) {
+                    preferredMaster = true;
+                }
             int port = (int)((ConfUInt16)valuePort.getValue()).longValue();
 
             haNodes.add ( new HANode ( valueName.getValue().toString(),
@@ -240,7 +257,7 @@ public class HAController {
 
         session.endSession();
         sock.close();
-
+        log.debug ( " readInitData() => ok");
         return new HAConfiguration ( haNodes , secretToken.toString(),
                                      virtualIPs );
     }
@@ -303,7 +320,7 @@ public class HAController {
         return ha;
     }
 
-    private CdbTxId getCurrenTxId () throws ConfException , IOException {
+    private CdbTxId getCurrentTxId () throws Exception {
         Cdb cdb = new Cdb ( "Get-TX", getSocket2Ncs() );
         CdbTxId txId = cdb.getTxId();
         return txId;

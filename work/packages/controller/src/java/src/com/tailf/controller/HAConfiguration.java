@@ -9,9 +9,11 @@ import java.net.InterfaceAddress;
 import java.net.SocketException;
 
 import com.tailf.conf.ConfBuf;
+import org.apache.log4j.Logger;
 
 public class HAConfiguration {
-
+    private static final Logger log = 
+        Logger.getLogger ( Logger.class);
     private List<HANode> haNodes;
     private String secretToken;
     private List<InetAddress> virutalIPAddresses;
@@ -35,8 +37,9 @@ public class HAConfiguration {
             throw new HAControllerDeterminationException ();
         }
         HANode haNode = null;
+
         for ( HANode node : haNodes ) {
-            if ( haNode.isLocal() ) {
+            if ( node.isLocal() ) {
                 haNode = node;
             }
         }
@@ -50,7 +53,7 @@ public class HAConfiguration {
 
         HANode haNode = null;
         for ( HANode node : haNodes ) {
-            if ( !haNode.isLocal() ) {
+            if ( !node.isLocal() ) {
                 haNode = node;
             }
         }
@@ -74,15 +77,48 @@ public class HAConfiguration {
                 networkInterface.getInterfaceAddresses();
 
             for ( InterfaceAddress interfaceAddress : interfaceAddresses ) {
+                log.info( " interfaceAddresses:" + 
+                          interfaceAddress.getAddress() );
 
                 for ( HANode haNode : haNodes ) {
-                    if ( interfaceAddress.getAddress()
-                         .equals ( haNode.getAddress() )) {
+                    InetAddress haNodeAddr = 
+                        haNode.getAddress().getAddress();
+                    log.info  ( "haNodeAddr:" + haNodeAddr );
+
+                    InetAddress localAddress = 
+                        interfaceAddress.getAddress();
+                    log.info  ( "localAddress:" + localAddress );
+                    
+                    if ( inetAddressEquals (haNodeAddr, localAddress) ) {
                         haNode.setLocal();
                         this.determined = true;
+                        return;
                     }
+                    log.info (" not equal ");
+                    
                 }
             }
         }
+    }
+
+    public boolean inetAddressEquals ( InetAddress a , InetAddress b ) {
+        
+        boolean isEquals = true;
+        byte ba[] = a.getAddress();
+        byte bb[] = b.getAddress();
+        log.info ( "ba:" + java.util.Arrays.toString ( ba ) ) ;
+        log.info ( "bb:" + java.util.Arrays.toString ( bb ) ) ;
+        
+        if ( ba.length == bb.length ) {
+            for ( int i = 0; i <  ba.length; i++ ) {
+                if ( ba[i] != bb[i] ) {
+                    return false;
+                }
+            }
+        } else {
+            isEquals = false;
+        }
+        
+        return isEquals;
     }
 }

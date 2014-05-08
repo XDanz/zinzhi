@@ -72,13 +72,12 @@ public class HAControllerAcceptor {
             ServerSocket srvSock = new ServerSocket ();
             srvSock.setReuseAddress(true);
             srvSock.bind( 
-                         new InetSocketAddress ( "192.168.60.3", port));
+                         new InetSocketAddress ( "localhost", port));
 
+            log.info ( " Acceptor Started! ");
             for ( ;; ) {
                 this.pool.execute ( new RequestHandler ( srvSock.accept()) );
             }
-                                              
-            
             
         } catch (Throwable e) { 
             log.error("",e);

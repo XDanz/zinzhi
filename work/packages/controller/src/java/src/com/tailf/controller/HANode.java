@@ -24,7 +24,7 @@ public class HANode {
     }
 
     public void setLocal () {
-        this.isLocal = isLocal;
+        this.isLocal = true;
     }
 
     public boolean isPreferredMaster() {

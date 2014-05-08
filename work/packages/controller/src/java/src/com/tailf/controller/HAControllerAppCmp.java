@@ -20,8 +20,8 @@ public class HAControllerAppCmp implements ApplicationComponent {
     Notif notif = null;
     Socket notifSocket = null;
     public void init () throws Exception {
-        haController = HAControllerFactory.getController();
-        log.info(" ----- haController initialized ----- ");
+        log.info("\n ----- haController initializing  ----- ");
+        haController = HAController.getController();
 
         NcsMain ncsMain = NcsMain.getInstance();
         notifSocket = new Socket (ncsMain.getNcsHost(),
@@ -34,7 +34,7 @@ public class HAControllerAppCmp implements ApplicationComponent {
     }
 
     public void run () {
-        log.info (" ---- Running ---- ");
+        log.info ("\n ---- Running ---- ");
         try {
 
             while ( shouldRun ) {
@@ -52,6 +52,7 @@ public class HAControllerAppCmp implements ApplicationComponent {
     }
 
     public void finish() throws Exception {
+        log.info ("\n ---- Finish ---- ");
         shouldRun = false;
     }
 }
