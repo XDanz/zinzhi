@@ -1,0 +1,132 @@
+module tailf-ha-controller {
+  namespace "http://tail-f.com/ns/ha-controller";
+  prefix thc;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+
+  organization "Tail-f Systems";
+
+  description
+    "This module contains the configuration and operation data items
+     used by the High Availability controller package.
+
+     There are always exactly two nodes configured in a HA controller
+     system.  One node should be running as HA master (active), and
+     the other as HA slave (standby).
+
+     The HA controller serves two purposes.  The first purpose is to
+     replicate the database, from the master to the slave.  The other
+     purpose is to manage a set of virtual IP addresses.  The HA
+     controller ensures that these addresses are brought up on the
+     current master node.
+
+     The roles of the nodes must be manually assigned, by invoking the
+     actions 'be-master' and 'be-slave' on the respective nodes, both
+     at startup and on failover.";
+
+  revision 2013-11-12 {
+    description
+      "Released as part of NCS-3.0";
+  }
+
+  container ha-controller {
+    presence "Enable the HA controller";
+    tailf:info "HA Controller settings";
+    tailf:action "be-master" {
+      description
+        "Order this NCS instance to be HA master";
+      tailf:info "Order this NCS instance to be HA master";
+      tailf:actionpoint "hapoint";
+    }
+    tailf:action "be-slave" {
+      description
+        "Order this NCS instance to be HA slave with the other
+         configured HA node as master.";
+      tailf:info "Order this NCS instance to be HA slave";
+      tailf:actionpoint "hapoint";
+    }
+    tailf:action "be-none" {
+      description
+        "Order this NCS instance to resume the initial state, i.e.,
+         be neither master nor slave.";
+      tailf:info "Order this NCS instance to be neither master nor slave";
+      tailf:actionpoint "hapoint";
+    }
+    leaf ha-status {
+      type enumeration {
+        enum "unknown" {
+          value 0;
+        }
+        enum "none" {
+          value 1;
+        }
+        enum "slave" {
+          value 2;
+        }
+        enum "master" {
+          value 3;
+        }
+      }
+      config false;
+      description
+        "The HA status of a the node.";
+      tailf:info "HA status of a the node";
+      tailf:callpoint "hastatus";
+    }
+    container virtual-ip-addresses {
+      description
+        "The virtual IP addresses are addresses that the HA controller
+         will add to the master node.  Each address is added to the
+         interface with the subnet that the address belongs to.";
+      leaf-list ip-address {
+        tailf:info "Virtual IP address";
+        type inet:ip-address;
+      }
+    }
+    leaf secret-token {
+      type tailf:aes-cfb-128-encrypted-string;
+      mandatory true;
+      description
+        "A shared secret that must be set to the same value on all
+         HA nodes.";
+    }
+    container ha-nodes {
+      description
+        "The HA nodes in this HA controller system.  There must be
+         exactly two nodes configured.";
+      list ha-node {
+        key "name";
+        min-elements 2;
+        max-elements 2;
+        leaf name {
+          type string;
+        }
+        leaf preferred-master {
+          type empty;
+          description
+            "Determine the preferred master on creation";
+        }
+        leaf ip-address {
+          type inet:ip-address;
+          mandatory true;
+          description
+            "The address that the local HA controller listens to and the
+             remote HA controller will connect to.";
+        }
+        leaf port {
+          type inet:port-number;
+          default 4571;
+          description
+            "This is the port number which the HA controller
+             will bind a listener to for responding the HA status
+             of the managed HA node.";
+        }
+      }
+    }
+  }
+}
