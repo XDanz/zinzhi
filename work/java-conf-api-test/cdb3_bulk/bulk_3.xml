@@ -1,0 +1,18 @@
+<special xmlns="http://tail-f.com/ns/example/bulk/1.0">
+  <bklist>
+    <bkey>a a</bkey>
+    <val>aaa</val>
+  </bklist>
+  <bklist>
+    <bkey>b b</bkey>
+    <val>bbb</val>
+  </bklist>
+  <bklist>
+    <bkey>c c</bkey>
+    <val>ccc</val>
+  </bklist>
+  <bklist>
+    <bkey>d d</bkey>
+    <val>ddd</val>
+  </bklist>
+</special>
