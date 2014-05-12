@@ -22,11 +22,11 @@ public class HAControllerAcceptorNIO {
     private int BUFSIZE = 20 * 1024 * 1024;
     private int port;
     
-    public static void main ( String arg[] ) {
-        log.info(" starting acceptor..");
-        new HAControllerAcceptor(4545);
+    // public static void main ( String arg[] ) {
+    //     log.info(" starting acceptor..");
+    //     new HAControllerAcceptor(4545);
 
-    }
+    // }
     public HAControllerAcceptorNIO (int port) {
         this.port = port;
 

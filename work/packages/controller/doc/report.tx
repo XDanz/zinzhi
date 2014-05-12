@@ -1,0 +1,210 @@
+This work is contraint to work on HA failover between 2 nodes.
+And it is contraint to use linux and experiments is done on 2 virtual machines
+which is based on Ubuntu. When a failover occures the failover node
+should create an alias interface and send garp requsts/responses.
+This could be done with for example with JNI native calls or it
+could execute binaries with a forking process.
+
+When the NCS brings starts the Controller the controller should 
+read information stored at Cdb from the namespace 
+http://tail-f.com/ns/ha-controller in tailf-ha-controller.yang.
+The module should contain configuration and operational data
+items used by the HA controller.  The yang model used by the HA Controller 
+is located in tailf-ha-controller/src/yang/tailf-ha-controller.yang. 
+It contains configuration items used by the HA Controller instance.
+
+/thc:ha-controller/virtual-address/address is a leaf-list
+of addresses which is intended to redirect traffic towards the
+master node it is the VIP addresses of the system.
+
+The yang model defines two nodes n1 and n2. For each
+node a address is supplied.
+
+The addresses is used by the HA Controller to determine which node is
+local and which is the remote node. The HA Controller uses the addresses
+to compare the local machines address list to determine for which
+ha node it is responsible for.
+
+The HA Controller uses the configuration parameter
+/thc:ha-controller/secret-token to connect a HA Socket to
+the local ha node to determine the HA State. And
+uses the HA API to order the local ha node to be either slave/master/none.
+
+The HA Controller never connects a HA Socket to the remote node.
+The HA Controller is responsible for only local node and it uses
+a HA Socket to command its local ha node.
+
+The HA Controller runs inside NCS and starts when the package is loaded.
+
+The HA Controller It listen for configuration changes on the top-node
+/thca:ha-controller for changes and reacts when changes are made
+on /thca:ha-controller/virtual-address/address
+which involves bringing the VIP addresses down and up again on the
+master node.
+
+The HA controller should manage a set of virutal IP addresses. The 
+HA controller ensures that these addresses ar brougth up on the
+current master node through the gratious arp.
+
+Both ha node participating in ha pair is required to load
+the package with the same initial configuration and the 
+tailf-ha-controller.yang and a HA must be enabled in ncs.conf on both 
+machines.
+
+When the package is initally stared the node ip should be compared 
+with the HA controller uses the machines interface (nic) that matches the
+ip address configured in /thc:ha-controller/ha-node/ip-address and
+creates aliases <nic-name>:<i> where <i> starts from 0 and increases
+for each ip address in the leaf list.
+
+
+The only thing NCS does is to replicate the CDB data amongst the members in 
+the HA group. It doesn't perform any of the otherwise High-Availability 
+related tasks such as running election protocols in order to elect a 
+new master. This is the task of a High-Availability Framework (HAFW) 
+which must be in place. The HAFW must instruct NCS which nodes are up and down 
+using API method in Java . Thus in order to use ConfD configuration 
+replication we must first have a HAFW. 
+
+HAFW
+---
+NCS only replicates the NCS data. NCS must be told by the HAFW which node 
+should be master and which nodes should be slaves.
+
+The HA framework must also detect when nodes fail and instruct NCS accordingly.
+If the master node fails, the HAFW must elect one of the remaining slaves 
+and appoint it the new master. The remaining slaves must also be informed 
+by the HAFW about the new master situation. NCS will never take any actions 
+regarding master/slave-ness by itself.
+
+The architecure is that HAFW lives on both nodes and it is written 
+as a ApplicationComponent where it contains code for accepting 
+tcp connections from the other HAFW node for queries and it pools 
+notification sockets which means that it receives information about
+ha events. The controller should figure out who should be slave and
+who should be master. The initial step when a first node is up and running
+is that the initial connect should be done to the other HAFW. In this 
+case there could be two situations. First is that the HAFW is not running
+which means that connection refused will occured in this situation 
+the HAFW should promote the local HA node to be master and also record
+the transaction id and save it to disk. We now has the situation with 
+one node master and the other node unreachable. The other node could
+alse be running but have no idea about the started node i.e a split 
+brain situation. Or in the simplest case the node has not been started.
+
+1.0 Initial Startup
+--------------
+
+1.0.1 Case: 1.0 The remote node has been started but we do not have a connection
+----------------------------------------------------------------------
+In the worst case we have two Masters without knowing each other.
+How does we need to reconcile when there occures a  connection.
+
+Solution 1.
+----------
+
+The solution is that the preferred master could start the 
+HAControllerReConntor after time NoSlave. The reconnector should try 
+to connect to The other node and when it successfully connect
+it should reconsilidate.
+
+1.0.2 Case: 1.1 The remote node has not been started.
+------------------------------------------------
+
+In this case we when the remote nodes starts it connects to the local
+node and detmine the status of the local node.
+
+The common situation is that the local node is the master and the remote
+figures this out. Before the remote node should premote itself 
+as the slave it needs to verify that no transaction diff has occured.
+
+1.0.3 Case 1.1.1 Transaction diff occured on remote
+---------------------------------------------
+
+When transaction diff has occured on the remote node the local node
+needs to be examine. In case of tx diff has occured the remote node
+should be none and the local should still be master.
+
+In situation when no diff occured on the local node the remote
+node should be promoted to master and the local node should be
+promoted to slave.
+
+First 2 nodes is offline and not started once a node is started.
+
+1.0.4 Case 1.1.2 No Transaction diff occured on remote
+------------------------------------------------
+
+In this situation we have the local master running and no txdiff
+has occured on the remote node. The result should be that 
+the local node should still be master and end remote node should 
+be promoted to slave.
+
+
+1.1 Running Phases.
+------------------
+
+We have the situation where the local node is up and running and is master
+and the remote is slave.
+
+Case: Master died
+
+When the master died the notifiction on the notif socket should occure
+NO_MASTER. In this case the remote node that is the slave node
+should write the current transaction id down as the new eventid.
+and promote the its NCS to be master.
+
+In this case there could also be a split brain situation so if 
+the remote node was the preferred master the HAControllerReConnector 
+should be started to try to connect to the local node. This is in fact
+the common situation and should be carfully be considered.
+
+The remote is now master and could could accept transactions.
+When this happens we have a transaction diff between when the master
+died and this current point in time.
+
+When the other nodes comes back online and reconnected a reconsolidation
+should occure. Reconsolidation is done in the ordinary fashion where
+the node that has a txdiff should be promoted to master only when
+the other node has not a txdiff or we have a split brain.
+
+Case: slave down
+
+In this scenario the master loses connection with its slave. A SLAVE_DIED
+notification should be informed to the controller. The controller should 
+consider this. If the master was the preferred master the 
+HAControllerReconnector should try to reconnect to the other node. If 
+it successfully reconnects to the slave node the situation could be that
+the previous slave lost connection with the master and it was promoted 
+to master a reconsilidatin should occure. The active HAControllerReConnector
+should call reconnected() method on the controller which in turns 
+take descition an reconsilidate.
+
+So we have 2 nodes in a cluster on that is master and one is slave.
+The first NCS that is is promoted to master accepts incomming slave
+request from NCS. A slave is initialized when it is promoted by 
+the HA API with Ha.beSlave( master ) the slave node connects to NCS master
+and replecates  its values with the master NCS master. When this is
+done no transactions on the slave could be done, only transaction 
+on the master node could occure. In this case all master nodes 
+gets replicated with the new data which was commited on the master.
+
+An important consideration of this work is a common scenario called split
+brain. This is when we two nodes think they are alone and are both is
+the master in the HA cluster. The work fokus on the a pesemistic case where
+transaction on both nodes result in manual intervenience before 
+the nodes could join a cluster as master and slave.
+
+In ncs there is functionallity for retrive a transaction id where in case
+of slave down or master down current transaction id called eventtxid 
+could be retrieved and saved to a file. 
+Later when the nodes tries to reconcile with each other the current txid
+could be retrived again and a txdiff could be checked before determine 
+who should be master and who should be slave. In case where a node
+has a transaction diff and the other not the node with the transaction diff
+should be premoted to master this is because we do not want to loose
+transactions that happen on one master while in the split brain situation.
+
+In case where there has been transaction diff on the both masters 
+a reconsilidation is not possible. In this case a manual reconsilidiation 
+should occure.
+

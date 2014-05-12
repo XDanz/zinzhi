@@ -1,17 +1,29 @@
+The Tailf HA Controller packagee implements a High Availablity HA-Controller to
+automatically handle simple fail overs between two (2) NCS HA nodes.
 
-This package implements actions to manually handle simple fail overs
-between two (2) NCS HA nodes.
-The YANG model defines actions to tell one node to be a master
-and the other to be a slave.
+The setup is intended to run on two NCS nodes (ha nodes)
+Each ha node links (or copy) the package to the packages directory before
+starting NCS.
+
+The YANG model defines data model configuration items that both 
+HA nodes must load.
+
+Both ha node participating in ha pair is required to load
+the package with the same initial configuration.
 
 ha must be enable in ncs.conf for the two nodes. See the example
 examples.ncs/web-server-farm/ha how to use this package.
+
+The package consists of yang model which should be loaded by NCS when
+linked (or copied) the tailf-ha-controller package.
 
 The package requires configuration of
 
 - names of the two nodes
 - IP addresses of the two nodes.
-- The cluster ID
+- The cluster ID which is a token which is used to connect the
+framework to NCS.
+
 
 This would typically have to be part of XML initialization files
 for the two nodes. For example

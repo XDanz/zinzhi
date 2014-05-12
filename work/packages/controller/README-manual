@@ -1,0 +1,230 @@
+Tailf Manual HA Controller
+-------------------------
+
+The Tailf HA Controller package is a implementation of the
+high availability API and it consist of actions that is intended
+to order a ha node to be master,slave or none.
+
+The setup is intended to run on two NCS nodes (ha nodes)
+Each ha node links (or copy) the package to the packages directory before
+starting NCS.
+
+Both ha node participating in ha pair is required to load
+the package with the same initial configuration.
+
+When the package is loaded by NCS an operator invokes
+actions to order the local ha node to be master/slave/none explicitly.
+
+For example to order a ha node to become master:
+
+%> request ha-controller be-master
+
+To order ha node to become slave:
+
+%> request ha-controller be-slave
+
+To order ha node to become none:
+
+%> request ha-controller be-none
+
+To view the ha node status:
+
+> show ha-controller ha-status
+
+The package consists of yang model which should be loaded by NCS when
+linked (or copied) the tailf-ha-controller package.
+
+Each HA node runs a instance of tailf_ha_controller.beam file which starts when
+the package is loaded by NCS.
+
+To be able to run the HA Controller correctly the same package must be
+loaded on both NCS nodes and a HA must be enabled in ncs.conf.
+
+When a node is order to be the master a vip address is brought up
+if the leaf list /thc:ha-controller/virtual-address/address is
+configured with ip addresses.
+
+The HA controller uses the machines interface (nic) that matches the
+ip address configured in /thc:ha-controller/ha-node/ip-address and
+creates aliases <nic-name>:<i> where <i> starts from 0 and increases
+for each ip address in the leaf list. When the interface is brought up
+the HA controller will issue 4 APR request and 4 APR replies. The
+GARP request/replies is issued with the arpsend command.
+
+1.) Content and directories
+-----------------------
+
+./README   - This Readme file
+
+./load-dir - directory which contains .fxs files and .beam files that NCS
+             loads at startup.
+
+./package-meta-data.xml - The configuration .xml file used by NCS for this
+                          package.
+
+./private-jar  - Contains private .jar package used by the NCS JVM
+               to load .jar files. No jar files is used by this package.
+
+./scripts - Scripts used by this package.
+
+./shared-jar  - Contains shared .jar packages used by the NCS JVM
+              to load.jar files. No shared jar files is used by this package.
+
+./src - Contains source files .erl and .yang files.
+
+./src/create-init-xml - Creates a tailf-ha-controller.xml based on
+                        user supplied parameters:
+
+$ ./create-init-xml.sh <ip-node1> <ip-node2>.
+
+./src/yang/tailf-ha-controller.yang - The .yang model defines the configuration
+                                   parameters used by the HA Controller.
+
+
+2.) Package Loading and configuration
+------------------------------------
+
+Each ha node participates in the setup must load this package
+the ha nodes which implies that both ha nodes loads the same .fxs file and
+a instance of the HA Controller.
+
+In addition each HA node must have exactly the same configuration to be
+able to function correctly. Either this is configure manually through
+the NCS CLI or supplied as .xml file in ncs-cdb in both ha nodes.
+
+3.) Yang model
+--------------
+
+The yang model used by the HA Controller is located in
+tailf-ha-controller/src/yang/tailf-ha-controller.yang. It contains
+configuration items used by the HA Controller instance.
+
+/thc:ha-controller/virtual-address/address is a leaf-list
+of addresses which is intended to redirect traffic towards the
+master node it is the VIP addresses of the system.
+
+The yang model defines two nodes n1 and n2. For each
+node a address is supplied.
+
+The addresses is used by the HA Controller to determine which node is
+local and which is the remote node. The HA Controller uses the addresses
+to compare the local machines address list to determine for which
+ha node it is responsible for.
+
+The HA Controller uses the configuration parameter
+/thc:ha-controller/secret-token to connect a HA Socket to
+the local ha node to determine the HA State. And
+uses the HA API to order the local ha node to be either slave/master/none.
+
+The HA Controller never connects a HA Socket to the remote node.
+
+4.) HA Controller
+----------------
+
+* The HA Controller is responsible for only local node and it uses
+  a HA Socket to command its local ha node.
+
+* The HA Controller runs inside NCS and starts when the package is loaded.
+
+* It listen for configuration changes on the top-node
+  /thca:ha-controller for changes and reacts when changes are made
+  on /thca:ha-controller/virtual-address/address
+  which involves bringing the VIP addresses down and up again on the
+  master node.
+
+5.) GARP
+--------
+
+The package use arpsend to send 4 unsolicited/gratuitous APR
+request and 4 APR replies (some devices will respond to the gratuitous
+request and some will respond to the gratuitous reply).
+To be able to set up VIPs on the master
+arpsend is required. To install arpsend on a Ubuntu Linux OS:
+
+sudo apt-get -q -y install vzctl
+
+6.) prerequisite
+--------------
+
+* arpsend must be installed usually in package vzctl ( see above )
+
+* NCS must be able to run sudo successfully without prompting for password.
+
+* /bin/ip must be installed
+
+7.) Installing
+--------------
+
+* Link the tailf-ha-controller package to your packages directory:
+
+  $ cd packages
+  $ ln -sf $NCS_DIR/packages/tools/tailf-ha-controller
+
+* Create tailf-ha-controller.xml
+   $ cd $NCS_DIR/packages/tools/tailf-ha-controller/src/example-init-xml/
+   $ ./create-init-xml.sh <IP-HA-Node1> <IP-HA-Node2>
+
+   will produce:
+   tailf-ha-controller.xml
+
+<thc:tailf-ha-controller xmlns:thc="http://tail-f.com/ns/tailf-ha-controller">
+  <thc:secret-token><SECRET TOKEN HERE></thc:secret-token>
+  <thc:ha-nodes>
+    <thc:ha-node>
+      <thc:name>node1</thc:name>
+      <thc:ip-address><IP-HA-Node1></thc:ip-address>
+    </thc:ha-node>
+    <thc:ha-node>
+      <thc:name>node2</thc:name>
+      <thc:ip-address><IP-HA-Node2></thc:ip-address>
+    </thc:ha-node>
+  </thc:ha-nodes>
+</thc:tailf-ha-controller>
+
+replace <SECRET TOKEN HERE> with a secret token
+
+replace <NODE 1 IP Address> with a IPV4 Address on the Machine
+on which should run NCS 1 (node1)
+
+replace <NODE 2 IP Address> with a IPV4 Address on the Machine
+on which should run NCS 2 (node2)
+
+* copy the modified tailf-ha-controller.xml file to ncs-cdb/ dir
+  on both node1 and node2
+
+* Start node 1 and node 2
+
+* (On Node 1):
+
+  start cli
+
+  to order node1 to be master
+  > request tailf-ha-controller be-master
+
+* (On Node 2):
+
+  start cli
+
+  to order node1 to be slave
+  > request tailf-ha-controller be-slave
+
+* Bring up VIPS ( On master node)
+
+  start cli
+
+  > configure
+
+  %> set tailf-ha-controller virtual-address address [ IP0 IP1 ... IPN ]
+  %> commit
+
+  on shell prompt to see the virtual addresses
+
+$  /sbin/ifconfig
+
+
+
+
+
+
+
+

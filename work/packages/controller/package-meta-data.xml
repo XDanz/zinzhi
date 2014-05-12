@@ -1,14 +1,14 @@
 <ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
-  <name>controller</name>
+  <name>HAFw</name>
   <package-version>1.0</package-version>
-  <description>Actions to manually control a two-node HA cluster</description>
+  <description>High Availabillity framework to controll two nodes</description>
   <ncs-min-version>3.0</ncs-min-version>
 
   <!-- It's possible to add more components to the -->
   <!-- same package, multiple services, data providers etc -->
 
   <component>
-    <name>HaActions</name>
+    <name>HACtrl</name>
     <application>
       <java-class-name>com.tailf.controller.HAControllerAppCmp</java-class-name>
     </application>
