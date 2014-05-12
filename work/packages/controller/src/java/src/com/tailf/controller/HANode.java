@@ -1,44 +1,37 @@
 package com.tailf.controller;
 
 import java.net.InetAddress;
+import java.net.Socket;
 
 import com.tailf.conf.ConfIP;
+import com.tailf.conf.ConfHaNode;
+import com.tailf.ha.HaStateType;
+import com.tailf.cdb.CdbTxId;
 
-public class HANode {
-    private String name;
-    private ConfIP address;
-    private boolean isLocal;
-    private boolean preferredMaster;
-    private int port;
+public interface  HANode {
 
-    public HANode (String name,ConfIP address,boolean preferredMaster ,
-                   int port  ) {
-        this.name = name;
-        this.address = address;
-        this.preferredMaster = preferredMaster;
-        this.port = port;
-    }
+    public ConfIP getAddress ();
 
-    public  ConfIP getAddress () {
-        return address;
-    }
+    public boolean isPreferredMaster();
+    
+    public int getPort();
 
-    public void setLocal () {
-        this.isLocal = true;
-    }
+    public boolean isLocal();
 
-    public boolean isPreferredMaster() {
-        return this.preferredMaster;
-    }
-    public int getPort() {
-        return this.port;
-    }
+    public String getName();
 
-    public boolean isLocal() {
-        return this.isLocal;
-    }
+    public HaStateType getHaStatus() throws Exception;
 
-    public String getName() {
-        return this.name;
-    }
+    public void beMaster () throws Exception;
+
+    public void beNone () throws Exception;
+    
+    public void beSlave ( HANode master ) throws Exception ;
+
+    public CdbTxId getTxId() throws Exception;
+
+    public boolean txDiff () throws Exception ;
+
+    public boolean isReachable();
+
 }

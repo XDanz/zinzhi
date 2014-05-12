@@ -30,6 +30,8 @@ public class HAControllerAppCmp implements ApplicationComponent {
             new Notif ( notifSocket ,
                         EnumSet.of(NotificationType.NOTIF_HA_INFO) );
 
+        haController.initialDetermination ();
+
 
     }
 
@@ -53,6 +55,7 @@ public class HAControllerAppCmp implements ApplicationComponent {
 
     public void finish() throws Exception {
         log.info ("\n ---- Finish ---- ");
+        HAControllerAcceptor.stopListening();
         shouldRun = false;
     }
 }

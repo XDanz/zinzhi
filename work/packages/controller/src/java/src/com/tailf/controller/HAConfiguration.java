@@ -1,6 +1,7 @@
 package com.tailf.controller;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import java.net.InetAddress;
@@ -64,7 +65,7 @@ public class HAConfiguration {
 
     public void recognizeNodeByInterfaces () throws HAControllerException,
                                                     SocketException {
-
+        log.info ( " recognizeNodeByInterfaces =>");
         Enumeration<NetworkInterface> allInterfaces =
             NetworkInterface.getNetworkInterfaces();
 
@@ -90,15 +91,64 @@ public class HAConfiguration {
                     log.info  ( "localAddress:" + localAddress );
                     
                     if ( inetAddressEquals (haNodeAddr, localAddress) ) {
-                        haNode.setLocal();
-                        this.determined = true;
-                        return;
+                        
+                        if ( System.getenv("NCS_HA_NODE") == null  ) {
+
+                            setLocalHANode ( haNode );
+                            this.determined = true;
+                            log.info ( " recognizeNodeByInterfaces => ok");
+                            return;
+
+                        } else {
+
+                            if ( checkEnv(haNode) ) {
+                                setLocalHANode ( haNode );
+                                this.determined = true;
+                                log.info ( " recognizeNodeByInterfaces => ok");
+                                return;
+                            }
+                        }
+                         log.info (" not equal ");
                     }
-                    log.info (" not equal ");
-                    
                 }
             }
         }
+        log.info ( " recognizeNodeByInterfaces => ok");
+    }
+    
+    boolean checkEnv ( HANode node ) {
+                        
+        if  (System.getenv("NCS_HA_NODE") != null
+             && System.getenv("NCS_HA_NODE")
+             .equals (node.getName())) {
+            return true;
+        }
+        return false;
+    }
+    
+    void setLocalHANode ( HANode node ) {
+        log.info ( " setLocalHANode() =>");
+        List<HANode> list = new ArrayList<HANode>();
+
+        HALocalNode local = new HALocalNode ( node.getName(),
+                                              node.getAddress(),
+                                              node.isPreferredMaster() ,
+                                              node.getPort());
+        local.setLocal();
+        log.info(node.getName() + " is LOCAL!");
+        haNodes.remove ( node );
+
+        HANode remoteUndef = haNodes.remove(0);
+        HARemoteNode remote = 
+            new HARemoteNode ( remoteUndef.getName(),
+                               remoteUndef.getAddress(),
+                               remoteUndef.isPreferredMaster(),
+                               remoteUndef.getPort());
+        list.add ( local );
+        list.add ( remote );
+
+        haNodes = list;
+        log.info ( " setLocalHANode() => ok");
     }
 
     public boolean inetAddressEquals ( InetAddress a , InetAddress b ) {
@@ -106,8 +156,6 @@ public class HAConfiguration {
         boolean isEquals = true;
         byte ba[] = a.getAddress();
         byte bb[] = b.getAddress();
-        log.info ( "ba:" + java.util.Arrays.toString ( ba ) ) ;
-        log.info ( "bb:" + java.util.Arrays.toString ( bb ) ) ;
         
         if ( ba.length == bb.length ) {
             for ( int i = 0; i <  ba.length; i++ ) {

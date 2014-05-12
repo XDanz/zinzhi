@@ -7,8 +7,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.InputStream;
+import java.io.Serializable;
+
 import java.net.ServerSocket;
 import java.net.Socket;
+import com.tailf.cdb.CdbTxId;
+import com.tailf.ha.HaStateType;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,61 +24,104 @@ public class HAControllerAcceptor {
         Logger.getLogger ( HAControllerAcceptor.class );
 
     private ServerSocket server = null;
-    private ExecutorService pool = null;
+    private static ExecutorService pool =  
+        Executors.newSingleThreadExecutor();
     private int port;
+    private static HAControllerAcceptor acceptor;
 
-    public static void main ( String arg[] ) {
-        log.info(" starting acceptor..");
-        new HAControllerAcceptor(4545);
+    protected ServerSocket getServerSocket() {
+        return server;
+    }
 
+    public static void execute () {
+        if ( acceptor == null ) {
+            pool.execute (  new Runnable () {
+                    public void run () {
+                        try { 
+                            acceptor = 
+                                new HAControllerAcceptor ( );
+                        } catch ( Exception e ) {
+                            log.error("",e );
+                            acceptor.executorService().shutdownNow();
+                        }
+                    }
+                }
+                );        
+        }
     }
 
     class RequestHandler implements Runnable {
         private final Socket clientSock;
-        // private static final Logger log = 
-        //     Logger.getLogger ( RequestHandler.class );
         RequestHandler ( Socket clientSock ) { this.clientSock = clientSock; }
         
         public void run () {
             try {
-                InputStream inStream = clientSock.getInputStream();
-                OutputStream outStream = clientSock.getOutputStream();
+                HAControllerConnector cn = 
+                    HAControllerConnector.connector ( clientSock );
 
-                
-                ObjectInputStream objInStream = 
-                    new ObjectInputStream ( inStream );
+                String req = (String)cn.recv();
+                Object resp = null;
 
-                Object o = objInStream.readObject();
-                log.info ( "Read object :" + o );
+                HAController ctrl = HAController.getController();
+                HALocalNode node = (HALocalNode)ctrl.getLocalHANode();
 
-            
-                ObjectOutputStream objOutStream = 
-                    new ObjectOutputStream ( outStream );
-
-                objOutStream.writeObject("ok");
-                objOutStream.flush();
-
-                inStream.close();
-                outStream.close();
-                
+                if ( req.equals("eventtxid")) {
+                    CdbTxId txid = node.getEventTxId();
+                    resp = txid;
+                } else if ( req.equals ("txid") ) {
+                    CdbTxId txid = node.getTxId();
+                    resp = txid;
+                } else if ( req.equals ("status") ) {
+                    HaStateType type = node.getHaStatus();
+                    
+                    switch ( type ) {
+                    case NONE:
+                        resp = "none";
+                        break;
+                    case MASTER:
+                        resp = "master";
+                        break;
+                    case SLAVE:
+                        resp = "slave";
+                        break;
+                    }
+                } else if ( req.equals ("ping") ) {
+                    resp = "pong";
+                }
+                cn.send (resp);
+                cn.close ();
             } catch ( Exception e ) {
                 log.error("",e );
             } finally {
+
             }
+        }
+
+    }
+
+    public static void stopListening() throws Exception {
+        pool.shutdownNow();
+        if ( acceptor.getServerSocket() != null ) {
+            acceptor.getServerSocket().close();
         }
     }
     
-    public HAControllerAcceptor (int port) {
-        this.port = port;
-
+    public HAControllerAcceptor () {
         try { 
-            this.pool = Executors.newFixedThreadPool ( 5 );
+            HAController controller = HAController.getController();
+            log.info(" controller :" + controller );
+            int port = controller.getLocalHANode().getPort();
+            InetAddress addr = controller.getLocalHANode()
+                .getAddress().getAddress();
+            
+            this.pool = Executors.newCachedThreadPool ();
             ServerSocket srvSock = new ServerSocket ();
             srvSock.setReuseAddress(true);
             srvSock.bind( 
-                         new InetSocketAddress ( "localhost", port));
+                         new InetSocketAddress (addr , port));
 
             log.info ( " Acceptor Started! ");
+            log.info(" sock:" + srvSock );
             for ( ;; ) {
                 this.pool.execute ( new RequestHandler ( srvSock.accept()) );
             }

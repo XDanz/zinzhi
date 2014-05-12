@@ -76,11 +76,13 @@
 
   <target name="sender" 
           depends="compile">
-    <java classname="com.tailf.controller.HAControllerSender"
+    <java classname="com.tailf.controller.HAControllerConnectorTest"
           failonerror="true"
           fork="true">
       <classpath refid="core-libs" />
     <classpath location="build/classes"/>
+    <arg value="${addr}" />
+    <arg value="${port}" />
     <!-- <jvmarg value="-verbose:class"/> -->
   </java>
 </target>
