@@ -36,6 +36,7 @@ import com.tailf.notif.HaNotification;
 import com.tailf.notif.NotificationType;
 
 import com.tailf.ha.Ha;
+import com.tailf.ha.HaStateType;
 import com.tailf.ncs.NcsMain;
 
 import org.apache.log4j.Logger;
@@ -44,16 +45,19 @@ public class HAController {
     private static final Logger log = Logger.getLogger ( HAController.class );
 
     private static HAController haControllerInstance = null;
-    
+
     private HAConfiguration configurationData;
 
-    private ExecutorService pool = 
+    private ExecutorService pool =
         Executors.newSingleThreadExecutor();
 
-    private CdbTxId eventTxId; 
     private static Object lock = new Object();
-    
 
+    /**
+     *  Returns the Current initialized singelton instance
+     *  HAController. (There could only be one).
+     *  @return Instance of HAController
+     */
     public static HAController getController()
         throws Exception {
         synchronized ( lock ) {
@@ -67,125 +71,120 @@ public class HAController {
     private HAController () throws Exception {
         log.debug ( " xxx initializing HAController xxx ");
 
+        // reads inital configuration
         this.configurationData = this.readInitData();
+        // determines who is local node and who is the remote node
         this.configurationData.recognizeNodeByInterfaces();
 
-        // start the HA Acceptor thread 
+        // start the HA Acceptor thread
         log.info ( " starting acceptor ");
         HAControllerAcceptor.execute();
-        
+
     }
 
-    // Callback method will be called on certain HA events 
+    // Callback method will be called on certain HA events
     //
     public void haEvent ( HaNotification haEvent ) throws Exception {
 
         switch ( haEvent.getHAInfoType() ) {
         case HaNotification.HA_INFO_NOMASTER:
             {
-                try {
-                    // master down
-                    HANode node = getLocalHANode();
-                    ((HALocalNode)node).saveTxId();
-                    HAControllerReConnector.execute();
-                    node.beMaster();
-
-                } catch ( Exception e ) {
-                    log.error("",e);
-                }
-
+                log.info(" => MASTER DIED !!!");
+                masterDown();
             }
             break;
         case HaNotification.HA_INFO_SLAVE_DIED:
             {
-                log.info(" slave died !!!" );
-                HANode node = getLocalHANode ();
-                CdbTxId id = node.getTxId();
-                eventTxId = id;
-                HAControllerReConnector.execute();
+                log.info(" => SLAVE DIED !!!" );
+                slaveDown();
             }
             break;
         case HaNotification.HA_INFO_SLAVE_ARRIVED:
             {
-                log.info ( " slave arrived ");
+                log.info ( " => SLAVE ARRIVED !!!");
             }
             break;
         case HaNotification.HA_INFO_SLAVE_INITIALIZED:
             {
-                log.info ( " slave initialized ");
-                /// log
-
+                log.info ( " => SLAVE INITIALIZED !!!");
             }
             break;
         case HaNotification.HA_INFO_IS_MASTER:
             {
-                log.info ( " is master ");
+                log.info ( " => IS MASTER !!!");
                 // log
             }
             break;
         case HaNotification.HA_INFO_IS_NONE:
             {
-                log.info ( " is none ");
+                log.info ( " => IS NONE !!!");
             }
             break;
         }
     }
-    // Callback method will be called when HA Node has been 
-    // reconnected i.e when HAControllerReConnector has done 
+
+    void masterDown () throws Exception {
+        // master down
+        haNodeDown ();
+        getLocalHANode().beMaster();
+    }
+
+    void slaveDown () throws Exception {
+        haNodeDown();
+    }
+
+    void haNodeDown ( ) throws Exception {
+        HANode node = getLocalHANode();
+        ((HALocalNode)node).saveTxId();
+        if ( node.isPreferredMaster() ) {
+            HAControllerReConnector.execute();
+        }
+    }
+
+    // Callback method will be called when HA Node has been
+    // reconnected i.e when HAControllerReConnector has done
     // its job
     public void reConnected ( ) throws Exception {
         log.info("reConnected() =>");
+        reConciliation();
+        log.info("reConnected() => ok");
+    }
+
+    void reConciliation () throws Exception {
+        log.info ( "reconciliation() =>");
         HANode remote = getRemoteHANode();
         HANode local = getLocalHANode();
-              
+
         if (local.txDiff() && remote.txDiff()) {
-            log.info(" case 1");
+            log.info(" CASE 1 TX DIFF ON BOTH NODES");
             //   ERROR need manual intervention!
         }
         else if (local.txDiff() && !remote.txDiff()) {
-            log.info(" case 2");
+            log.info(" CASE 2 LOCAL HAS TX DIFF");
             local.beMaster();
             remote.beSlave( local );
         }
         else if (!local.txDiff() && remote.txDiff()) {
-            log.info(" case 3");
+            log.info(" CASE 3 REMOTE HAS TX DIFF");
             remote.beMaster();
-            
             local.beNone();
             local.beSlave( remote );
         }
         else if (!local.txDiff() && !remote.txDiff()) {
-            log.info(" case 4");
+            log.info(" CASE 4 NO TX DIFF");
             preferredMaster().beMaster();
             notPreferredMaster().beSlave( preferredMaster() );
         }
-        log.info("reConnected() => ok");
+        log.info( "reConciliation() => ok");
     }
-    
+
     void determinationByTxId () throws Exception {
         log.info(" determinationByTxId () => ");
         HANode remote = getRemoteHANode();
-        HANode local = getLocalHANode();
-
-        if ( remote.isReachable () ) {
-              
-            if (local.txDiff() && remote.txDiff()) {
-                //   ERROR need manual intervention!
-            }
-            else if (local.txDiff() && !remote.txDiff()) {
-                local.beMaster();
-                remote.beSlave( local );
-            }
-            else if (!local.txDiff() && remote.txDiff()) {
-                remote.beMaster();
-                local.beSlave( remote );
-            }
-            else if (!local.txDiff() && !remote.txDiff()) {
-                preferredMaster().beMaster();
-                notPreferredMaster().beSlave( preferredMaster() );
-            }
+        if ( getRemoteHANode().isReachable () ) {
+            reConciliation ();
         } else {
-            local.beMaster();
+            getLocalHANode().beMaster();
         }
         log.info(" determinationByTxId () => ok");
     }
@@ -212,7 +211,7 @@ public class HAController {
             cdb.startSession(CdbDBType.CDB_RUNNING);
 
         ConfList confVirtualIPs =
-            (ConfList)session.getElem ("/thc:ha-controller/" + 
+            (ConfList)session.getElem ("/thc:ha-controller/" +
                                        "virtual-ip-addresses/ip-address");
 
         List<InetAddress> virtualIPs =
@@ -235,7 +234,6 @@ public class HAController {
         for  (int i = 0; i < n; i++ ) {
 
             inParam.add  ( new ConfXMLParamLeaf("thc", "name"));
-            // inParam.add  ( new ConfXMLParamLeaf("thc", "preferred-master"));
             inParam.add  ( new ConfXMLParamLeaf("thc", "ip-address"));
             inParam.add  ( new ConfXMLParamLeaf("thc", "port"));
 
@@ -256,17 +254,17 @@ public class HAController {
             ConfXMLParamValue valueIPAddress =
                 (ConfXMLParamValue)outParam[indx++];
 
-            ConfXMLParamValue valuePort = 
+            ConfXMLParamValue valuePort =
                 (ConfXMLParamValue)outParam[indx++];
 
             ConfIP ipAddress = (ConfIP)valueIPAddress.getValue();
 
             boolean preferredMaster = false;
-            ConfPath prefMasterPath = 
-                new ConfPath ("/thc:ha-controller/ha-nodes/ha-node[" + i + 
+            ConfPath prefMasterPath =
+                new ConfPath ("/thc:ha-controller/ha-nodes/ha-node[" + i +
                               "]/preferred-master");
-                
-            log.info ( " path :" + prefMasterPath );
+
+
             if ( session.exists(prefMasterPath ) ) {
                     preferredMaster = true;
                 }
@@ -298,12 +296,21 @@ public class HAController {
         return addresses;
     }
 
-
-
+    /**
+     *  Returns the remote HANode
+     *  @return The remote HANode
+     *  @throws
+     */
     public HANode getRemoteHANode () throws Exception {
         return this.configurationData.getRemoteHANode();
     }
 
+    /**
+     *  Returns the local HANode
+     *
+     *  @return The remote HANode
+     *  @throws
+     */
     public HANode getLocalHANode() throws Exception {
         return this.configurationData.getLocalHANode();
     }
@@ -313,15 +320,15 @@ public class HAController {
     }
 
     void determinationByNoTxDiff() throws Exception {
-        
+
         HANode remote = getRemoteHANode();
         switch ( remote.getHaStatus() ) {
-        case NONE: 
+        case NONE:
             {
                 log.info(" NONE ");
                 if ( getLocalHANode().isPreferredMaster() ) {
                     getLocalHANode().beMaster();
-                                
+
                 } else {
                     try {
                         Thread.currentThread().sleep(1000);
@@ -344,7 +351,7 @@ public class HAController {
 
         }
     }
-    
+
 
     void initialDetermination () throws Exception {
         log.info(" initialDetermination () =>");
@@ -352,17 +359,18 @@ public class HAController {
             HANode remote = getRemoteHANode();
             HANode local = getLocalHANode();
             if ( remote.isReachable() ) {
-                   
+
                 if (  local.txDiff() || remote.txDiff() ) {
                     determinationByTxId ();
                 } else {
+                    log.warn (" NO TXDIFF ON ANY NODES!");
                     switch ( remote.getHaStatus() ) {
-                    case NONE: 
+                    case NONE:
                         {
                             log.info(" NONE ");
                             if ( getLocalHANode().isPreferredMaster() ) {
                                 getLocalHANode().beMaster();
-                                
+
                             } else {
                                 try {
                                     Thread.currentThread().sleep(1000);
@@ -376,26 +384,70 @@ public class HAController {
 
                     case MASTER:
                         {
-                            log.info(" remote was MASTER ");
-                            getLocalHANode().beSlave( getRemoteHANode() );
+                            log.info(" --remote was MASTER!--");
+                            // The remote HA node was MASTER
+                            // and there was no transaction diff
+                            // on either nodes so we determine
+                            // the local node to be slave
+                            // maybe we need to check HAStatus of the
+                            // local node before promoting the local
+                            // node to be slave.
+                            log.info(" CALL (" + getLocalHANode()
+                                     + ").beSlave() =>");
+                            HaStateType haState =
+                                getLocalHANode().getHaStatus();
+                            switch ( haState ) {
+                            case MASTER:
+                                {
+                                    // no txdiff has occured
+                                    // so we promote the local
+                                    // node tx be slave by first
+                                    // calling beNone();
+                                    getLocalHANode().beNone();
+                                    // and now call beSlave()
+                                    log.info(" CALL (" + getLocalHANode()
+                                             + ").beSlave() =>");
+                                    getLocalHANode()
+                                        .beSlave( getRemoteHANode());
+
+                                    log.info(" CALL (" + getLocalHANode()
+                                             + ").beSlave() => ok");
+
+                                }
+                                break;
+                            case NONE:
+                                {
+                                    // no txdiff has occured
+                                    // so we promote the local
+                                    // node to be slave
+                                    log.info(" CALL (" + getLocalHANode()
+                                             + ").beSlave() =>");
+                                    getLocalHANode()
+                                        .beSlave(getRemoteHANode());
+                                    log.info(" CALL (" + getLocalHANode()
+                                             + ").beSlave() => ok");
+                                }
+                                break;
+                            case SLAVE:
+                                log.info (getLocalHANode() + " already slave!");
+                                break;
+                            }
                         }
                         break;
                     case SLAVE:
                         {
-
+                            log.info (" remote already slave! --");
                         }
                         break;
                     }
                 }
             } else {
-                log.info (" The remote node " +  remote + 
-                          " is not reachable !" );
+                log.info ( remote + " IS DOWN !" );
                 log.info( " saving txid ");
                 ((HALocalNode) getLocalHANode()).saveTxId();
-                log.info(" Call " + getLocalHANode() + ". beMaster () =>");
+                log.info(" Call (" + getLocalHANode() + ").beMaster () =>");
                 getLocalHANode().beMaster();
-                log.info(" Call " + getLocalHANode() + ". beMaster () => ok");
-                
+                log.info(" Call (" + getLocalHANode() + ").beMaster () => ok");
             }
             log.info ("initialDetermination() => ok");
             return ;

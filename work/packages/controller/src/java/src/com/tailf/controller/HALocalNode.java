@@ -34,7 +34,7 @@ public class HALocalNode extends AbstractHANode {
                 new ObjectInputStream ( new FileInputStream ( "txid" + 
                                                               getName()));
             this.eventTxId = (CdbTxId) is.readObject();
-            log.info("eventTxId:"+ eventTxId);
+            log.info("READING TXID "+ eventTxId);
         } catch ( Exception e ) {
             log.info("No eventTxId found!");
         }
@@ -95,8 +95,14 @@ public class HALocalNode extends AbstractHANode {
             if ( this.eventTxId == null ) {
                 return false;
             }
-            
-            return !this.eventTxId.equals ( getTxId() ) ;
+            boolean equals = false;
+            CdbTxId txid = getTxId();
+            if ( txid.getS1() == eventTxId.getS1() &&
+                 txid.getS2() == eventTxId.getS2() &&
+                 txid.getS3() == eventTxId.getS3() ) {
+                equals = true;
+            }
+            return !equals;
         } catch ( Exception e ) {
             log.error("",e );
             return false;
@@ -123,7 +129,6 @@ public class HALocalNode extends AbstractHANode {
 
     public void saveTxId () throws Exception {
         this.eventTxId = getTxId();
-        log.info(" eventTxId:" + eventTxId );
         ObjectOutputStream oo = 
             new ObjectOutputStream (
                                     new FileOutputStream ("txid" + 
@@ -152,17 +157,11 @@ public class HALocalNode extends AbstractHANode {
         sock.close();
     }
 
-    // private Socket getSocket2Ncs () throws Exception {
-    //     NcsMain ncsMain = NcsMain.getInstance();
-    //     return new Socket (ncsMain.getNcsHost(),
-    //                        ncsMain.getNcsPort());
-    // }
-
-
-    // private Ha getHASocket2Ncs (Socket sock) throws Exception {
-    //     HAController ctrl = HAController.getController();
-    //     Ha ha = new Ha (sock, ctrl.getSecretToken() );
-    //     return ha;
-    // }
-
+    public String toString () {
+        String str = "RemoteNode[name:" + getName() + ",addr:" + 
+            getAddress() + 
+            ",port=" + getPort() + 
+            "]";
+        return str;
+    }
 }

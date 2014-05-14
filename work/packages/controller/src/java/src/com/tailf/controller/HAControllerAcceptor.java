@@ -20,12 +20,13 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 public class HAControllerAcceptor {
-    private static final Logger log = 
+    private static final Logger log =
         Logger.getLogger ( HAControllerAcceptor.class );
 
     private ServerSocket server = null;
-    private static ExecutorService pool =  
-        Executors.newSingleThreadExecutor();
+    private static ExecutorService pool =
+        Executors.newCachedThreadPool();
+
     private int port;
     private static HAControllerAcceptor acceptor;
 
@@ -37,8 +38,8 @@ public class HAControllerAcceptor {
         if ( acceptor == null ) {
             pool.execute (  new Runnable () {
                     public void run () {
-                        try { 
-                            acceptor = 
+                        try {
+                            acceptor =
                                 new HAControllerAcceptor ( );
                         } catch ( Exception e ) {
                             log.error("",e );
@@ -46,17 +47,17 @@ public class HAControllerAcceptor {
                         }
                     }
                 }
-                );        
+                );
         }
     }
 
     class RequestHandler implements Runnable {
         private final Socket clientSock;
         RequestHandler ( Socket clientSock ) { this.clientSock = clientSock; }
-        
+
         public void run () {
             try {
-                HAControllerConnector cn = 
+                HAControllerConnector cn =
                     HAControllerConnector.connector ( clientSock );
 
                 String req = (String)cn.recv();
@@ -73,7 +74,7 @@ public class HAControllerAcceptor {
                     resp = txid;
                 } else if ( req.equals ("status") ) {
                     HaStateType type = node.getHaStatus();
-                    
+
                     switch ( type ) {
                     case NONE:
                         resp = "none";
@@ -100,33 +101,34 @@ public class HAControllerAcceptor {
     }
 
     public static void stopListening() throws Exception {
-        pool.shutdownNow();
-        if ( acceptor.getServerSocket() != null ) {
+        if ( pool != null && pool.isShutdown() ) {
+            pool.shutdownNow();
+        }
+        
+        if ( acceptor != null && acceptor.getServerSocket() != null ) {
             acceptor.getServerSocket().close();
         }
     }
-    
+
     public HAControllerAcceptor () {
-        try { 
+        try {
             HAController controller = HAController.getController();
-            log.info(" controller :" + controller );
             int port = controller.getLocalHANode().getPort();
             InetAddress addr = controller.getLocalHANode()
                 .getAddress().getAddress();
-            
-            this.pool = Executors.newCachedThreadPool ();
+
             ServerSocket srvSock = new ServerSocket ();
             srvSock.setReuseAddress(true);
-            srvSock.bind( 
+            srvSock.bind(
                          new InetSocketAddress (addr , port));
 
-            log.info ( " Acceptor Started! ");
+            log.info ( "  XXX Acceptor Started! XXX ");
             log.info(" sock:" + srvSock );
             for ( ;; ) {
                 this.pool.execute ( new RequestHandler ( srvSock.accept()) );
             }
-            
-        } catch (Throwable e) { 
+
+        } catch (Throwable e) {
             log.error("",e);
 
         } finally {

@@ -78,21 +78,17 @@ public class HAConfiguration {
                 networkInterface.getInterfaceAddresses();
 
             for ( InterfaceAddress interfaceAddress : interfaceAddresses ) {
-                log.info( " interfaceAddresses:" + 
-                          interfaceAddress.getAddress() );
 
                 for ( HANode haNode : haNodes ) {
                     InetAddress haNodeAddr = 
                         haNode.getAddress().getAddress();
-                    log.info  ( "haNodeAddr:" + haNodeAddr );
 
                     InetAddress localAddress = 
                         interfaceAddress.getAddress();
-                    log.info  ( "localAddress:" + localAddress );
                     
                     if ( inetAddressEquals (haNodeAddr, localAddress) ) {
-                        
-                        if ( System.getenv("NCS_HA_NODE") == null  ) {
+                     
+                        if ( System.getenv("NCS_HA_NODE") == null) {
 
                             setLocalHANode ( haNode );
                             this.determined = true;
@@ -117,7 +113,6 @@ public class HAConfiguration {
     }
     
     boolean checkEnv ( HANode node ) {
-                        
         if  (System.getenv("NCS_HA_NODE") != null
              && System.getenv("NCS_HA_NODE")
              .equals (node.getName())) {
