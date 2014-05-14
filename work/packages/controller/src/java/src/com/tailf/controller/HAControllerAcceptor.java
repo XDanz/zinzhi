@@ -66,13 +66,13 @@ public class HAControllerAcceptor {
                 HAController ctrl = HAController.getController();
                 HALocalNode node = (HALocalNode)ctrl.getLocalHANode();
 
-                if ( req.equals("eventtxid")) {
+                if (req.equals("eventtxid")) {
                     CdbTxId txid = node.getEventTxId();
                     resp = txid;
-                } else if ( req.equals ("txid") ) {
+                } else if (req.equals ("txid")) {
                     CdbTxId txid = node.getTxId();
                     resp = txid;
-                } else if ( req.equals ("status") ) {
+                } else if (req.equals ("status")) {
                     HaStateType type = node.getHaStatus();
 
                     switch ( type ) {
@@ -86,8 +86,11 @@ public class HAControllerAcceptor {
                         resp = "slave";
                         break;
                     }
-                } else if ( req.equals ("ping") ) {
+                } else if (req.equals ("ping")) {
                     resp = "pong";
+                } else if (req.equals ("slave")) {
+                    ctrl.localNodeBeSlave ();
+
                 }
                 cn.send (resp);
                 cn.close ();
@@ -101,7 +104,7 @@ public class HAControllerAcceptor {
     }
 
     public static void stopListening() throws Exception {
-        if ( pool != null && pool.isShutdown() ) {
+        if ( pool != null && !pool.isShutdown() ) {
             pool.shutdownNow();
         }
         

@@ -3,6 +3,7 @@ package com.tailf.controller;
 
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.ConnectException;
 
 import com.tailf.ha.Ha;
 import com.tailf.conf.ConfIP;
@@ -20,7 +21,7 @@ public class HARemoteNode extends AbstractHANode {
         super( name, address, preferredMaster, port );
     }
 
-    public  ConfIP getAddress () {
+    public ConfIP getAddress () {
         return address;
     }
     
@@ -103,6 +104,14 @@ public class HARemoteNode extends AbstractHANode {
         }
     }
 
+    /**
+     * Tries to connect to the remote node ip and listening port
+     * and sends a ping request. 
+     *
+     * @returns true wether the remote node response with the
+     * string "pong" which indicates that the remote HAController
+     * listener is accepting connection.
+     */
     public boolean isReachable ( )  {
         HAControllerConnector con = null;
         boolean reachable = false;
@@ -114,6 +123,10 @@ public class HARemoteNode extends AbstractHANode {
             if ( repl != null && repl.equals("pong") ) {
                 reachable = true;
             }
+        } catch ( ConnectException e) {
+            // The remote node is down this is common case
+            // i.e the remote node has not been started yet
+            // log.warn ( "Remote node not available!");
         } catch ( Exception e ) {
             log.warn (e);
         } finally {

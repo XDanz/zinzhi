@@ -1,6 +1,7 @@
 package com.tailf.controller;
 
 import java.net.InetAddress;
+
 import java.net.Socket;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
@@ -22,7 +23,7 @@ import org.apache.log4j.Logger;
 
 
 public class HALocalNode extends AbstractHANode {
-    private static final Logger log = 
+    private static final Logger log =
         Logger.getLogger( HALocalNode.class );
 
     public HALocalNode (String name, ConfIP address,boolean preferredMaster ,
@@ -30,8 +31,8 @@ public class HALocalNode extends AbstractHANode {
         super ( name, address, preferredMaster, port );
 
         try {
-            ObjectInputStream is = 
-                new ObjectInputStream ( new FileInputStream ( "txid" + 
+            ObjectInputStream is =
+                new ObjectInputStream ( new FileInputStream ( "txid" +
                                                               getName()));
             this.eventTxId = (CdbTxId) is.readObject();
             log.info("READING TXID "+ eventTxId);
@@ -68,7 +69,7 @@ public class HALocalNode extends AbstractHANode {
         try {
             sock = getSocket2Ncs();
             Ha ha = getHASocket2Ncs(sock);
-            
+
             HaStatus stat = ha.status();
             return stat.getHaState();
 
@@ -78,7 +79,7 @@ public class HALocalNode extends AbstractHANode {
             }
         }
     }
-    
+
     public CdbTxId getTxId() throws Exception {
         Cdb cdb = new Cdb ( "cdb-txid", getSocket2Ncs() );
         CdbTxId txid =  cdb.getTxId();
@@ -107,17 +108,14 @@ public class HALocalNode extends AbstractHANode {
             log.error("",e );
             return false;
         }
-       
+
     }
 
     public void beMaster () throws Exception {
-        log.info ( " beMaster() =>" );
         Socket sock = getSocket2Ncs();
         Ha ha = getHASocket2Ncs(sock);
-        log.info(" Name :" + getName());
         ha.beMaster ( new ConfBuf ( getName() ));
         sock.close();
-        log.info ( " beMaster() => ok" );
     }
 
     public void beNone () throws Exception {
@@ -129,9 +127,9 @@ public class HALocalNode extends AbstractHANode {
 
     public void saveTxId () throws Exception {
         this.eventTxId = getTxId();
-        ObjectOutputStream oo = 
+        ObjectOutputStream oo =
             new ObjectOutputStream (
-                                    new FileOutputStream ("txid" + 
+                                    new FileOutputStream ("txid" +
                                                           getName()));
         oo.writeObject ( eventTxId );
         oo.flush();
@@ -141,16 +139,16 @@ public class HALocalNode extends AbstractHANode {
     public boolean isReachable () {
         return true;
     }
-    
+
     public void beSlave ( HANode master ) throws Exception {
         Socket sock = getSocket2Ncs();
         Ha ha = getHASocket2Ncs(sock);
-        
+
         ConfHaNode masterConfHaNode =
             new ConfHaNode ( new ConfBuf( master.getName()),
                              master.getAddress());
-        
-        
+
+
         ha.beSlave(new ConfBuf( getName() ),
                    masterConfHaNode,true) ;
 
@@ -158,9 +156,9 @@ public class HALocalNode extends AbstractHANode {
     }
 
     public String toString () {
-        String str = "RemoteNode[name:" + getName() + ",addr:" + 
-            getAddress() + 
-            ",port=" + getPort() + 
+        String str = "LocalNode[name:" + getName() + ",addr:" +
+            getAddress() +
+            ",port=" + getPort() +
             "]";
         return str;
     }

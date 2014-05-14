@@ -101,12 +101,19 @@ public class HAController {
             break;
         case HaNotification.HA_INFO_SLAVE_ARRIVED:
             {
-                log.info ( " => SLAVE ARRIVED !!!");
+                log.info ( " => SLAVE " + haEvent.getHANode() +
+                           " ARRIVED !!!");
             }
             break;
         case HaNotification.HA_INFO_SLAVE_INITIALIZED:
             {
+                // Local Node has been initialized to slave
+                // and CdbTxId should be the same as the master
+                // remote the eventTxId
                 log.info ( " => SLAVE INITIALIZED !!!");
+                HALocalNode local =
+                    (HALocalNode)getLocalHANode();
+                local.saveTxId();
             }
             break;
         case HaNotification.HA_INFO_IS_MASTER:
@@ -121,6 +128,20 @@ public class HAController {
             }
             break;
         }
+    }
+
+    void localNodeBeSlave ( ) throws Exception {
+        switch ( getLocalHANode().getHaStatus() ) {
+        case MASTER:
+            getLocalHANode().beNone();
+            break;
+        case SLAVE:
+            return;
+        case NONE:
+        default:
+            break;
+        }
+        getLocalHANode().beSlave(getRemoteHANode());
     }
 
     void masterDown () throws Exception {
