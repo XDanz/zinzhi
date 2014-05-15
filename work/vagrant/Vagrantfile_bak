@@ -1,0 +1,55 @@
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant::Config.run do |config|
+
+  config.vm.define :node0 do |node0|
+    # Every Vagrant virtual environment requires a box to build off of.
+
+    node0.vm.box = "precise64"
+    node0.vm.box_url = "http://files.vagrantup.com/precise64.box"
+
+    # Boot with a GUI so you can see the screen. (Default is headless)
+    #config.vm.boot_mode = :gui
+
+    # Host-only networking to make the machine easy to access.
+    node0.vm.network :hostonly, "192.168.60.22"
+
+    # Share the confd directory.
+    # Use NFS because the default vboxfs doesn't support symlinks.
+    node0.vm.share_folder("foo","/confd",
+                          "/Users/dtc/dev/confd-5.0linux")
+    
+
+    # Install & setup
+    node0.vm.provision :shell, :path => "vm-init.sh"
+    # config.ssh.username = "dtc"
+
+  end
+
+
+  # config.vm.define :node1 do |node1|
+  #   # Every Vagrant virtual environment requires a box to build off of.
+
+  #   node1.vm.box = "precise64"
+  #   node1.vm.box_url = "http://files.vagrantup.com/precise64.box"
+
+
+  #   # Boot with a GUI so you can see the screen1. (Default is headless)
+  #   #config.vm.boot_mode = :gui
+
+  #   # Host-only networking to make the machine easy to access.
+  #   node1.vm.network :hostonly, "192.168.60.33"
+
+  #   # Share the confd directory.
+  #   # Use NFS because the default vboxfs doesn't support symlinks.
+  #   node1.vm.share_folder "vagrant-data","/confd","/Users/dtc/dev/confd-5.0linux"
+
+  #   # Install & setup
+  #   node1.vm.provision :shell, :path => "vm-init.sh"
+  #   # config.ssh.username = "dtc"
+
+  # end
+end
+
