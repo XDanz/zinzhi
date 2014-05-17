@@ -1,55 +1,235 @@
-This work is contraint to work on HA failover between 2 nodes.
-And it is contraint to use linux and experiments is done on 2 virtual machines
-which is based on Ubuntu. When a failover occures the failover node
-should create an alias interface and send garp requsts/responses.
-This could be done with for example with JNI native calls or it
-could execute binaries with a forking process.
+Introduction to NCS Hight Availability
+--------------------------------------
+NCS support replication of the CDB configuration as well as of the 
+operational data kept in CDB. The replication architecture is that of one 
+active master and a number of passive slaves.
 
-When the NCS brings starts the Controller the controller should 
-read information stored at Cdb from the namespace 
-http://tail-f.com/ns/ha-controller in tailf-ha-controller.yang.
+A group of NCS hosts consisting of a master, and one or more slaves, 
+is referred to as an HA group and sometimes as an HA cluster 
+
+All configuration write operations must occur at the master and NCS will 
+automatically distribute the configuration updates to the set of live slaves.
+
+Operational data in CDB may be replicated or not based on the tailf:persistent 
+statement in the data model. 
+
+All write operations for replicated operational data must also occur at the
+master, with the updates distributed to the live slaves, 
+whereas non-replicated operational data can also be written on the slaves.
+
+The only thing NCS does is to replicate the CDB data amongst the members in 
+the HA group. It doesn't perform any of the otherwise High-Availability 
+related tasks such as running election protocols in order to elect a new master.
+This is the task of a High-Availability Framework (HAFW) which must be in 
+place. The HAFW must instruct NCS which nodes are up and down using methods
+from HA API.
+
+Thus in order to use NCS configuration replication we must first have a HAFW. 
+In this report the HAFW will be denoted HAController.
+
+The HAFW must also detect when nodes fail and instruct NCS accordingly which
+is done with the Notification API.
+
+If the master node fails, the HAFW must elect one of the remaining slaves 
+and appoint it the new master. The remaining slaves must also be informed 
+by the HAFW about the new master situation. NCS will never take any actions 
+regarding master/slave-ness by itself.
+
+Limitation of the problem
+-------------------------
+
+This work is limits the problem to work on HA failover scenario 
+between only 2 nodes which is one active master and one failover slave.
+
+The implementation is also limited to us linux as the plattform.
+
+
+HAController Achitecture
+------------------------
+
+The HAController resides on both HA nodes in a HA pair.
+Each HAController controls its local NCS on which it resides on and
+never changes the others HA State. Both HAController talks to each
+other through a simple protocol. Each HAController starts 
+a controller TCP acceptor which the remote connects to.
+
+One of these two HAControllers will have the role of a preferred master.
+The purpose is that the NCS of the HAController which is preferred master 
+should be the preferred master in the majority of cases.
+
+On the HAController which have the role of a preferred master it should
+take active actions when it looses its slave by trying to reconnect
+to its loosing slave.
+
+The HAController should take special consider regarding transactions that 
+occured on both NCS nodes while not in a HA pair.
+
+HAController Implementation
+---------------------------
+
+HAController is written in Java as a ApplicationComponent and resides
+in a package thus the class HAControllerAppCmp implements the 
+ApplicationComponent interface which o implements the 
+init(), finish() and the run() method.
+
+The NCS Java VM will start each class in a separate thread. 
+The init() is called prior the run() method by the init thread. 
+During NCS startup the init() method in the 
+interface ApplicatonComponent which is implemented by the 
+HAControllerAppCmp will be run.
+
+The method will initialize the HAController by calling the static
+method HAController.getController() which does three main important tasks. 
+
+First it reads configuration data from Cdb second it does the 
+inial determination which means that the HAController needs to figure out 
+which NCS it is deployed on. This is done through comparing the
+local machines configured ip addresses with a match against against
+the Cdb data which previously was read. If a match was found it 
+knowns how to contact the remote HAController and in turn 
+starts a acceptor which binds to a TCP port and third and finally
+it determines what HA state the NCS should be in the inital determination.
+
+The run() method has the normal java Runnable behavior and it starts
+a Notifiation which read a Notif socket for HA information.
+
+The finish() method is called when the NCS Java VM wants the application 
+thread to stop explicitly. 
+
+Initial HA State determination
+-----------------------------
+
+The initial step when a first node is up and running
+is that the initial connect should be done to the remote 
+HAController. In this case there could be two situations. 
+
+First is that the remote HAController is not running, which means that 
+connection is refused to the remote address and port. 
+What will in this case happen is that the local HAController will tell the 
+local NCS to be the master. The HAController has no way to figure out if 
+the remote HAController is down or a network route between them is broken. 
+We could n fact wind up in a split brain situation sooner or later. 
+To remedy this the current transaction on the local NCS should be persisted.
+
+We now has the situation with one node master and the other node unreachable.
+The remote node could in fact be running but have no idea about this.
+
+The other situation is that the remote node is up and the local
+HAController and remote HAController must agree on who should be the master
+and slave. In this situation the local HAController successfully 
+connects to the remote HAController and determine what should the local
+NCS be. The descition is based on transaction differences on the local and 
+remote node  the time they were disconnected as a HA pair.
+
+The local node needs to check if there is a transaction difference. This
+is determine by reading the persisted transaction id c. If the transaction
+id from the disk differs from the current transaction id then the local
+node has commited transaction that the remote node does not have.
+
+When the local node starts and successfully connect to the remote
+node we could assume that the remote node was started before the local node.
+
+
+We could speculate that transactions occured when the local node was
+singel master back in time before the NCS was rebooted.
+
+When there were a transaction difference on the local node the 
+local node could not be a slave which means that the transactions occured
+will be lost. Depending on if the remote node has transaction difference
+the local node could accept the remote as the slave if only 
+the remote node has no transaction difference. If in fact the remote
+node has transactions committed both nodes could not be accepted as a 
+slave which means that we have different commits on both local and remote 
+node.
+
+This work is limits the problem to work on HA failover scenario 
+between 2 nodes which is one active master and one failover slave.
+
+
+ Testing
+a failover scenario is done on 2 virtual machines which runs
+Linux x86_64 Ubuntu.
+
+When a failover occures the failover node will create interface aliases 
+on the interface that the HAController found during initial 
+determination. The interface address configured in 
+/thc:ha-controller/virtual-address/address will be configured 
+to the interface aliases and send garp requsts/responses to the 
+network. 
+
+The implementation solution will have two options
+1.) The first option will create a forking process and call arpsend 
+to acomplish the above.
+
+2.) The other option is to write custom c code which the current
+java process will call as the native methods throu JNI native call.
+
+The HAController is implemented as a NCS package of type
+ApplicationComponent. The package is defined as an application component 
+that consists of jar files in the private-jar directory which defines the
+HAController Java Application.
+
+Both ha node participating in ha pair is required to 
+load the package with the same initial configuration and
+tailf-ha-controller.yang and a HA must be enabled in ncs.conf on node
+machines.
+
+
+HAController startup
+-------------------
+When the NCS starts the NCS package controller will be loaded.
+
+During NCS startup the init() method in the interface ApplicatonComponent
+which is implemented by the HAControllerAppCmp will be run.
+
+The method will initialize the HAController by calling the static
+method HAController.getController() which does two main things. The first
+is it reads configuration data from Cdb from the namespace 
+http://tail-f.com/ns/ha-controller in tailf-ha-controller.yang. 
+
 The module should contain configuration and operational data
-items used by the HA controller.  The yang model used by the HA Controller 
-is located in tailf-ha-controller/src/yang/tailf-ha-controller.yang. 
-It contains configuration items used by the HA Controller instance.
+items used by the HA controller. 
+
+The yang model used by the HAController is located in 
+controller/src/yang/tailf-ha-controller.yang.
+
+The configuration data consists of the following node information:
 
 /thc:ha-controller/virtual-address/address is a leaf-list
 of addresses which is intended to redirect traffic towards the
-master node it is the VIP addresses of the system.
+master node in case of failover. It is the VIP addresses of the system.
+The HAController ensures that these addresses are brougth up on the
+current master node through the gratious arp.
 
-The yang model defines two nodes n1 and n2. For each
-node a address is supplied.
 
-The addresses is used by the HA Controller to determine which node is
-local and which is the remote node. The HA Controller uses the addresses
+/thc:ha-controller/secret-token is a token which is used 
+by the application when creating a Ha socket.
+
+/thc:ha-nodes/ha-node is a list containing node information.
+The name of a node, ip address that is used for determine which node is
+local and which is the remote node, local/remote node 
+determination. The HA Controller uses the addresses
 to compare the local machines address list to determine for which
-ha node it is responsible for.
+ha node it should be responsible for. The port on which the TCP Acceptor will 
+listen to for incoming request from the remote HAController.
 
-The HA Controller uses the configuration parameter
-/thc:ha-controller/secret-token to connect a HA Socket to
-the local ha node to determine the HA State. And
-uses the HA API to order the local ha node to be either slave/master/none.
+/thc:ha-controller/secret-token 
+The HA Controller uses this configuration parameter
+to connect a HA Socket to the local ha node to determine the HA State 
+and uses this information to order the local ha node to be either 
+slave/master/none.
 
-The HA Controller never connects a HA Socket to the remote node.
-The HA Controller is responsible for only local node and it uses
-a HA Socket to command its local ha node.
+The HAController never connects a HA Socket to the remote node.
+The HAController is responsible for only local node and it uses
+a HA Socket to command only its local HA node.
 
-The HA Controller runs inside NCS and starts when the package is loaded.
-
-The HA Controller It listen for configuration changes on the top-node
+The HAController listen for configuration changes on the top-node
 /thca:ha-controller for changes and reacts when changes are made
 on /thca:ha-controller/virtual-address/address
 which involves bringing the VIP addresses down and up again on the
 master node.
 
-The HA controller should manage a set of virutal IP addresses. The 
-HA controller ensures that these addresses ar brougth up on the
-current master node through the gratious arp.
 
-Both ha node participating in ha pair is required to load
-the package with the same initial configuration and the 
-tailf-ha-controller.yang and a HA must be enabled in ncs.conf on both 
-machines.
 
 When the package is initally stared the node ip should be compared 
 with the HA controller uses the machines interface (nic) that matches the
@@ -58,39 +238,9 @@ creates aliases <nic-name>:<i> where <i> starts from 0 and increases
 for each ip address in the leaf list.
 
 
-The only thing NCS does is to replicate the CDB data amongst the members in 
-the HA group. It doesn't perform any of the otherwise High-Availability 
-related tasks such as running election protocols in order to elect a 
-new master. This is the task of a High-Availability Framework (HAFW) 
-which must be in place. The HAFW must instruct NCS which nodes are up and down 
-using API method in Java . Thus in order to use ConfD configuration 
-replication we must first have a HAFW. 
 
 HAFW
 ---
-NCS only replicates the NCS data. NCS must be told by the HAFW which node 
-should be master and which nodes should be slaves.
-
-The HA framework must also detect when nodes fail and instruct NCS accordingly.
-If the master node fails, the HAFW must elect one of the remaining slaves 
-and appoint it the new master. The remaining slaves must also be informed 
-by the HAFW about the new master situation. NCS will never take any actions 
-regarding master/slave-ness by itself.
-
-The architecure is that HAFW lives on both nodes and it is written 
-as a ApplicationComponent where it contains code for accepting 
-tcp connections from the other HAFW node for queries and it pools 
-notification sockets which means that it receives information about
-ha events. The controller should figure out who should be slave and
-who should be master. The initial step when a first node is up and running
-is that the initial connect should be done to the other HAFW. In this 
-case there could be two situations. First is that the HAFW is not running
-which means that connection refused will occured in this situation 
-the HAFW should promote the local HA node to be master and also record
-the transaction id and save it to disk. We now has the situation with 
-one node master and the other node unreachable. The other node could
-alse be running but have no idea about the started node i.e a split 
-brain situation. Or in the simplest case the node has not been started.
 
 1.0 Initial Startup
 --------------

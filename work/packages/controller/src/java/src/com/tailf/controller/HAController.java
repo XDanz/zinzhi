@@ -133,7 +133,12 @@ public class HAController {
     void localNodeBeSlave ( ) throws Exception {
         switch ( getLocalHANode().getHaStatus() ) {
         case MASTER:
-            getLocalHANode().beNone();
+            {
+                getLocalHANode().beNone();
+                HAControllerVipManager vipManager = 
+                    HAControllerVipManager.getManager();
+                vipManager.destroyVips();
+            } 
             break;
         case SLAVE:
             return;
@@ -142,6 +147,28 @@ public class HAController {
             break;
         }
         getLocalHANode().beSlave(getRemoteHANode());
+    }
+
+    void localNodeBeMaster () throws Exception {
+        switch ( getLocalHANode().getHaStatus() ) {
+        case MASTER:
+            //no op already master
+            return;
+        case NONE:
+        case SLAVE:
+            {
+                getLocalHANode().beMaster();
+                HAControllerVipManager vipManager = 
+                    HAControllerVipManager.getManager();
+
+                vipManager.initializeAvailableVips();
+                
+            }
+            break;
+        default:
+            break;
+        }
+
     }
 
     void masterDown () throws Exception {
@@ -326,6 +353,10 @@ public class HAController {
         return this.configurationData.getRemoteHANode();
     }
 
+    public List<InetAddress> getVips () {
+        return this.configurationData.getVips();
+    }
+
     /**
      *  Returns the local HANode
      *
@@ -464,11 +495,10 @@ public class HAController {
                 }
             } else {
                 log.info ( remote + " IS DOWN !" );
-                log.info( " saving txid ");
+                log.info( " SAVING TXID! ");
                 ((HALocalNode) getLocalHANode()).saveTxId();
-                log.info(" Call (" + getLocalHANode() + ").beMaster () =>");
-                getLocalHANode().beMaster();
-                log.info(" Call (" + getLocalHANode() + ").beMaster () => ok");
+                log.info ("COMMAND LOCAL => MASTER");
+                localNodeBeMaster ();
             }
             log.info ("initialDetermination() => ok");
             return ;

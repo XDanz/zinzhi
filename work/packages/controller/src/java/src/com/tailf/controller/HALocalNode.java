@@ -3,6 +3,7 @@ package com.tailf.controller;
 import java.net.InetAddress;
 
 import java.net.Socket;
+import java.net.NetworkInterface;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
@@ -25,9 +26,11 @@ import org.apache.log4j.Logger;
 public class HALocalNode extends AbstractHANode {
     private static final Logger log =
         Logger.getLogger( HALocalNode.class );
+    
+    private NetworkInterface ifc;
 
     public HALocalNode (String name, ConfIP address,boolean preferredMaster ,
-                        int port  ) {
+                        int port ) {
         super ( name, address, preferredMaster, port );
 
         try {
@@ -58,6 +61,15 @@ public class HALocalNode extends AbstractHANode {
 
     public boolean isLocal() {
         return this.isLocal;
+    }
+
+
+    public void setNetworkInterface ( NetworkInterface ifc ) {
+        this.ifc = ifc;
+    }
+
+    public NetworkInterface getNetworkInterface() {
+        return this.ifc;
     }
 
     public String getName() {

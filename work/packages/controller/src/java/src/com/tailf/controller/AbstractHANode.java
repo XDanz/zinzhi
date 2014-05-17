@@ -20,7 +20,7 @@ public abstract class AbstractHANode implements HANode {
     protected CdbTxId eventTxId;
 
     public AbstractHANode (String name,ConfIP address,boolean preferredMaster ,
-                           int port  ) {
+                           int port ) {
         this.name = name;
         this.address = address;
         this.preferredMaster = preferredMaster;

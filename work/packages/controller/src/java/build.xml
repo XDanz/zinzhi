@@ -74,6 +74,21 @@
   </java>
   </target>
 
+  <target name="vip" 
+          depends="compile">
+    <java classname="com.tailf.controller.HAControllerVip"
+          failonerror="true"
+          fork="true">
+      <classpath refid="core-libs" />
+    <classpath location="build/classes"/>
+    <arg value="${cmd}" />
+
+    <!-- <arg value="${port}" /> -->
+    <!-- <jvmarg value="-verbose:class"/> -->
+  </java>
+</target>
+
+
   <target name="sender" 
           depends="compile">
     <java classname="com.tailf.controller.HAControllerConnectorTest"

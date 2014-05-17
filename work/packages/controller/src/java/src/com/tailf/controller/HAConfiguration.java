@@ -17,7 +17,7 @@ public class HAConfiguration {
         Logger.getLogger ( Logger.class);
     private List<HANode> haNodes;
     private String secretToken;
-    private List<InetAddress> virutalIPAddresses;
+    private List<InetAddress> virtualIPAddresses;
     private boolean determined = false;
 
 
@@ -26,7 +26,11 @@ public class HAConfiguration {
 
         this.haNodes = haNodes;
         this.secretToken = secretToken;
-        this.virutalIPAddresses = virtualIPAddresses;
+        this.virtualIPAddresses = virtualIPAddresses;
+    }
+
+    List<InetAddress> getVips ( ) {
+        return this.virtualIPAddresses;
     }
 
     String getSecretToken ( ) {
@@ -89,9 +93,11 @@ public class HAConfiguration {
                     if ( inetAddressEquals (haNodeAddr, localAddress) ) {
                      
                         if ( System.getenv("NCS_HA_NODE") == null) {
-
-                            setLocalHANode ( haNode );
+                            
+                            HALocalNode localNode = 
+                                setLocalHANode ( haNode );
                             this.determined = true;
+                            localNode.setNetworkInterface ( networkInterface );
                             log.info ( " recognizeNodeByInterfaces => ok");
                             return;
 
@@ -121,7 +127,7 @@ public class HAConfiguration {
         return false;
     }
     
-    void setLocalHANode ( HANode node ) {
+    HALocalNode  setLocalHANode ( HANode node ) {
         log.info ( " setLocalHANode() =>");
         List<HANode> list = new ArrayList<HANode>();
 
@@ -144,6 +150,8 @@ public class HAConfiguration {
 
         haNodes = list;
         log.info ( " setLocalHANode() => ok");
+        return local;
+
     }
 
     public boolean inetAddressEquals ( InetAddress a , InetAddress b ) {
