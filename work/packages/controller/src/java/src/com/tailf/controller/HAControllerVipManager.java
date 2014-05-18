@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
 import java.io.IOException;
+import java.io.File;
 
 import org.apache.log4j.Logger;
 
@@ -37,6 +38,9 @@ public class HAControllerVipManager {
 
         HALocalNode localNode =
             (HALocalNode)HAController.getController().getLocalHANode();
+
+        final File path = 
+            HAController.getController().getPackageDirectory();
         int index = 0;
 
         if ( localNode.getNetworkInterface () != null ) {
@@ -56,6 +60,7 @@ public class HAControllerVipManager {
                                 try {
                                     ifDown = 
                                         new HAControllerAutoIfDown (
+                                                                    path,
                                               vip.getInetAddress(),
                                               vip.getNetworkInterface(),
                                               vip.getVipIndex() );

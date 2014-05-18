@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.InetAddress;
 
 import java.io.IOException;
+import java.io.File;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,7 +48,7 @@ public class HAController {
     private static HAController haControllerInstance = null;
 
     private HAConfiguration configurationData;
-
+    private File path; // the current package path
     private ExecutorService pool =
         Executors.newSingleThreadExecutor();
 
@@ -128,6 +129,14 @@ public class HAController {
             }
             break;
         }
+    }
+
+    void addPackageDirectory (File path) {
+        this.path = path;
+    }
+    
+    File getPackageDirectory ( ) {
+        return this.path;
     }
 
     void localNodeBeSlave ( ) throws Exception {

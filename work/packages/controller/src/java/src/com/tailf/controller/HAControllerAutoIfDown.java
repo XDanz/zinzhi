@@ -8,20 +8,25 @@ import java.net.NetworkInterface;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.File;
 
 public class HAControllerAutoIfDown extends HAControllerOSCommand {
     private InetAddress addr;
     private NetworkInterface ifc;
     private int index;
+    private File path;
     private List<String> cmd = new ArrayList<String>();
-    HAControllerAutoIfDown ( InetAddress addr , NetworkInterface ifc , 
+    HAControllerAutoIfDown ( File path,  InetAddress addr ,
+                             NetworkInterface ifc , 
                              int index ) 
     throws Exception {
+        this.path = path;
         this.addr = addr;
         this.ifc = ifc;
         this.index = index;
         cmd.add ( "sudo");
-        cmd.add ( "packages/scripts/autoifdown.sh");
+        File script = new File ( path , "autoifdown.sh" );
+        cmd.add ( script.getPath() );
         cmd.add ( addr.getHostAddress());
         cmd.add ( "32" );
         cmd.add ( ifc.getName());
