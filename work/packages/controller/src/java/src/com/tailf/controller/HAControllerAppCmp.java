@@ -52,12 +52,14 @@ public class HAControllerAppCmp implements ApplicationComponent {
             new Notif ( notifSocket ,
                         EnumSet.of(NotificationType.NOTIF_HA_INFO) );
 
+        File currPkgDir = getCurrentPackageDirectory();
+        log.info (" currPkgDir:" + currPkgDir );
+        haController.addPackageDirectory ( currPkgDir );
+
         log.info ( " CALL initalDetermination () =>");
         haController.initialDetermination ();
         log.info ( " CALL initalDetermination () => ok");
-
-        File currPkgDir = getCurrentPackageDirectory();
-        haController.addPackageDirectory ( currPkgDir );
+        
     }
 
     public void run () {
@@ -106,10 +108,11 @@ public class HAControllerAppCmp implements ApplicationComponent {
                                         MaapiUserSessionFlag.PROTO_TCP);
             ConfPath path = 
                 new ConfPath("/ncs:packages/package{controller}/directory" );
-                int th = maapiSock.startTrans ( Conf.DB_RUNNING,
-                                                Conf.MODE_READ);
-                ConfValue pkgPath = maapiSock.getElem( th, path ) ;
-                return new File(pkgPath.toString());
+            int th = maapiSock.startTrans ( Conf.DB_RUNNING,
+                                            Conf.MODE_READ);
+            ConfValue pkgPath = maapiSock.getElem( th, path ) ;
+            log.info ( " pkgPath :" + pkgPath );
+            return new File(pkgPath.toString());
         } catch ( Exception e ) {
             log.error("",e);
             return null;

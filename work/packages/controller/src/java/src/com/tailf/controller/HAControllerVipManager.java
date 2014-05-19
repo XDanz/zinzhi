@@ -42,14 +42,15 @@ public class HAControllerVipManager {
         final File path = 
             HAController.getController().getPackageDirectory();
         int index = 0;
-
+        log.info (" localNode If:" + localNode.getNetworkInterface() );
         if ( localNode.getNetworkInterface () != null ) {
             for ( InetAddress addr : availVips ) {
                 final HAControllerVip vip =
                     new HAControllerVip ( addr ,
                                           localNode.getNetworkInterface() ,
                                           index++);
-
+                log.info (" Initialize Vip " + vip.getInetAddress() + 
+                          " on " + vip.getNetworkInterface() );
                 vip.bringInterfaceUp();
                 Future<Void> future = 
                     pool.submit( 
