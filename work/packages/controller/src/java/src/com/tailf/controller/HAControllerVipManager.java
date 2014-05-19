@@ -19,8 +19,8 @@ public class HAControllerVipManager {
         Logger.getLogger ( HAControllerVipManager.class);
     static HAControllerVipManager inst;
 
-    Map<HAControllerVip,Future> vipsup =
-        new HashMap<HAControllerVip,Future> ();
+    Map<HAControllerVip,List<Future>> vipsup =
+        new HashMap<HAControllerVip,List<Future>> ();
 
     private ExecutorService pool = 
         Executors.newCachedThreadPool();
@@ -33,6 +33,7 @@ public class HAControllerVipManager {
     }
 
     public void initializeAvailableVips () throws Exception {
+        log.info ("initializeAvailableVips () =>");
         List<InetAddress> availVips =
             HAController.getController().getVips();
 
@@ -52,6 +53,8 @@ public class HAControllerVipManager {
                 log.info (" Initialize Vip " + vip.getInetAddress() + 
                           " on " + vip.getNetworkInterface() );
                 vip.bringInterfaceUp();
+
+                List<Future> futures = new ArrayList<Future>();
                 Future<Void> future = 
                     pool.submit( 
                                 new Callable<Void>() {
@@ -80,25 +83,64 @@ public class HAControllerVipManager {
                                 }
                                 
                                 });
+                futures.add( future );
 
-                vipsup.put ( vip , future );                
+
                 
+                Future<Void> garpFuture = 
+                    pool.submit(
+                               new Callable<Void>() {
 
-                HAControllerGratuitousArp garpProvider =
-                    new HAControllerGratuitousArp ( vip );
 
-                garpProvider.arpReply ( 4 );
-                garpProvider.arpResponse ( 4 );
+                                   public Void call () {
+                                       
+                                       try {
+                                           log.info (" a -> ");
+                                       
+                                       HAControllerGratuitousArp garpProvider =
+                                       new HAControllerGratuitousArp ( vip );
+                                       
+                                       garpProvider.arpReply ( 4 );
+                                       garpProvider.arpResponse ( 4 );
+                                   
+                                       log.info (" GARPING -> OK");
+                                       log.info (" Initialize Vip " + 
+                                                 vip.getInetAddress() + 
+                                                 " on " + 
+                                                 vip.getNetworkInterface()  + 
+                                                 " DONE!");   
+                                       } catch ( Exception e ) {
+                                           log.error("",e);
+                                       }
+                                       return null;
+                                   } 
+                               }
+                               );
+                futures.add ( garpFuture );
+                log.info (" putting " + futures );
+                vipsup.put ( vip , futures );                
 
             }
+            log.info (" All VIP up and running!");
         }
+        log.info ("initializeAvailableVips () => ok");
     }
 
+
+       
+
     public void destroyVips () throws HAControllerException {
-        for (Map.Entry<HAControllerVip,Future> e : vipsup.entrySet() ) {
-            Future future = e.getValue();
-            future.cancel (true);
+        log.info (  " destroying vips ");
+        for (Map.Entry<HAControllerVip,List<Future>> e : vipsup.entrySet() ) {
+            List<Future> futures = e.getValue();
+            log.info (" interrupting ..");
+            for ( Future future : futures ) 
+                future.cancel (true);
         }
         vipsup.clear();
+    }
+
+    public void destroy () {
+        pool.shutdownNow();
     }
 }

@@ -93,9 +93,16 @@ public class HAControllerAppCmp implements ApplicationComponent {
         log.info ("\n ---- Finish ---- START");
         HAControllerAcceptor.stopListening();
         shouldRun = false;
+        HAControllerVipManager vipMngr = 
+            HAControllerVipManager.getManager();
+        log.info ( " destroy All vips ");
+        vipMngr.destroyVips();
+        vipMngr.destroy();
+        log.info ( " destroy All vips ok");
+
+        
         log.info ("\n ---- Finish ---- END");
     }
-
     File getCurrentPackageDirectory() {
 
         try {

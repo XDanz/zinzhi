@@ -41,6 +41,10 @@ public class HAControllerAcceptor {
                         try {
                             acceptor =
                                 new HAControllerAcceptor ( );
+                            log.info (" acceptor " + acceptor );
+                            log.info ( " Starting Acceptor !");
+                            acceptor.acceptHARemoteConnections();
+                            
                         } catch ( Exception e ) {
                             log.error("",e );
                             acceptor.executorService().shutdownNow();
@@ -49,6 +53,7 @@ public class HAControllerAcceptor {
                 }
                 );
         }
+        
     }
 
     class RequestHandler implements Runnable {
@@ -104,16 +109,22 @@ public class HAControllerAcceptor {
     }
 
     public static void stopListening() throws Exception {
-        if ( pool != null && !pool.isShutdown() ) {
-            pool.shutdownNow();
-        }
-        
+        log.info ( " acceptor = " + acceptor );
         if ( acceptor != null && acceptor.getServerSocket() != null ) {
+            log.info (" closing Server Socket!");
             acceptor.getServerSocket().close();
+            log.info (" closing Server Socket! ok");
         }
+
+        if ( pool != null ) {
+            log.info (" pool shuting down =>");
+            pool.shutdownNow();
+            log.info (" pool shuting down => ok");
+        }
+
     }
 
-    public HAControllerAcceptor () {
+    public void acceptHARemoteConnections () {
         try {
             HAController controller = HAController.getController();
             int port = controller.getLocalHANode().getPort();
@@ -121,6 +132,7 @@ public class HAControllerAcceptor {
                 .getAddress().getAddress();
 
             ServerSocket srvSock = new ServerSocket ();
+            this.server = srvSock;
             srvSock.setReuseAddress(true);
             srvSock.bind(
                          new InetSocketAddress (addr , port));
