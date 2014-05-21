@@ -1,0 +1,200 @@
+\ProvidesPackage{avesta}
+\usepackage[utf8]{inputenc}
+
+%% konfidentiell data
+
+\newcommand{\C}{$i_1$}
+\newcommand{\N}{$i_2$}
+\newcommand{\Al}{$i_3$}
+\newcommand{\Si}{$i_4$}
+\newcommand{\fosfor}{$i_5$}
+\newcommand{\svavel}{$i_6$}
+\newcommand{\Ti}{$i_7$}
+\newcommand{\V}{$i_8$}
+\newcommand{\Cr}{$i_9$}
+\newcommand{\Mn}{$i_{10}$}
+\newcommand{\Fe}{$i_{11}$}
+\newcommand{\Co}{$i_{12}$}
+\newcommand{\Ni}{$i_{13}$}
+\newcommand{\Cu}{$i_{14}$}
+\newcommand{\Nb}{$i_{15}$}
+\newcommand{\Mo}{$i_{16}$}
+\newcommand{\As}{$i_{17}$}
+\newcommand{\W}{$i_{18}$}
+\newcommand{\Ce}{$i_{19}$}
+\newcommand{\B}{$i_{20}$}
+\newcommand{\Bi}{$i_{21}$}
+\newcommand{\Pb}{$i_{22}$}
+\newcommand{\Ca}{$i_{23}$}
+\newcommand{\Ta}{$i_{24}$}
+\newcommand{\POx}{$i_{25}$}
+\newcommand{\NiOx}{$i_{26}$}
+\newcommand{\MoOx}{$i_{27}$}
+\newcommand{\CaOx}{$i_{28}$}
+\newcommand{\MgOx}{$i_{29}$}
+\newcommand{\SiOx}{$i_{30}$}
+\newcommand{\CaFl}{$i_{31}$}
+\newcommand{\AlOx}{$i_{32}$}
+\newcommand{\VOx}{$i_{33}$}
+\newcommand{\TiOx}{$i_{34}$}
+\newcommand{\FeOx}{$i_{35}$}
+\newcommand{\MnOx}{$i_{36}$}
+\newcommand{\CrOx}{$i_{37}$}
+
+\newcommand{\matnamea}{18/10/2 SLIPSP 1}
+\newcommand{\matnameb}{18/10/2 SLIPSP 2}
+\newcommand{\matnamec}{18/10/2 SLIPSP 3}
+\newcommand{\matnamed}{18/10/2 SLIPSP 4}
+\newcommand{\matnamee}{18/10/2 SLIPSP 5}
+\newcommand{\matnamef}{18/8 RUSOR 1}
+\newcommand{\matnameg}{18/8 RUSOR 2}
+\newcommand{\matnameh}{18/8 STYCKE 1}
+\newcommand{\matnamei}{18/8 STYCKE 2}
+\newcommand{\matnamej}{18/8 STYCKE 3}
+\newcommand{\matnamek}{18/8 STYCKE 4}
+\newcommand{\matnamel}{18/8 STYCKE 5}
+\newcommand{\matnamem}{18/8 STYCKE 6}
+\newcommand{\matnamen}{18/8 STYCKE 7}
+\newcommand{\matnameo}{18/8 STYCKE 8}
+\newcommand{\matnamep}{BESKICKNING NI 1}
+\newcommand{\matnameq}{BESKICKNING NI 2}
+\newcommand{\matnamer}{BESKICKNING NI 3}
+\newcommand{\matnames}{BESKICKNING NI 4}
+\newcommand{\matnamet}{Bränd kalk 1}
+\newcommand{\matnameu}{Bränd kalk 2}
+\newcommand{\matnamev}{Bränd kalk 3}
+\newcommand{\matnamew}{Bränd kalk 4}
+\newcommand{\matnamex}{CR SKROT NI <4\% - a}
+\newcommand{\matnamey}{CR SKROT NI <4\% - b}
+\newcommand{\matnamez}{CR SKROT NI <4\% - c}
+\newcommand{\matnameaa}{Dolomit 1}
+\newcommand{\matnameab}{Dolomit 2}
+\newcommand{\matnameac}{Dolomit 3}
+\newcommand{\matnamead}{Dolomit 4}
+\newcommand{\matnameae}{HC FECR SI 3 - a}
+\newcommand{\matnameaf}{HC FECR SI 3 - b}
+\newcommand{\matnameag}{HC FECR SI 3 - c}
+\newcommand{\matnameah}{HC FECR SI 3 - d}
+\newcommand{\matnameai}{HC FECR SI 3 - d}
+\newcommand{\matnameaj}{KOLPULVER 1}
+\newcommand{\matnameak}{KOLPULVER 2}
+\newcommand{\matnameal}{LÅGLEG SPÅN 1}
+\newcommand{\matnameam}{LÅGLEG SPÅN 2}
+\newcommand{\matnamean}{LÅGLEG SPÅN 3}
+\newcommand{\matnameao}{LÅGLEG STYCKE 1}
+\newcommand{\matnameap}{LÅGLEG STYCKE 2}
+\newcommand{\matnameaq}{LÅGLEG STYCKE 3}
+\newcommand{\matnamear}{LÅGLEG STYCKE 4}
+\newcommand{\matnameas}{LÅGLEG STYCKE 5}
+\newcommand{\matnameat}{LÅGLEG STYCKE 6}
+\newcommand{\matnameau}{OLEG SKROT 1}
+\newcommand{\matnameav}{SLIPVADDSBRIK 1}
+
+% faktoriserade priser
+\newcommand{\matpricea}{382,17}
+\newcommand{\matpriceb}{382,17}
+\newcommand{\matpricec}{509,55}
+\newcommand{\matpriced}{509,55}
+\newcommand{\matpricee}{509,55}
+\newcommand{\matpricef}{1210,19}
+\newcommand{\matpriceg}{1210,19}
+\newcommand{\matpriceh}{955,41}
+\newcommand{\matpricei}{955,41}
+\newcommand{\matpricej}{955,41}
+\newcommand{\matpricek}{955,41}
+\newcommand{\matpricel}{955,41}
+\newcommand{\matpricem}{955,41}
+\newcommand{\matpricen}{1019,11}
+\newcommand{\matpriceo}{1019,11}
+\newcommand{\matpricep}{7579,62}
+\newcommand{\matpriceq}{7579,62}
+\newcommand{\matpricer}{10000}
+\newcommand{\matprices}{10000}
+\newcommand{\matpricet}{63,69}
+\newcommand{\matpriceu}{63,69}
+\newcommand{\matpricev}{63,69}
+\newcommand{\matpricew}{63,69}
+\newcommand{\matpricex}{382,17}
+\newcommand{\matpricey}{382,17}
+\newcommand{\matpricez}{382,17}
+\newcommand{\matpriceaa}{63,69}
+\newcommand{\matpriceab}{63,69}
+\newcommand{\matpriceac}{63,69}
+\newcommand{\matpricead}{63,69}
+\newcommand{\matpriceae}{573,25}
+\newcommand{\matpriceaf}{764,33}
+\newcommand{\matpriceag}{764,33}
+\newcommand{\matpriceah}{764,33}
+\newcommand{\matpriceai}{764,33}
+\newcommand{\matpriceaj}{254,78}
+\newcommand{\matpriceak}{254,78}
+\newcommand{\matpriceal}{191,08}
+\newcommand{\matpriceam}{191,08}
+\newcommand{\matpricean}{191,08}
+\newcommand{\matpriceao}{191,08}
+\newcommand{\matpriceap}{191,08}
+\newcommand{\matpriceaq}{191,08}
+\newcommand{\matpricear}{191,08}
+\newcommand{\matpriceas}{191,08}
+\newcommand{\matpriceat}{191,08}
+\newcommand{\matpriceau}{63,69}
+\newcommand{\matpriceav}{1528,66}
+
+\newcommand{\matsaldoa}{2980}
+\newcommand{\matsaldob}{3280}
+\newcommand{\matsaldoc}{3660}
+\newcommand{\matsaldod}{2660}
+\newcommand{\matsaldoe}{2660}
+\newcommand{\matsaldof}{10080}
+\newcommand{\matsaldog}{10000}
+\newcommand{\matsaldoh}{27100}
+\newcommand{\matsaldoi}{9880}
+\newcommand{\matsaldoj}{30920}
+\newcommand{\matsaldok}{10720}
+\newcommand{\matsaldol}{10460}
+\newcommand{\matsaldom}{10720}
+\newcommand{\matsaldon}{7640}
+\newcommand{\matsaldoo}{8560}
+\newcommand{\matsaldop}{1320}
+\newcommand{\matsaldoq}{1680}
+\newcommand{\matsaldor}{1500}
+\newcommand{\matsaldos}{1500}
+\newcommand{\matsaldot}{5140}
+\newcommand{\matsaldou}{4900}
+\newcommand{\matsaldov}{4960}
+\newcommand{\matsaldow}{5140}
+\newcommand{\matsaldox}{13910}
+\newcommand{\matsaldoy}{14840}
+\newcommand{\matsaldoz}{9140}
+\newcommand{\matsaldoaa}{1580}
+\newcommand{\matsaldoab}{1480}
+\newcommand{\matsaldoac}{1500}
+\newcommand{\matsaldoad}{1520}
+\newcommand{\matsaldoae}{10400}
+\newcommand{\matsaldoaf}{1720}
+\newcommand{\matsaldoag}{10280}
+\newcommand{\matsaldoah}{11600}
+\newcommand{\matsaldoai}{2000}
+\newcommand{\matsaldoaj}{250}
+\newcommand{\matsaldoak}{250}
+\newcommand{\matsaldoal}{13060}
+\newcommand{\matsaldoam}{12380}
+\newcommand{\matsaldoan}{12800}
+\newcommand{\matsaldoao}{5200}
+\newcommand{\matsaldoap}{24960}
+\newcommand{\matsaldoaq}{12540}
+\newcommand{\matsaldoar}{10140}
+\newcommand{\matsaldoas}{6960}
+\newcommand{\matsaldoat}{18020}
+\newcommand{\matsaldoau}{4900}
+\newcommand{\matsaldoav}{1560}
+
+\newcommand{\enhetsprisa}{\epris~$\approx$~678,22~kg$^{-1}$}
+\newcommand{\enhetsprisb}{\epris~$\approx$~627,01~kg$^{-1}$}
+\newcommand{\enhetsprisc}{\epris~$\approx$~723,69~kg$^{-1}$}
+\newcommand{\enhetsprisd}{\epris~$\approx$~653,06~kg$^{-1}$}
+
+\newcommand{\konfidentiell}{}
+\newcommand{\epris}{enhetsprisfaktor}
+\newcommand{\enhetspris}{\epris~(kg$^{-1}$)}
+%% slut på konfidentiell data

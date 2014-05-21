@@ -1,0 +1,441 @@
+\message{ !name(xjobb-sv.tex)}\documentclass[a4paper,11pt]{kth-mag}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{lmodern}
+\usepackage[latin1]{inputenc}
+\usepackage[swedish,english]{babel}
+\usepackage{modifications}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{Metoder för blandningsoptimering i metallurgiska processer}
+
+\subtitle{Blandning av skrot och legeringar vid en metallurgisk processindustri}
+\author{Fredrik Persson}
+\date{december 2008}
+\blurb{Examenrapport vid NADA utfört på Kobolde \& Partners AB\\
+Handledare Kobolde \& Partners AB: Rutger Gyllenram\\
+Handledare KTH: Örjan Ekeberg\\
+Examinator: Anders Lansner}
+\trita{TRITA xxx yyyy-nn}
+\begin{document}
+
+\message{ !name(xjobb-sv.tex) !offset(-3) }
+
+\frontmatter
+\pagestyle{empty}
+\removepagenumbers
+\maketitle
+\selectlanguage{swedish}
+\begin{abstract}
+  Detta examensarbete har syftat till att inventera möjliga metoder för att
+  optimera en metallurgisk blandningsprocess där olika råmaterial blandas för
+  att producera en slutprodukt av eftersökt kompositionsanalys.
+  Denna fil ger ett avhandlingsskelett.
+  Mer information om \LaTeX-mallen finns i
+  dokumentationen till paketet.
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris
+purus. Fusce tempor. Nulla facilisi. Sed at turpis. Phasellus eu
+ipsum.
+
+Nam porttitor laoreet nulla. Phasellus massa massa, auctor
+rutrum, vehicula ut, porttitor a, massa. Pellentesque fringilla. Duis
+nibh risus, venenatis ac, tempor sed, vestibulum at, tellus. Class
+aptent taciti sociosqu ad litora torquent per conubia nostra, per
+inceptos hymenaeos.
+\end{abstract}
+\clearpage
+\begin{foreignabstract}{english}
+  This is a skeleton for KTH theses. More documentation
+  regarding the KTH thesis class file can be found in
+  the package documentation.
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris
+purus. Fusce tempor. Nulla facilisi. Sed at turpis. Phasellus eu
+ipsum.
+
+Nam porttitor laoreet nulla. Phasellus massa massa, auctor
+rutrum, vehicula ut, porttitor a, massa. Pellentesque fringilla. Duis
+nibh risus, venenatis ac, tempor sed, vestibulum at, tellus. Class
+aptent taciti sociosqu ad litora torquent per conubia nostra, per
+ hymenaeos. 
+\end{foreignabstract}
+\clearpage
+\tableofcontents*
+\mainmatter
+\pagestyle{newchap}
+\chapter{Introduktion}
+
+Vid produktion av stål genom smältning av skrot i ljusbågsugn eller
+induktionsugn är processekonomin beroende av val av råvaror. Råvaror är köpt
+skrot av olika klasser, internt fallande skrot av olika stålsorter och
+legeringsämnen. Dessutom tillsätts slaggbildare. Råvarornas pris och
+egenskaper ändras hela tiden varför fasta recept inte är ekonomiskt
+optimalt. I första hand gäller det att ta vara på skrotets legeringsinnehåll,
+som i vissa fall till exempel krom och nickel, utan att få för höga halter av
+oönskade ämnen som till exempel svavel och tenn. Om skrotets legeringsinnehåll
+inte uppnår den eftersökta sammansättningen så tillsätts så kallade
+ferrolegeringar som är dyrare. 
+
+Målet med själva blandningsoptimeringen är att
+välja ut de mest ekonomiskt fördelaktiga råmaterialen som ska ingå i
+blandningen samt minimera risken att inte nå en slutprodukt av korrekt
+metallurgisk sammansättning. Urvalet av råmaterial kan göras med hänsyn till
+mer eller mindre långsiktiga kostnadsmodeller där lagersaldo, leveranser och
+framtida blandningar är variabler som påverkar det avgörande
+receptet. Eftersom den metallurgiska blandningsberäkningen är olinjär emedan
+vissa element fördelar sig mellan en slaggfas och en metallfas kan man inte
+utan förenklade antaganden använda sig av linjära optimeringsmetoder.
+
+\section{Blandningsprocesser}
+Det finns många olika sorters processer där blandning av råmaterial är
+en viktig del i produktionskedjan. Långt ifrån alla har en koppling till
+metallindustrin där råvarorna kan vara skrot och ferrolegeringar av olika
+slag. Vid produktion av vätskor, gaser och plaster kan till exempel
+råmaterialen variera från vanligt vatten till extremt komplexa polymerer. De olika
+produktionsprocesserna skiljer sig åt vad gäller framställning av olika
+blandningar. Vissa blandningar innehåller råmaterial som interagerar med
+varandra vilket kräver en mer komplex modell för att simulera blandningsförloppet
+medans andra blandningar består av råmaterial som inte interagerar med
+varandra och då kan simuleras genom enklare modeller. Problematiken kring val
+av recept är dock oftast oberoende av användningsområde. 
+
+\paragraph{Metallurgiska blandningsprocessen.}
+\begin{figure}
+  \begin{center}
+    \includegraphics{graphics/steelmakingprocess.eps}
+  \end{center}
+  \caption{Skrotbaserad ståltillverkningsprocess}
+  \label{steelprocess}
+\end{figure}
+I den metallurgiska blandningsprocessen är råmaterialet ofta skrot av olika
+slag. Problemet med att använda skrot som råmaterial är att olika sorters
+skrot består av metalliska material som i sig är föreningar av ämnen där,
+beeroende på smältprocessen och den eftersökta slutprodukten, vissa ämnen ses
+som smutsiga föroreningar medans andra ses som värdefulla
+tillsatser. Dessutom är skrot inte ett homogent material vilket gör det i
+praktiken omöjligt att bestämma en korrekt kemisk analys av materialet,
+mätningar görs därför ofta med hänsyn till en viss
+standardavvikelse. Blandningsprocessen kan beskrivas i följande steg:   
+\begin{enumerate}
+\item En eftersökt slutblandning \textit{B} definieras efter ett önskat
+  metallurgiskt sammansättningsintervall.
+\item Ett råmaterialrecept \textit{R} konstrueras framförallt med hänsyn till:
+  \begin{enumerate}
+  \item att analysen för den slutliga blandningen \textit{B$'$} hamnar inom sammansättningsintervallet
+    enligt punkt 1.
+  \item att minimera totalkostnaden för produktionen. Det är då viktigt att
+    inte bara ta häsyn till endast enstaka charger utan även ta hänsyn till
+    lägsta totalkostnad för produktion av flera charger.
+  \end{enumerate}
+\item Råmaterialen samlas enligt \textit{R} till en charge och tillsätts sedan
+  i exempelvis en ljusbågs- eller induktions-ugn~\cite{engh1992} där
+  materialen smälts samman till en blandning \textit{B$'$}.
+\item Blandningen \textit{B$'$} kontrolleras så att dess analys ligger inom det
+  eftersökta sammansättningsintervallet för \textit{B}. 
+\end{enumerate} Blandningen \textit{B$'$} går sedan vidare in i en
+argon-oxygen decarburization converter (AOD) där argon och syre blåses in för
+få ner kolhalten i blandningen, (se Fig.~\ref{steelprocess}). De metallurgiska beräkningsmodeller som
+beskriver förloppet när olika råmaterial smälts samman kan göras mer eller
+mindre avancerade beroende på om hänsyn tas till reaktioner mellan slagg och
+metall, infodringsslitage på ugn, värmebalans etc.
+
+
+\section{Optimal blandning}
+En optimal skrotblandning har framförallt följande egenskaper:
+\begin{enumerate}
+\item Slutprodukten har en analys som ligger inom det
+  fördefinierade sammansättningsintervallet.
+\item Totalkostnaden för produktion av recptet ska vara så låg som
+  möjligt. Kostnadsberäkningen för ett recept kan göras mer eller mindre
+  avancerad med hänsyn till:
+  \begin{enumerate}
+  \item priset på de ingående råmaterialen. Ett råmaterial som innehåller
+    mycket föroreningar ses som en billigare komponent i receptet.
+  \item lagersaldo och leveranstid för olika råmaterial. Om det är ont om ett
+    billigt råmaterial så är det inte bra att använda allt till endast en
+    blandning. Då kommer framtida behov av detta råmaterial vara omöjligt,
+    dyrare legeringar kanske måste tillsättas, vilket medför en ökad kostnad.
+  \item energiförbrukningen som kräv för att smälta de ingående
+    råmaterialen. Vissa råmaterial kanske har en högre smälttemperatur än andra osv.
+  \end{enumerate}
+\item Det ska vara enkelt att samla ihop de ingående råmaterialen. För många
+  små enheter i ett recept är tidsödande att samla ihop och bildar en flaskhals
+  i processkedjan.
+\item Massan på de olika enheterna måste gå att sammanställa från det
+  råmaterial man har att tillgå. Ett råmaterial som väger 50 kg kanske inte går att
+  dela upp i mindre enheter osv.
+\end{enumerate}
+
+För att konstruera ett så optimalt recept som möjligt krävs en
+metallurgisk modell som beskriver smältning av råmaterial på ett så
+relevant sätt som möjligt. Samtliga antaganden påverkar den
+slutgiltiga produktionskostnaden som även innefattar energiförbrukningen som
+krävs för att samla och smälta en charge. Råmaterialet är ofta skrot som
+samlas in från en skrotgård med hjälp av till exempel kran eller
+hjullastare. Därmed innebär ett optimalt recept i förlängningen en besparing
+av både miljö, produktionskostnad och material.
+
+\newpage
+\section{Problemformulering}
+Målet med en blandningsoptimering är att få ett så ekonomiskt fördelaktigt
+recept som möjligt som trots de ingående råmaterialens föroreningar ger en
+slutprodukt vars kemiska analys ligger inom ett fördefinierat accepterbart
+sammansättningsintervall.
+
+Forskning har bedrivits där blandningsproblematiken behandlas inom olika områden. De
+flesta behandlar dock inte den metallurgiska blandningsprocessen, men ofta
+sker optimeringen under liknande förutsättningar vad gäller råmaterialens
+sammansättning och den eftersökta slutproduktens sammansättning samt kravet på en
+så ekonomiskt fördelaktig blandning som möjligt. En av de större skillnaderna
+inom de blandningsprocesser som har studerats är de ingående råmaterialens
+förmåga att interagera med de övriga råmaterialen i blandningen. Vid en
+metalliurgisk blandningsprocess sker komplicerade reaktioner mellan de
+ingående råmaterialen men i en blandning av olika kvaliteter av vatten sker
+inte några relevanta reaktioner. I de fall där de olika råmaterialen interagerar
+med varandra får man ofta ickelinjära reaktionssamband vilket kräver en mer
+komplex modell för att simulera och optimera en blandning. 
+
+Många av de
+artiklar som finns publicerade inom forskningsområdet antar en mer förenklad modell för att
+sedan angripa problemet genom olika varianter av linjärprogrammering
+(LP), se till exempel Rong och Lahdelma~\cite{Rong08}. Detta är en snabb och vedertagen teknik som lämpar sig väl för att lösa
+större ekvationssystem, men som har nackdelen att inte kunna lösa mer komplexa
+system med ickelinjära samband. Det finns även viss forskning som analyserar
+blandningproblemet med hjälp av metoder som optimerar under ickelinjära
+förhållanden, till exempel Roy et al.~\cite{NR04} som optimerar en
+polymerblandningsprocess med hjälp av genetiska algoritmer~\cite{goldberg1989}~\cite{mitchell1997}~\cite{mitchell1996} och neurala
+nätverk~\cite{fausett1994}. Eftersom den metallurgiska
+blandningsberäkningen är ickelinjär då vissa element fördelar sig mellan
+slagg-, metall- och gas-fas kan man inte utan försämrat resultat använda sig
+av en förenklad linjär beräkningsmodell. Därför bör optimeringen utföras under
+ickelinjära förhållanden för att få önskad noggrannhet.
+
+\section{Syfte}
+Exjobbet syftar till att inventera möjliga metoder som kan användas
+för att optimera blandningar med hänsyn till en mer avancerad metallurgisk
+beräkningsmodell som är utvecklad av Kobolde \& Partners AB, samt att
+implementera någon av dessa metoder i det Java-baserade metallurgiska
+beräkningssystem TimeAOD2\texttrademark, utvecklat av Kobolde \& Partners AB. 
+
+\chapter{Avgränsningar och antaganden}
+\section{Avgränsningar}
+\begin{enumerate}
+\item Totalkostnaden för en charge beräknas endast utifrån en summerad kostnad
+  av den ingående råmaterialens pris. Hänsyn tas ej till energiförbrukning vid
+  smältning av en charge.
+\item Optimeringen bergänsas till endast en charge, en så kallad single heat model. Det borde bli andra
+  resultat om man tar hänsyn till lägsta totalkostnad vid optimering av flera
+  charger.
+\item Den metallurgiska beräkningsmodellen är utvecklad av Kobolde \& Partners
+  AB och behandlas som en svart låda för att beräkna ett recepts blandningsresultat.
+
+\end{enumerate}
+\section{Antaganden}
+\begin{enumerate}
+\item Innan optimeringen startar finns en önskad massa för slutprodukten.
+\item Vid optimeringen av receptet kan en mängd av ett specifikt råmaterial
+  sättas som ett hårt villkor. Den valda algoritmen optimerar då på det övriga
+  receptinnehållet utifrån att den bestämda mängden måste ingå i receptet.
+\item Råmaterial kan tillsättas i antingen steglös vikt eller i diskreta
+  mängder (till exempel säckar á 50-kg)
+\item De metallurgiska beräkningsmodellerna levereras av Kobolde \& Partners
+  AB med följande antaganden:
+  \begin{enumerate}
+    \item Antagande 1
+    \item Antagande 2
+  \end{enumerate}
+\end{enumerate}
+\chapter{Analys av möjliga optimeringsmetoder}
+Ett optimeringsproblem kan ofta lösas med fler än en optimeringsmetod. Det
+finns ingen universell optimeringsmetod som kan
+tillämpas på alla sorters problem, däremot finns det en uppsjö av olika
+metoder och tekniker som är anpassade till olika sorters
+optimeringsområden. Det finns mer eller mindre etablerade metoder för att lösa
+ett optimeringsproblem. Ofta har man ett försprång om man väljer en mer
+vedertagen optimeringsmetod då det ofta finns färdiga
+kommersiella programvaror att tillgå. Beroende på hur problemställningen
+formuleras finns det vissa metoder som lämpar sig bättre än
+andra. För att kartlägga vilka metoder som lämpar sig bäst för en
+metallurgisk blandningsoptimering gjordes en litteraturstudie för att undersöka den
+aktuella forskningsfronten. Tyvärr visar det sig att inte mycket forskning har bedrivits inom optimering av den metallurgiska
+blandningsprocessen. Därför utökas studien till att även titta på
+blandningsoptimering inom andra områden med liknande förutsättningar.
+
+De få som behandlar den metallurgiska blandningsoptimeringen antar ofta mer förenklade
+metallurgiska reaktionsmodeller för att sedan tillämpa någon form av
+linjärprogrammering~(\ref{LP}) för att optimera blandningen (Se Rong och Lahdelma~\cite{Rong08} och Bernatzki at
+al.~\cite{KB98}). Det finns dock fler studier inom övriga områden med förutsättningar som liknar den metallurgiska
+blandningsprocesen som angriper problemt med hjälp av tekniker som klarar av
+att optimera under olinjära förhållanden. Till exempel finns två studier där genetiska
+algoritmer~(\ref{GA}) används för att optimera dels en blandning av bensin (se Block et
+al.~\cite{JMB97}) och dels en blandning av polymerer (se Roy et
+al.~\cite{NR04}). Det finns även en studie som behandlar en blandningsprocess
+där man optimerar med hänsyn till osäkerheten i råmaterialens sammansättning med
+hjälp av tekniken Particle Swarm Optimization (se Pan och Wang~\ref{HPaLW06}
+), vilket är en av de faktorerna som påverkar den metallurgiska blandningsprocessen. 
+
+studie där en blandningprocess för framställning av olika sorters fett
+optimeras med genetiska algoritmer, 
+
+
+Detta resulterade i att
+optimeringsmetoderna linjärprogrammering, genetiska
+algoritmer, simulated annealing och particle swarm
+optimization valdes ut för ytterligare utvärdering.
+
+\section{Linjärprogrammering}\label{LP}
+Linjärprogrammering är en av de mer traditionella teknikerna som kan användas
+vid optimering. Själva begreppet har sin början vid andra världskriget då det
+växte fram ur behovet av att planera militära aktiviteter. George B. Dantzig
+anses som grundaren av tekniken och utvecklade
+simplexalgoritmen~\cite{Ruhul07} som publicerades 1947, se George
+B. Dantzig~\cite{Dantzig82}. För att använda sig av linjärprogrammering är det
+viktigt att problemställningen kan definieras som en matematisk modell där
+målfunktion och randvillkor uttrycks med linjära samband, till exempel:
+\begin{equation}
+\min  f(\bar{x}) = c_1x_1 + c_2x_2 + c_3x_3
+\label{LpExEqn}\end{equation}  med hänsyn till:
+\begin{align*}
+a_{11}x_1 + a_{12}x_2 + a_{13}x_3 & \le b_1 \\
+a_{21}x_1 + a_{22}x_2 + a_{23}x_3 & \ge b_2 \\
+a_{31}x_1 + a_{32}x_2 + a_{33}x_3 & = b_3 \\
+x_1, x_2, x_3 \ge & 0
+\end{align*} Här skulle målfunktionen~(\ref{LpExEqn}) kunna representera en
+produktionskostnad som ska minimeras där koeffecienterna \(a_{ij}, b_i\)
+bestämmer villkoren för minimeringen. 
+
+Det finnns många metoder som bygger på linjärprogrammering, till exempel Fuzzy
+Linear Programming (FLP) och Mixed Integer Linear Programming. Dessa metoder
+lämpar sig väl för optimering där problemställningen kan formuleras efter linjära förhållanden. För att
+kunna tillämpa linjärprogrammering på den metallurgiska blandnigsoptimeringen
+måste den reaktionsbeskrivande matematiska modellen förenklas så att endast
+linjära samband kvarstår. Detta medför en försämring i modellens noggrannhet
+och resultatet av ett recept som optimerats fram kanske leder till en blandning vars
+slutliga sammansättning inte ligger inom det eftersökta
+sammansättningsintervallet. Dyrare legeringar måste då tillsättas för att
+uppnå en accepterbar slutprodukt vilket medför en ökad
+produktionskostnad. Alternativt kan den linjära modellen kompensera
+för eventuella förluster vid den metallurgiska reaktionen, genom att anta att
+en viss del av varje råmaterial går direkt till en slaggfas, så att risken att nå en felaktigt
+sammansättning minimeras, men även detta påverkar noggrannheten vid
+blandningen och det kan resultera i en större materialförbrukning än
+nödvändigt vilket också ökar den slutgiltiga produktionskostnaden.
+
+\section{Heuristiska metoder}
+Eftersom den metallurgiska blandningsmodellen är ickelinjär krävs metoder som
+kan optimera under ickelinjära förhållanden för att nå ett blandningsrecept
+som tar bättre hänsyn till de metallurgiska ickelinjära reaktionerna. Ett
+intressant område inom optimering är de heuristiska metoder som kan hantera
+problem med ickelinjära samband. Fördelen med att använda sådana huristiska
+optimeringsmetoder är framförallt deras förmåga att relativt snabbt kunna hitta
+godtagbara lösningar i stora flerdimensionella hypotesrum där uttömmande
+sökningar skulle kräva oändligt med tid för att hitta motsvarande
+lösning. Nackdelen är framförallt att den framtagna lösningen oftast inte,
+beroende på problemformulering, är den globalt bästa. De heuristiska metoderna
+hittar godtagbara lösningar, men det finns oftast inga bevis för att det inte skulle
+finnas bättre lösningar. (Se Judea Pearl, Heuristics: Intelligent Search
+Strategies for Computer Problem Solving~\cite{pearl1984})
+
+\subsection{Genetiska algoritmer}\label{GA}
+Den genetiska algoritmen~\cite{Dantzig82} är en heuristisk sökalgoritm som inspirerats av den
+biologiska evolutionen där ärftliga egenskaper förs vidare via gener som
+ibland förändras genom små mutationer från en generation till nästa. De
+egenskaper som inte anses fördelaktiga sorteras bort genom diverse urvalsprocesser,
+inom evolutionsläran kallads denna process det naturliga
+urvalet~\cite{darwin2006}. Algoritmen arbetar med abstrakta representationer
+av objekt som individ och population samt med begrepp som mutation, crossover och
+fitness. Traditionellt representeras olika lösningar till ett problem som
+binära strängar vilka kallas individer eller kromosomer. Dessa
+individer ingår i en större samling kallad population. 
+
+Populationen utvecklas sedan steg för steg tills en godtagbar lösning tagits
+fram. En typisk itterationscykel för genetiska algoritmer består av följande
+steg:
+\begin{enumerate}
+\item Urval - individer ur den aktuella populationen väljs ut för att
+  ingå i en ny generation av individer. Urvalet görs med hänsyn till en
+  sannolikhet som baseras på de ingående individernas fitness, vilket är
+  ett mått på hur bra individen är. Endast en viss del av den ursprungliga
+  populationen väljs ut vid varje reproduktionsteg, detta är en av algoritmens
+  parametrar.
+\item Crossover - individer väljs probabilistiskt ut i par och två nya individer
+  konstrueras genom att varje individ i paret utbyter segment av sig själva
+  med den andra individen. Detta kan ses som algoritmens motsvarighet till den
+  biologiska parningen. Antalet individer väljs så att populationens
+  storlek antingen minskar, ökar eller förblir oförändrad.
+\item Mutation - Ett visst antal individer väljs slumpmässigt ur den nya
+  populationen. Från varje vald individ väljs sedan ett slumpmässigt element i
+  dess kodning och värdet för detta element förändras efter en förutbestämd
+  muteringsmetod. 
+  
+  Om kodningen är binär kan denna metod till exempel förändra
+  elementets värde till 1 om nuvarande värde är 0 och vice versa. Används
+  reella tal vid kodningen av individerna blir muteringsmetoden mer avancerad,
+  då behöver man på något sätt tolka vad en mutering av ett speciellt element egentligen
+  betyder, vad representerar det speciella elementet och så vidare.
+\end{enumerate} Efter varje iterationscykel utvärderas populationens individerna beroende på hur
+sökproblemet har formulerats. Varje individ tilldelas ett fitness-värde som är
+ett mått på hur bra individen löser det definierade problemet, det är detta
+värde som påverkar sannolikheten för individens chans att reproducera sig till
+nästa generation. En bra individ har större sannolikhet att reproducera ny
+individer och vice versa. Fördelarna med genetiska algoritmer gentemot andra
+sökalgoritmer som till exempel \textit{hill climbing} \cite{mitchell1997} är framförallt:
+\begin{enumerate}
+\item att relativt snabbt lokalisera optimala lösningar i ett gigantiskt
+  sökrum där uttömmande sökningar kanske kräver oändlig tid.
+\item förmågan att ta sig ur lokala optima och där med öka chanserna till att
+  hitta ett globalt optima. Sannolikheten att algoritmen finner det globala
+  optimat beror till stor del på hur fitnesslandskapet ser ut (se
+  Mitchell~\cite{mitchell1996}). Beroende på hur algoritmens parametrar ställs
+  in och hur sökrummet ser ut fås ett mer eller mindre sökvänligt
+  fitnesslandskap.
+\end{enumerate}
+En av nackdelarna med genetiska algoritmer är dess känslighet för nya
+sökrum då de interna parametrar, som bland annat bestämmer populationens
+storlek, antal individer som reproduceras samt mutationshastighet, måste
+anpassas till det nya sökrummet. Detta kan dock automatiseras med hjälp av
+andra tekniker som automatiskt anpassar algoritmens parametrar efter nya sökrum.
+
+\subsection{Simulated annealing}\label{SA}
+\subsection{Particle Swarm Optimization}\label{PSO}
+
+\chapter{Metoder}
+För att utvärdera hur de olika optimeringsmetoderna lämpar sig för
+den metallurigska blandningsoptimeringen så implementeras de olika metoderna i
+en Java-baserad utvecklingsmiljö hos Kobolde \& Partners AB.
+
+\section{Linjärprogrammering}
+\section{Heuristiska metoder}
+\subsection{Genetiska algoritmer}
+\subsection{Simulated annealing}
+\subsection{Particle Swarm Optimization}
+\section{Implementation i TimeAOD2\texttrademark}
+
+
+
+\chapter{Resultat}
+
+
+\section{Evolutionära metoder}
+\subsection{Genetiska algoritmer}
+\subsection{Simulated annealing}
+\subsection{Particle Swarm Optimization}
+\section{Linjärprogrammering}
+
+\chapter{Diskussion}
+
+
+\chapter{Slutsats}
+
+\chapter{Förslag på förbättringar}
+
+\appendix
+\addappheadtotoc
+\bibliographystyle{is-plain}
+\bibliography{biblio}
+\end{document}
+
+
+\message{ !name(xjobb-sv.tex) !offset(-441) }

@@ -1,0 +1,343 @@
+\documentclass[a4paper,11pt]{kth-mag}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{lmodern}
+\usepackage[latin1]{inputenc}
+\usepackage[swedish,english]{babel}
+\usepackage{modifications}
+\title{Design and implementation of a High Availability Controller}
+
+\subtitle{Duis autem vel eum iruire dolor in hendrerit in
+          vulputate velit esse molestie consequat, vel illum
+          dolore eu feugiat null}
+\foreigntitle{Lorem ipsum dolor sit amet, sed diam nonummy nibh eui
+              mod tincidunt ut laoreet dol}
+\author{Daniel Terranova}
+\date{20140501}
+\blurb{Master's Thesis at CSC\\
+Supervisor: Tjoho\\
+Examiner: Tjohej}
+\trita{TRITA xxx yyyy-nn}
+\begin{document}
+\frontmatter
+\pagestyle{empty}
+\removepagenumbers
+\maketitle
+\selectlanguage{english}
+\begin{abstract}
+  Network devices and network management systems are mission critical.
+  Therefore these kind of systems are often configured in redundant modes,
+  one or several other systems can take over the function of a node which undergoes
+  a system crash of some kind. This is often called High-Availability.
+
+  The Tail-f System's Network Control System (NCS) is a network management
+  framework. NCS offers centralised network configuration management
+  functionality, along with providing options for extending the framework
+  with additional features. The provisioning information managed by NCS are
+  stored in its build in Configuration Database (CDB).
+
+  The NCS product support high-availability through a replication
+  architecture; one active master and a number of passive slaves.
+  Slaves initialises the replication through a active connect to
+  the master.
+
+  The only thing NCS does is to replicate the CDB data amongst the members
+  in the HA group. It does not perform any of the otherwise High-Availability
+  related tasks such as running election protocols in order to elect a new
+  master. This is the task of a High-Availability Controller (HAC) which
+  must be in place and assume an external controller to take those decisions:
+  switching master/slave nodes based on some criteria.
+
+  At any point in time a slave can take over the role from the master.
+  The decision is made by the controller which commands NCS to be
+  master or slave by API calls.
+
+  The background for this thesis work is to study the requirements and
+  propose an implementation along with an evaluated prototype for a
+  high-availability controller that could be a optional part of the
+  Tail-f NCS product.
+
+  Apart from developing the software High-Availability module, this work aims
+  to summarise existing methods for design and to develop new methods
+  for High-Availability controllers.
+
+\end{abstract}
+\clearpage
+\begin{foreignabstract}{swedish}
+  Nätverks element och system för är konfigurering av nätverk är kritiska.
+  Vilket innebär ofta att dessa system är konfigurerade redundant.
+  En eller flera system kan ta över en funktion från ett system som genomgår en
+  system crash. Detta kallas oftast för hög tillgänglighet.
+
+  Tail-f Systems NCS produkt är ett nätverk konfigurerings verktyg och ett ramverk. 
+  NCS är användbart som det är, men kan även byggas ut av användaren
+  med ytterligare funktioner. De enheter som hanteras av NCS lagras i 
+  konfigurationsdatabasen (CDB).  
+  
+  NCS stödjer replikering mellan noder men det fins ingen automatisk mekanism som 
+  avgör vilken nod som avgör vem ska vara den aktiv och passiv slav. Detta är en uppgift
+  åt en kontroller vilket måste finnas på plats och som tar dessa beslut baserat på
+  vissa kriterier.
+  
+  I en given tidpukt kan en passiv slav ta över rollen från den aktive noden.
+  
+  Bakgrunden för detta examens arbete är att studera krav som ställs på en sådan kontroller
+  och föreslå en implementation.
+  
+  Förutom att utveckla programvara för enhetsidentifiering, syftar detta projekt till att sammanfatta 
+  oika design och implementering befintliga metoder.
+  
+  \end{foreignabstract}
+\clearpage
+\tableofcontents*
+\mainmatter
+\pagestyle{newchap}
+\chapter{Introduction}
+
+Network management became a non trivial task, as networks grew and
+incorporated different types of devices and configuration items.
+Manual network management of large scale networks is unfeasible due to
+the need for engineers specialized in different aspects and types of
+network devices and their management, limited time, need to define a
+strategy for configuration management, and the effort to track the
+configuration state of large number of different devices.
+
+These factors obviously increase the costs and effort required for network
+management. To overcome these difficulties Network Management Systems (NMSs)
+were developed. An NMS is a tool for network operators and engineers.
+Such a tool enables centralized configuration management of many different
+network devices, consolidates the storage of device configuration and state
+information, pushes and pulls the configuration changes to and from the
+devices. The state of the network must be persist to a storage where
+it could be keep safe from system crash and failures that could occur.
+
+Thus the configuration state information of the network is crusial for
+the network to operate. Instead of having this information stored at
+a single point in the system is made redundant.
+
+Network Control System (NCS), an NMS developed by Tail-f Systems, is a
+network management system and framework based on the
+Network Configuration Protocol (NETCONF) and YANG
+(a protocol that provides a unified interface to different devices and a
+modelling language utilized by this protocol) supports the replication
+mechanism between a master and a numer of passive slaves.
+
+NCS support replication of the CDB configuration as well as of the
+operational data kept in CDB. A group of NCS hosts consisting of a master,
+and one or more slaves, is referred to as an HA group and sometimes as an
+HA cluster.
+
+A master has the primary role of a node in a HA cluster where modification
+to the state of the network should be performed. Each passive slave
+obtain the modifications done on the master node which means that
+transaction that occurs on the master is replicated to the slaves.
+
+When the master in some point in time faces a system crash the passive
+slaves should be able to take the role of the master. A decision is
+made by the controller which detect such failing situation and in turn
+appoint some passive slave to take over the role of a master. The
+remaning slaves should be notice of this situation by the controller in
+turns receive commands of the new role situation.
+
+\section{Problem Statement}
+
+The only thing NCS does is to replicate the CDB data amongst the members in
+the HA group. It doesn't perform any of the otherwise High-Availability
+related tasks such as running election protocols in order to elect a new
+master. This is the task of a High-Availability Framework controller which
+must be in place. The HAFWC must instruct NCS which nodes are up and down using
+API functions. Thus in order to use NCS configuration replication
+we must first have a HAFWC in place.
+
+A HAFWC must detect when nodes fail and instruct NCS accordingly.
+If the master node fails, the HAFWC must elect one of the remaining slaves
+and appoint it the new master. The remaining slaves must also be informed
+by the HAFWC about the new master situation. NCS will never take any actions
+regarding master/slave-ness by itself.
+
+The HAFWC must also handle and detect a situation known as split brain which
+indicates data inconsistencies originating from the maintenance of two
+separate data sets with overlap in scope caused by network partition.
+
+When a network partiton occurs the nodes in a HA cluster will not be able
+to communicating with each other, believing that the other node is down will
+be appointed a new master. At this point in time we end up with multiple
+masters which could accept any modifications of the network state and failing
+to synchronizing with each other lead to inconsistencies with each other.
+
+A automatic reconciliation could not be performed without loosing
+network state a manual intervene must be made to solve
+the current situation.
+
+The goal of this thesis work is to produce a prototype of High Availability
+Controller (HAC) which is aware of the HA states of the HA Pairs. The
+HAC should implement an internal state machine to keep track of the HA states.
+This makes it possible to preserve database consistency.
+
+theoretical model of how
+a framework with two HA pairs should work and depict different events or
+scenarios that could occur with expecting results base on
+different criteria.
+
+The model will be the base of a prototype which will be implemented
+and tested.
+
+\subsection{Restrictions and limitations}
+
+This work is limited to only two nodes working as pairs. One master
+and the other is a standby slave.
+
+\part{Important Results}
+
+\chapter{First One}
+
+Aliquam et ante. Vivamus ultricies, neque eget iaculis interdum, lacus
+quam hendrerit sapien, vel posuere justo nulla vitae arcu. Morbi
+magna. Aliquam erat volutpat. Aenean mattis consequat nibh. Donec
+lobortis sapien a enim. Cras mattis ultricies mi. Quisque venenatis.
+Phasellus risus justo, vulputate non, tristique in, tristique vel,
+neque. Phasellus pretium, dui nec dapibus laoreet, ligula enim laoreet
+eros, tempus interdum massa turpis quis dolor. Etiam ultricies
+condimentum neque. Maecenas pellentesque. Duis tortor. Aliquam ac
+dolor. Vestibulum nisl. Nunc facilisis tincidunt mi. Morbi feugiat
+velit vitae velit. Suspendisse potenti. Maecenas eget ante. Maecenas
+blandit, urna at varius lacinia, lorem purus ullamcorper risus, non
+pretium arcu libero at odio.
+
+\section{Preliminaries}
+
+Vestibulum dolor dolor, interdum eu, iaculis scelerisque, auctor at,
+mi. Nullam ut erat quis sem bibendum dignissim. Vestibulum volutpat
+nisl in tortor. Etiam pretium nulla et elit. Integer tortor. Ut metus
+ligula, egestas non, ornare vel, bibendum eu, urna. Pellentesque
+rutrum dui vel orci. Aliquam lacus lacus, varius a, sodales vitae,
+egestas a, purus. Integer varius venenatis odio. Pellentesque dui
+mauris, lacinia in, placerat lobortis, tempor ac, lectus.
+
+\subsection{HA States}
+
+Sed lobortis neque non mauris. Maecenas rhoncus tempor justo. Nunc vel
+diam at dolor luctus tincidunt. Ut egestas. Aliquam eu turpis eu nisl
+ultricies sollicitudin. Donec erat odio, fermentum id, malesuada id,
+viverra vitae, lorem. Morbi scelerisque sagittis enim. Donec non ante
+sed neque dictum consectetuer. Etiam bibendum odio quis est. Quisque
+mollis magna et odio. Nunc nulla. Suspendisse magna felis, tincidunt
+in, blandit non, tempus vel, orci.
+
+\subsection{Definitions}
+
+Sed laoreet tellus in massa. Fusce egestas dapibus wisi. Pellentesque
+sit amet nulla. Donec dignissim rutrum urna. Integer et mi at urna
+viverra vestibulum. Nullam justo tortor, vulputate nec, porta non,
+consequat ac, lectus. Sed ligula. Nullam tristique. Nullam pulvinar.
+Morbi at elit et lacus tristique nonummy. Vivamus nunc ante, imperdiet
+at, luctus non, aliquam a, neque. In interdum sapien et wisi.
+Curabitur ipsum justo, consequat eget, viverra eu, porta vel, lacus.
+Suspendisse potenti. Proin wisi. In tristique neque at ipsum.
+Phasellus ac justo eu nibh faucibus lobortis. Vestibulum lorem.
+
+Duis blandit est id diam. Sed aliquet semper arcu. Curabitur sed eros
+ut neque eleifend sagittis. Cras lacinia, nisl a sagittis scelerisque,
+nibh risus varius pede, ac interdum lacus lorem quis quam. Mauris sit
+amet orci a ligula porttitor nonummy. Aliquam malesuada turpis at diam
+semper vestibulum. Phasellus ullamcorper. Aenean ultrices lacus a diam
+lobortis posuere. Duis porttitor euismod turpis. Ut sem nulla, porta
+vel, lacinia eget, rutrum non, justo. Phasellus risus sem, placerat
+at, sodales ac, viverra vitae, magna. Fusce non magna. Mauris varius
+vestibulum eros. Nullam nec quam in tortor ultrices varius. Nulla
+tempus lectus ut tortor.
+
+Ut vestibulum diam in lacus. Aenean vestibulum bibendum dolor.
+Praesent in wisi. Aenean ornare faucibus orci. Donec mattis magna et
+dui. Nullam vestibulum lobortis nibh. Etiam ultrices lorem nec est.
+Duis ut nisl. Vivamus risus. Pellentesque habitant morbi tristique
+senectus et netus et malesuada fames ac turpis egestas. Suspendisse
+sagittis, dolor eget ullamcorper elementum, sem erat sagittis dolor,
+sit amet tincidunt quam neque consectetuer quam. Maecenas at quam.
+Etiam gravida. Sed nec enim. Fusce pulvinar. In pede metus, lobortis
+a, ullamcorper quis, commodo vitae, turpis. Maecenas sed mi sit amet
+odio suscipit ornare. Phasellus pede arcu, elementum sed, elementum
+eu, viverra et, ligula. Aliquam metus nisl, convallis et, ultrices
+vel, consequat quis, felis. Aenean gravida euismod urna.
+
+\section{The Main Theorem}
+
+Aliquam quis nibh quis justo elementum viverra. Vestibulum ipsum.
+Integer sit amet urna id lorem condimentum pretium. Nam adipiscing
+lobortis purus. Donec at libero id augue interdum vulputate. Curabitur
+imperdiet suscipit metus. Curabitur ac quam sed lacus accumsan
+posuere. Quisque pharetra mi sit amet enim. Curabitur quis elit. Lorem
+ipsum dolor sit amet, consectetuer adipiscing elit. Sed ultricies
+aliquet lorem. Proin posuere tincidunt diam. Donec quis orci non leo
+elementum nonummy. Donec urna lectus, fringilla at, tempus id, auctor
+a, wisi. Pellentesque habitant morbi tristique senectus et netus et
+malesuada fames ac turpis egestas. Suspendisse blandit. Nam wisi.
+Phasellus egestas lacus ut lorem. Suspendisse sapien. Fusce non dolor
+ac odio tempus placerat.
+
+
+\subsection{The Proof}
+
+Suspendisse aliquam fringilla tortor. Nullam lacinia rutrum orci. Cras
+pellentesque iaculis ligula. Fusce elit enim, nonummy ut, fermentum
+sed, nonummy a, nunc. Suspendisse potenti. Nunc tortor dolor, eleifend
+non, aliquam sit amet, vestibulum id, erat. Curabitur imperdiet.
+Quisque in velit. Etiam a urna sed turpis scelerisque tempor. Praesent
+in dolor eget massa congue aliquet. Praesent magna lacus, dictum a,
+accumsan a, sollicitudin vel, nibh. Phasellus accumsan porta tortor.
+Curabitur mauris. Quisque ut wisi. Sed aliquet molestie mi. Quisque ut
+magna. Vivamus rhoncus urna in libero.
+
+Nullam tristique tempus neque. Nunc ac tortor lobortis felis nonummy
+lacinia. Pellentesque vestibulum facilisis quam. Aliquam aliquam,
+lorem eget elementum euismod, urna dui rutrum libero, a imperdiet erat
+augue ut ipsum. Morbi gravida turpis ut sapien. Aliquam ante sapien,
+ultricies at, vulputate non, ullamcorper quis, dolor. Quisque velit
+turpis, consectetuer vitae, facilisis feugiat, volutpat eget, nunc.
+Quisque quis ipsum in diam elementum vulputate. Donec convallis sapien
+ut tellus. Cras dictum turpis nec sem. Nunc augue. Aliquam nunc
+tortor, semper vel, aliquam at, tempus ut, risus. Mauris feugiat nunc
+id justo. Nunc ullamcorper magna vel urna. Morbi rutrum massa non
+sapien. Fusce purus. Cras magna. In condimentum augue ac libero. Nulla
+lacinia vulputate leo. Mauris lobortis molestie turpis.
+
+Pellentesque neque odio, ornare a, hendrerit ac, vestibulum sit amet,
+tortor. Vestibulum ante ipsum primis in faucibus orci luctus et
+ultrices posuere cubilia Curae; Phasellus malesuada porta sem. Nunc
+wisi neque, lobortis at, consequat sit amet, pulvinar eget, mauris.
+Aliquam egestas, arcu ut tristique tempus, urna lorem pulvinar nisl,
+at auctor lectus sem ut felis. Duis hendrerit, mi et varius venenatis,
+nibh libero blandit mauris, bibendum pellentesque sapien dolor quis
+velit. Vivamus nec augue ut velit eleifend accumsan. Fusce euismod.
+Phasellus volutpat. Donec sollicitudin. Donec non mi eu lorem suscipit
+tincidunt. Suspendisse vehicula. Integer iaculis diam ac quam.
+Pellentesque velit mi, pulvinar eget, suscipit sed, rhoncus ut,
+tortor. Etiam ultricies, wisi non ornare rutrum, ipsum nunc posuere
+leo, vitae blandit est enim eu massa. Nulla sed felis vel nunc
+eleifend venenatis. Sed non purus. Aliquam enim. Nulla neque massa,
+elementum sit amet, rhoncus vel, rhoncus in, leo.
+
+In convallis pellentesque quam. Fusce venenatis neque id justo.
+Aliquam felis. Nullam vitae eros. Sed sit amet lorem. Vestibulum
+elementum purus in nunc. Phasellus nec libero non ipsum ultrices
+porttitor. Vestibulum ante ipsum primis in faucibus orci luctus et
+ultrices posuere cubilia Curae; Praesent quis elit sed eros bibendum
+tempor. Suspendisse tempor congue nisl. Nam a est. Aliquam erat
+volutpat. Quisque tincidunt. Donec egestas dapibus diam. Aenean ante
+mi, vulputate vitae, adipiscing in, fermentum luctus, wisi. In nibh
+mauris, ultricies a, fermentum eget, faucibus pharetra, neque. Cras
+consectetuer congue ipsum. Nulla eu metus. Sed at turpis.
+
+\appendix
+\addappheadtotoc
+\chapter{RDF}\label{appA}
+
+\begin{figure}[ht]
+\begin{center}
+And here is a figure
+\caption{\small{Several statements describing the same resource.}}\label{RDF_4}
+\end{center}
+\end{figure}
+
+that we refer to here: \ref{RDF_4}
+\end{document}

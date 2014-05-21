@@ -1,0 +1,199 @@
+\ProvidesPackage{avesta}
+\usepackage[utf8]{inputenc}
+
+%% konfidentiell data
+
+\newcommand{\C}{C}
+\newcommand{\N}{N}
+\newcommand{\Al}{Al}
+\newcommand{\Si}{Si}
+\newcommand{\fosfor}{P}
+\newcommand{\svavel}{S}
+\newcommand{\Ti}{Ti}
+\newcommand{\V}{V}
+\newcommand{\Cr}{Cr}
+\newcommand{\Mn}{Mn}
+\newcommand{\Fe}{Fe}
+\newcommand{\Co}{Co}
+\newcommand{\Ni}{Ni}
+\newcommand{\Cu}{Cu}
+\newcommand{\Nb}{Nb}
+\newcommand{\Mo}{Mo}
+\newcommand{\As}{As}
+\newcommand{\W}{W}
+\newcommand{\Ce}{Ce}
+\newcommand{\B}{B}
+\newcommand{\Bi}{Bi}
+\newcommand{\Pb}{Pb}
+\newcommand{\Ca}{Ca}
+\newcommand{\Ta}{Ta}
+\newcommand{\POx}{P$_2$O$_5$}
+\newcommand{\NiOx}{NiO}
+\newcommand{\MoOx}{MoO$_3$}
+\newcommand{\CaOx}{CaO}
+\newcommand{\MgOx}{MgO}
+\newcommand{\SiOx}{SiO$_2$}
+\newcommand{\CaFl}{CaF}
+\newcommand{\AlOx}{Al$_2$O$_3$}
+\newcommand{\VOx}{V$_2$O$_5$}
+\newcommand{\TiOx}{TiO$_2$}
+\newcommand{\FeOx}{FeO}
+\newcommand{\MnOx}{MnO}
+\newcommand{\CrOx}{Cr$_2$O$_3$}
+
+\newcommand{\matnamea}{18/10/2 SLIPSP 1}
+\newcommand{\matnameb}{18/10/2 SLIPSP 2}
+\newcommand{\matnamec}{18/10/2 SLIPSP 3}
+\newcommand{\matnamed}{18/10/2 SLIPSP 4}
+\newcommand{\matnamee}{18/10/2 SLIPSP 5}
+\newcommand{\matnamef}{18/8 RUSOR 1}
+\newcommand{\matnameg}{18/8 RUSOR 2}
+\newcommand{\matnameh}{18/8 STYCKE 1}
+\newcommand{\matnamei}{18/8 STYCKE 2}
+\newcommand{\matnamej}{18/8 STYCKE 3}
+\newcommand{\matnamek}{18/8 STYCKE 4}
+\newcommand{\matnamel}{18/8 STYCKE 5}
+\newcommand{\matnamem}{18/8 STYCKE 6}
+\newcommand{\matnamen}{18/8 STYCKE 7}
+\newcommand{\matnameo}{18/8 STYCKE 8}
+\newcommand{\matnamep}{BESKICKNING NI 1}
+\newcommand{\matnameq}{BESKICKNING NI 2}
+\newcommand{\matnamer}{BESKICKNING NI 3}
+\newcommand{\matnames}{BESKICKNING NI 4}
+\newcommand{\matnamet}{Bränd kalk 1}
+\newcommand{\matnameu}{Bränd kalk 2}
+\newcommand{\matnamev}{Bränd kalk 3}
+\newcommand{\matnamew}{Bränd kalk 4}
+\newcommand{\matnamex}{CR SKROT NI <4\% - a}
+\newcommand{\matnamey}{CR SKROT NI <4\% - b}
+\newcommand{\matnamez}{CR SKROT NI <4\% - c}
+\newcommand{\matnameaa}{Dolomit 1}
+\newcommand{\matnameab}{Dolomit 2}
+\newcommand{\matnameac}{Dolomit 3}
+\newcommand{\matnamead}{Dolomit 4}
+\newcommand{\matnameae}{HC FECR SI 3 - a}
+\newcommand{\matnameaf}{HC FECR SI 3 - b}
+\newcommand{\matnameag}{HC FECR SI 3 - c}
+\newcommand{\matnameah}{HC FECR SI 3 - d}
+\newcommand{\matnameai}{HC FECR SI 3 - d}
+\newcommand{\matnameaj}{KOLPULVER 1}
+\newcommand{\matnameak}{KOLPULVER 2}
+\newcommand{\matnameal}{LAGLEG SPAN 1}
+\newcommand{\matnameam}{LAGLEG SPAN 2}
+\newcommand{\matnamean}{LAGLEG SPAN 3}
+\newcommand{\matnameao}{LAGLEG STYCKE 1}
+\newcommand{\matnameap}{LAGLEG STYCKE 2}
+\newcommand{\matnameaq}{LAGLEG STYCKE 3}
+\newcommand{\matnamear}{LAGLEG STYCKE 4}
+\newcommand{\matnameas}{LAGLEG STYCKE 5}
+\newcommand{\matnameat}{LAGLEG STYCKE 6}
+\newcommand{\matnameau}{OLEG SKROT 1}
+\newcommand{\matnameav}{SLIPVADDSBRIK 1}
+
+\newcommand{\matpricea}{60}
+\newcommand{\matpriceb}{60}
+\newcommand{\matpricec}{80}
+\newcommand{\matpriced}{80}
+\newcommand{\matpricee}{80}
+\newcommand{\matpricef}{190}
+\newcommand{\matpriceg}{190}
+\newcommand{\matpriceh}{150}
+\newcommand{\matpricei}{150}
+\newcommand{\matpricej}{150}
+\newcommand{\matpricek}{150}
+\newcommand{\matpricel}{150}
+\newcommand{\matpricem}{150}
+\newcommand{\matpricen}{160}
+\newcommand{\matpriceo}{160}
+\newcommand{\matpricep}{1190}
+\newcommand{\matpriceq}{1190}
+\newcommand{\matpricer}{1570}
+\newcommand{\matprices}{1570}
+\newcommand{\matpricet}{10}
+\newcommand{\matpriceu}{10}
+\newcommand{\matpricev}{10}
+\newcommand{\matpricew}{10}
+\newcommand{\matpricex}{60}
+\newcommand{\matpricey}{60}
+\newcommand{\matpricez}{60}
+\newcommand{\matpriceaa}{10}
+\newcommand{\matpriceab}{10}
+\newcommand{\matpriceac}{10}
+\newcommand{\matpricead}{10}
+\newcommand{\matpriceae}{90}
+\newcommand{\matpriceaf}{120}
+\newcommand{\matpriceag}{120}
+\newcommand{\matpriceah}{120}
+\newcommand{\matpriceai}{120}
+\newcommand{\matpriceaj}{40}
+\newcommand{\matpriceak}{40}
+\newcommand{\matpriceal}{30}
+\newcommand{\matpriceam}{30}
+\newcommand{\matpricean}{30}
+\newcommand{\matpriceao}{30}
+\newcommand{\matpriceap}{30}
+\newcommand{\matpriceaq}{30}
+\newcommand{\matpricear}{30}
+\newcommand{\matpriceas}{30}
+\newcommand{\matpriceat}{30}
+\newcommand{\matpriceau}{10}
+\newcommand{\matpriceav}{240}
+
+\newcommand{\matsaldoa}{2980}
+\newcommand{\matsaldob}{3280}
+\newcommand{\matsaldoc}{3660}
+\newcommand{\matsaldod}{2660}
+\newcommand{\matsaldoe}{2660}
+\newcommand{\matsaldof}{10080}
+\newcommand{\matsaldog}{10000}
+\newcommand{\matsaldoh}{27100}
+\newcommand{\matsaldoi}{9880}
+\newcommand{\matsaldoj}{30920}
+\newcommand{\matsaldok}{10720}
+\newcommand{\matsaldol}{10460}
+\newcommand{\matsaldom}{10720}
+\newcommand{\matsaldon}{7640}
+\newcommand{\matsaldoo}{8560}
+\newcommand{\matsaldop}{1320}
+\newcommand{\matsaldoq}{1680}
+\newcommand{\matsaldor}{1500}
+\newcommand{\matsaldos}{1500}
+\newcommand{\matsaldot}{5140}
+\newcommand{\matsaldou}{4900}
+\newcommand{\matsaldov}{4960}
+\newcommand{\matsaldow}{5140}
+\newcommand{\matsaldox}{13910}
+\newcommand{\matsaldoy}{14840}
+\newcommand{\matsaldoz}{9140}
+\newcommand{\matsaldoaa}{1580}
+\newcommand{\matsaldoab}{1480}
+\newcommand{\matsaldoac}{1500}
+\newcommand{\matsaldoad}{1520}
+\newcommand{\matsaldoae}{10400}
+\newcommand{\matsaldoaf}{1720}
+\newcommand{\matsaldoag}{10280}
+\newcommand{\matsaldoah}{11600}
+\newcommand{\matsaldoai}{2000}
+\newcommand{\matsaldoaj}{250}
+\newcommand{\matsaldoak}{250}
+\newcommand{\matsaldoal}{13060}
+\newcommand{\matsaldoam}{12380}
+\newcommand{\matsaldoan}{12800}
+\newcommand{\matsaldoao}{5200}
+\newcommand{\matsaldoap}{24960}
+\newcommand{\matsaldoaq}{12540}
+\newcommand{\matsaldoar}{10140}
+\newcommand{\matsaldoas}{6960}
+\newcommand{\matsaldoat}{18020}
+\newcommand{\matsaldoau}{4900}
+\newcommand{\matsaldoav}{1560}
+
+\newcommand{\enhetsprisa}{\epris~$\approx$~106,48~SEK/kg}
+\newcommand{\enhetsprisb}{\epris~$\approx$~98,44~SEK/kg}
+\newcommand{\enhetsprisc}{\epris~$\approx$~113,62~SEK/kg}
+\newcommand{\enhetsprisd}{\epris~$\approx$~102,53~SEK/kg}
+
+\newcommand{\konfidentiell}{_konf}
+\newcommand{\epris}{enhetspris}
+\newcommand{\enhetspris}{\epris~(SEK/kg)}
+%% slut på konfidentiell data
