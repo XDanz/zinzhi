@@ -3,7 +3,7 @@ CC = g++
 CFLAGS = -Wall -std=c++11 -I../../includes
 SRC = $(wildcard *.cpp)
 OBJS = ../../objs/date.o ../../objs/gregorian.o ../../objs/julian.o test.o
-
+OBJS+= ../../objs/kattistime.o
 all: $(OBJS) test_run
 
 test_run: $(OBJS)

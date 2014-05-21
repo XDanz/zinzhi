@@ -1,10 +1,10 @@
 #include "gregorian.h"
-
+#include "kattistime.h"
 using namespace lab2;
 
 Gregorian::Gregorian()
 { 
-  time_t temp = time(NULL);
+  time_t temp = k_time(NULL);
   struct tm* tmtemp = gmtime(&temp);
   curr_year = 1900+tmtemp->tm_year;
   curr_month = tmtemp->tm_mon+1;
@@ -79,7 +79,8 @@ const int Gregorian::week_day() const
 
   while (weekday < 1) { weekday+=7; }
 
-  return weekday;
+
+  return (weekday == 0)? 7:weekday;
 }
 
 const int Gregorian::days_per_week() const
@@ -290,7 +291,7 @@ const int Gregorian::mod_julian_day() const
 }
 
 void Gregorian::toString(std::ostream& os) const {
-  os  << "Greg@" << this << " (" << this->curr_year << "-";
+  os  << this->curr_year << "-";
   
   if (this->curr_month <= 9) {
     os << "0";
@@ -299,7 +300,7 @@ void Gregorian::toString(std::ostream& os) const {
   if (curr_day <= 9) {
     os << "0";
   }
-  os << curr_day << " " << week_day_name() << "," << mod_julian_day() << ")";
+  os << curr_day;
 }
 
 bool Gregorian::leap_year(int year) const

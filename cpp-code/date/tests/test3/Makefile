@@ -9,9 +9,11 @@ build: test_run
 test_run: $(OBJS)
 	$(CC) $(OBJS) -o $@
 
-test:
+test: test_run
 	cat lab22c.in | ./test_run > utdata.txt
-	# diff utdata.txt lab22c.out
+	diff -q utdata.txt lab22c.out
+
+
 
 # ../../objs/%.o:
 # 	make -C ../../src all
