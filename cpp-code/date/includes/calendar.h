@@ -1,257 +1,188 @@
-/*
- *  calendar.h
- *  Calendar
- *
- *  Created by Fredrik Gustafsson on 11/1/10.
- *  Copyright 2010 Kungliga Tekniska Högskolan. All rights reserved.
- *
- */
+#ifndef CALENDAR_H_
+#define CALENDAR_H_
 
-#ifndef LAB2_CALENDAR_H_
-#define LAB2_CALENDAR_H_
 
 #include "date.h"
 #include "gregorian.h"
 #include <list>
-#include <iostream>
-#include <limits>
-#include <stdio.h>
-
-#define OUR_UNDEF INT_MIN+25
 
 namespace lab2 {
+    template<typename C>
+    class Calendar
+        {
+          public:
+          Calendar() : events ( std::list<Calendar::Event>{} ) {
+          }
+            
+            friend std::ostream& operator<<(std::ostream& ostream,
+                                            const Calendar<C>& d ) {
+                typename std::list<Calendar<C>::Event>::const_iterator it =
+                    d.events.begin();
+                for ( ; it != d.events.end() ; it++ ) {
+                    Calendar<C>::Event event = *it;
+                    // if (event.event_date() > d.current_date ) {
+                    ostream << event << std::endl;
+                    // }
+                }
+                return ostream;
+            }
 
-  template <class T> struct Event {
-    Event(const T& edate, std::string edesc) : date(edate), desc(edesc) {}
-    T date;
-    std::string desc;
-    friend std::ostream& operator<<(std::ostream& os, const Event& ev) {
-      os << ev.date << " : " << ev.desc << std::endl;
-      return os;
-    }
-  };
 
-  template <class T> class Calendar {
-  public:
-    Calendar() : now(T()), events(std::list<Event<T> > ()),
-                 current_format(iCalendar) {}
+          bool set_date (int year, int month , int day ) {
+            std::cout << "set date  " << std::endl;
+            C date;
+              try {
+                date = C(year,month,day);
+                std::cout << "date  " << date << std::endl;
+              } catch (std::out_of_range ignore ) {
+                return false;
+              }
+              current_date = date;
+              return true;
+            }
+          
+          C get_date() {
+            return current_date;
+          }
 
-    template <class S>
-    Calendar<T> operator=(const Calendar<S>& c) {
-      if ((void*)this == (void*)&c) {
-        return *this;
-      }
-      this->events.clear();
-      this->now = T(c.now);
-      this->current_format = (typename Calendar<T>::format)c.current_format;
-      typename std::list<Event<S> >::const_iterator it;
-      for (it = c.events.begin(); it != c.events.end(); it++) {
-        this->events.push_back(Event<T>(T(((Event<S>)*it).date),
-                                        ((Event<S>)*it).desc));
-      }
-      return *this;
-    }
+          
 
-    template <class S>
-    Calendar<T>(const Calendar<S>& c) {
-      this->now = T(c.now);
-      this->current_format = (typename Calendar<T>::format)c.current_format;
-      typename std::list<Event<S> >::const_iterator it;
-      for (it = c.events.begin(); it != c.events.end(); it++) {
-        this->events.push_back(Event<T>(T(((Event<S>)*it).date),
-                                        ((Event<S>)*it).desc));
-      }
-    }
+          bool add_event ( std::string str , C date ) {
+            typename std::list<Calendar<C>::Event>::iterator it =
+              events.begin();
+            for (; it != events.end(); it++ ) {
+              Calendar<C>::Event event = *it;
+              if ( event.event_date() == date &&
+                   event.event_str() == str )
+                return false;
+              else if (event.event_date() > date ) {
+                events.insert ( it , Event ( date , str ) );
+                return true;
+              }
+            }
+            events.push_back ( Calendar<C>::Event ( date , str ));
+            return true;
+          }
+          
+          bool add_event(std::string str , int day) {
+            C event_date;
+            try {
+              event_date =
+                C(current_date.year(), current_date.month(), day);
+              return add_event ( str, event_date );
+            } catch ( std::out_of_range ign ) {
+              return false;
+            }
+          }
 
-    bool set_date(int y,int m,int d) {
-      T temp;
-      try {
-        temp = T(y,m,d);
-      }
-      catch (...) {
-        return false;
-      }
-      now = temp;
-      return true;
-    }
+          bool add_event(std::string str , int day , int month ) {
+            C event_date;
+            try {
+              event_date =
+                C(current_date.year(), month , day);
+              return add_event ( str, event_date );
+            } catch ( std::out_of_range ign ) {
+              return false;
+            }
+          }
 
-    bool add_event(std::string desc) {
-      return add_event(desc, now.day(), now.month(), now.year());
-    }
+          bool add_event(std::string str , int day , int month , int year ) {
+            std::cout << "ADD event " << std::endl;
+            C event_date;
+            try {
+              event_date =
+                C(year, month , day);
+              std::cout << "event_date :" << event_date << std::endl;
+              return add_event ( str, event_date );
+            } catch ( std::out_of_range ign ) {
+              return false;
+            }
+          }
 
-    bool add_event(std::string desc, int d) {
-      return add_event(desc, d, now.month(), now.year());
-    }
+          bool remove_event (std::string str, int day ) {
+            C event_date;
+            try {
+              event_date = C(current_date.year(), current_date.month(),
+                             day );
+              return remove_event ( str , event_date ) ;
+            } catch ( std::out_of_range ign ) {
+              return false;
+            }
+          }
 
-    bool add_event(std::string desc, int d,int m) {
-      return add_event(desc, d, m, now.year());
-    }
+          bool remove_event (std::string str , int month , int day ) {
+            C event_date;
+            try {
+              event_date = C(current_date.year(), month,
+                             day );
+              return remove_event ( str , event_date ) ;
+            } catch ( std::out_of_range ign ) {
+              return false;
+            }
+          }
 
-    bool add_event(std::string desc, int d,int m,int y) {
-      T temp;
-      try {
-        temp = T(y,m,d);
-      }
-      catch (...) {
-        return false;
-      }
-
-      typename std::list<Event<T> >::iterator it;
-      for (it = events.begin(); it != events.end(); it++) {
-        if (((Event<T>)*it).date == temp && ((Event<T>)*it)
-            .desc.compare(desc) == 0)
+          bool remove_event (std::string str , int year , int month , int day )
           {
+            C event_date;
+            try {
+              event_date = C(year, month,
+                             day );
+              return remove_event ( str , event_date ) ;
+            } catch ( std::out_of_range ign ) {
+              return false;
+            }
+          }
+
+          bool remove_event (std::string str , C date ) {
+            typename std::list<Calendar<C>::Event>::iterator it =
+              events.begin();
+            for (; it != events.end(); it++ ) {
+              Calendar<C>::Event event = *it;
+              if ( event.event_date() == date
+                   && event.event_str() == str ) {
+                events.remove ( event );
+                return true;
+              }
+            }
             return false;
           }
-        if (((Event<T>)*it).date > temp) {
-          events.insert(it, Event<T>(temp, desc));
-          return true;
-        }
-      }
-      events.push_back(Event<T>(temp, desc));
-      return true;
-    }
-    bool remove_event(std::string desc) {
-      return remove_event(desc, now.day(),now.month(),now.year());
-    }
-    bool remove_event(std::string desc, int d) {
-      return remove_event(desc, d, now.month(), now.year());
-    }
+          // inner class --
+          class Event {
+          public:
+            Event (C date, std::string s): date (date), str(s) { }
 
-    bool remove_event(std::string desc, int d,int m) {
-      return remove_event(desc, d, m, now.year());
-    }
-
-    bool remove_event(std::string desc, int d,int m, int y) {
-      T temp;
-      try {
-        temp = T(y,m,d);
-      }
-      catch (...) {
-        return false;
-      }
-
-      typename std::list<Event<T> >::iterator it;
-      for (it = events.begin(); it != events.end(); it++) {
-        if (((Event<T>)*it).date == temp && ((Event<T>)*it).desc
-            .compare(desc) == 0) {
-          events.erase(it);
-          return true;
-        }
-      }
-      return false;
-    }
-
-    void print_list(const std::ostream& os) const {
-      typename std::list<Event<T> >::const_iterator it;
-      for (it = events.begin(); it != events.end(); it++) {
-        if (((Event<T>)*it).date>now) {
-          std::cout << *it;
-        }
-      }
-    }
-
-    void print_cal(const std::ostream& os) const {
-      std::cout << "\t\t" << now.month_name() << " " <<
-        now.year() << std::endl;
-      std::cout << " må   ti   on   to   fr   lö   sö" << std::endl;
-      bool first_run = true;
-      for (T temp(now.year(),now.month(),1);
-           temp.month() == now.month(); ++temp)
-        {
-          if (first_run) {
-            for (int i=1; i<temp.week_day(); ++i) {
-              std::cout << "     ";
+            bool operator==(const Event& event) {
+              if (event.event_date() == date && 
+                  event.event_str() ==  str ) {
+                return true;
+              }
+              return false;
             }
-            first_run = false;
-          }
-          if (temp.day()<10) {
-            std::cout << " ";
-          }
-          if (now.day() == temp.day()) {
-            if (has_event(temp)) {
-              std::cout << "<" << temp.day() << ">*";
-            } else {
-              std::cout << "<" << temp.day() << "> ";
+            friend std::ostream& operator<<(std::ostream& ostream,
+                                            const Event& e )
+            {
+              ostream << e.event_date() << ": " << e.event_str();
+              return ostream;
             }
-          } else {
-            if (has_event(temp)) {
-              std::cout << " " << temp.day() << "* ";
-            } else {
-              std::cout << " " << temp.day() << "  ";
+            C event_date() const { 
+              return date; 
             }
-          }
+            std::string event_str() const { 
+              return str; 
+            }
 
-          if (temp.week_day() == 7 && temp.days_this_month() != temp.day()) {
-            std::cout << std::endl;
-          }
-        }
-      std::cout << std::endl << std::endl;
-      typename std::list<Event<T> >::const_iterator it;
-      for (it = events.begin(); it != events.end(); it++) {
-        if (((Event<T>)*it).date.month() ==
-            now.month() && ((Event<T>)*it).date.year() == now.year())
-          {
-            std::cout << *it;
-          }
-      }
-    }
+          private:
+            C date;
+            std::string str;
+          };
+          /// inner class end --
 
-    void print_ical(std::ostream& os) const {
-      /*
-        os << "BEGIN:VCALENDAR" << std::endl
-        << "VERSION:2.0" << std::endl
-        << "PRODID:-//YO MAMA//" << std::endl;
-
-        typename std::list<Event<T> >::const_iterator it;
-        for (it = events.begin(); it != events.end(); it++) {
-        const Event<T>& c = *it;
-        char *datestr = new char[4+2+2];
-        sprintf(datestr, "%d%.2d%.2d", c.date.year(),
-        c.date.month(), c.date.day());
-        os << "BEGIN:VEVENT" << std::endl
-        << "DTSTART:" << datestr << "T080000" << std::endl
-        << "DTEND:" << datestr << "T090000" << std::endl
-        << "SUMMARY:" << c.desc << std::endl
-        << "END:VEVENT" << std::endl;
-        free(datestr);
-        }
-        os << "END:VCALENDAR" << std::endl;
-      */
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Calendar<T>& c) {
-      if (c.current_format == list) {
-        c.print_list(os);
-      } else if (c.current_format == cal) {
-        c.print_cal(os);
-      } else if (c.current_format == iCalendar) {
-        c.print_ical(os);
-      }
-      return os;
-    }
-
-    enum format {
-      list,
-      cal,
-      iCalendar
+          std::list<Calendar<C>::Event> events;
+          
+        protected:
+          C current_date;
     };
-
-    format current_format;
-    T now;
-    std::list<Event<T> > events;
-  private:
-    bool has_event(T& d) const {
-      typename std::list<Event<T> >::const_iterator it;
-      for (it = events.begin(); it != events.end(); it++) {
-        if (((Event<T>)*it).date == d) {
-          return true;
-        }
-      }
-      return false;
-    }
-  };
-
 }
+
 
 #endif
