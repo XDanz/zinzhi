@@ -1,0 +1,281 @@
+/////////////////////////////////////////////////////////////////
+//
+// Personuppgifter (namn, pnr, epost) på dem som gjort labben
+//
+Daniel Terranova
+19761020-0474
+danieltc@kth.se
+
+/////////////////////////////////////////////////////////////////
+//
+// 1.1
+//
+// vad betyder \$* i en makefile? 
+Expanderar till vad som matchades i % av ett mönste rmatchande mål ( target ).
+
+// vad gör -Wall och -g ?
+
+-g
+Producerar debug information i os format så att GDB kan jobba med
+informationen.
+
+-Wall
+Slår på de vissa kompilerings varningar men inte alla.
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 1.2 a)
+// 
+// int powerof(int x, int y) {
+//     int res = 1;
+//     for (int i = 0; i < y; i++); {
+//         res *= x;
+//     }
+//     return res;
+// }
+// 
+// int main() {
+//     int x = 10;
+//     int y = 3;
+// 
+//     int res = powerof(x, y);
+// 
+//     std::cout << x << " upphöjt till " << y << " är " << res << std::endl;
+// 
+//     float z = 0.29;
+//     int w = (int) (z * x * x);
+//     if (z * x * x == 29)
+//         std::cout << z << "*" << x * x << " är 29" << std::endl;
+//     else
+//         std::cout << z << "*" << x * x << " är inte 29" << std::endl;           
+// }
+// 
+
+// Varför blir värdet på variabeln w inte det man tror (0.29*100)?
+Trunkering av decimal tal vid konvertering från float till int gör att
+w blir 0.
+
+// Hur många varv körs for-loopen i funktionen powerof?
+
+1 gång körs uttrycket:
+
+res *= x;
+
+Loopen körs 3 gånger men i varje varv görs inget pga semikolon vilket
+innebär slutet på en rad för ett uttryck.
+
+// 1.2 b)
+//
+// int must_follow_a(char * start, int length, char a, char b) {
+//     int nr = 0;
+//     for (int i = 0; i < length; i++, ++start) {
+//         if (*start == a && *(start + 1) == b) // maintainers note: DANGER!
+//             nr += 1;
+//     }
+//     return nr;
+// }
+// 
+// Dina tre testfall
+
+ void test_a_is_second_and_fourth(void) 
+  {
+    char vek[] = { 'a','b','x','a','b'};
+    int result = must_follow_a(vek,5,'a','b');
+    TS_ASSERT_EQUALS( result, 2);
+  }
+
+  void test_is_failing (void) 
+  {
+    char vek[] = { 'a','b','a','b','a','b'};
+    int result = must_follow_a(vek,5,'a','b');
+    TS_ASSERT_EQUALS( result, 2);
+  }
+
+  void test_a_is_third(void)
+  {
+    char vek[] = {'b','b','a','b','b'};
+    int result = must_follow_a(vek,3,'a','b');
+    TS_ASSERT_EQUALS( result , 0);
+
+  }
+
+
+// Varför är det så viktigt att testa randvillkoren?
+
+För att det är lätt o "gå över kanten".
+
+/////////////////////////////////////////////////////////////////
+//
+// 1.3 
+// 
+// Bifoga källkoden till din version av A.cpp
+
+class A {
+public:
+  A() 
+  {
+    std::cout << "[" << this << "]: The default ctor" << std::endl; 
+  }
+  A(const A & ref) 
+  {
+    std::cout << "[" << this << "]: The copy ctor src-cpy:" << 
+      &ref << std::endl; 
+  }
+  ~A() 
+  {
+    std::cout << "[" << this << "]: The destructor" << std::endl; }
+
+  A(char * s) 
+  {
+    std::cout << "[" << this << "]: Some other ctor s=" << s 
+              << std::endl;}
+  A & operator=(const A & s) 
+  {
+    std::cout << "[" << this << "]: The assignment operator src-cpy:" << 
+      &s <<  std::endl; 
+    return *this;
+  }
+};
+
+void no_ref(A a) {
+  std::cout << "no_ref(a:" << &a << ") =>" << std::endl;
+  std::cout << "no_ref(a:" << &a << ") => ok" << std::endl;
+}
+void with_ref(const A & a) {}
+
+
+int main() {
+  std::cout << " ==== main ==== \n";
+  A a("my name is a");
+  std::cout << "&a=" << &a << "\n";
+  A b = a;         // vad är skillnaden
+  A c(a);          // mellan dessa
+  A d;             // tre tekniker?
+  d = a;
+  std::cout << " Call no_ref(a:" << &a << ")" << std::endl;
+  no_ref(a);  // Bildas temporära objekt? 
+  std::cout << " Call no_ref(a:" << &a << ")" << std::endl;
+  
+  with_ref(a);     // Bildas temporära objekt?
+  
+  A *aa = new A[5];
+  delete aa;       // Vad kommer att hända?
+  std::cout << " ==== main ==== END \n";
+  return 0;
+}
+
+
+// Vad skriver ditt program ut, var förberedd att förklara varför.
+
+
+// När frigörs objekten? SVAR:
+----
+a,b,c,d - frigörs när main funktionen har går ur sitt scope.
+De automatiska objekten frigörs när de går ur ett scope, scopet i detta
+fall är main funktionen. Det temporära objektet som bildas vid anropet
+av no_ref frigörs efter exekveringen av funktionen dvs sitt scope.
+
+Objekten a,b,c,d och det temporära objektet allokeras på stacken.
+
+De fem objekten som allokeras i samband vid new A[5] kommer
+allokeras på heapen och generellt kommer inte frigöras då pekaren a hamnar ur
+sitt scope det måste ske en explicit delete [] a för att objekten
+ska frigöras från heapen.
+----
+// När skapas temporära objekt? SVAR: 
+----
+Temporärt objekt bildas vid andropet av no_ref mha av A(const A&) copy 
+konstruktorn innan no_ref exekveras och frigörs efter anropet av no_ref.
+----
+
+//   A b = a;         // vad är skillnaden
+//   A c(a);          // mellan dessa
+//   A d;             // tre tekniker?
+//   d = a;
+
+SVAR:
+----
+I Båda det första och i det andra fallet används koperingskonstruktorn.
+
+Skillnaden mellan dessa två är att i första fallet ber vi kompilatorn om
+att kopiera höger ledets operand till det objekt vi försöker skapa,
+konvertering implicit av höger ledet om så krävs, i detta fall krävs dock 
+ingen konvertering.
+
+I det andra fallet ber vi kompilatorn om ett explicit funktionsanrop till
+typen A's konstruktor, vilket är koperingskonstruktor.
+
+I det tredje fallet används A default konstruktor därefter sker ett anrop
+till A's medlemsfunktion A::operator=(const A&) vilket är A's tilldelnings
+operator.
+----
+
+//   no_ref(a);       // Bildas temporära objekt?
+SVAR: 
+----
+Det bildas ett temporärt objekt innan andropet till no_ref(a). 
+Kopieringskontruktorn används för att skapa kopian från "a" detta borde
+vara ekvivallent med fallet 1 i ovanstående fråga.
+
+
+//   with_ref(a);     // Bildas temporära objekt?
+SVAR:
+----
+Det bildas inget temporärt objekt innan anropet av with_ref(a) parametern
+skickas in som en referens vilket innebär att ingen kopia skapas.
+
+//   delete aa;       // Vad kommer att hända
+SVAR:
+----
+Programet krashar på min Darwin Version 11.4.2 
+med gcc 4.8.1. Noterat att före krashen så exekveras destruktorn
+på ett objekt endast.
+
+
+/////////////////////////////////////////////////////////////////
+//
+// struct Data {
+//     int x, y, z;
+// };  
+// 
+// Data ** foo(Data ** v, int x) {
+//     for (int i = 0; i < x; i++)
+//         //if (v[i] != 0)
+//             v[i] = new Data;
+//     return v;
+// }
+// 
+// int main () {
+//     const int size = 5;
+//     Data ** v = new Data * [size];
+//     Data ** p = foo(v, size);
+//     delete [] p;
+// }
+
+// Hur ser valgrinds felmeddelande ut?  
+
+
+// Blir det någon skillnad i hur mycket minne som läcker när man
+// kommenterar if-satsen?
+
+
+// Borde det ha blivit någon skillnad?
+
+
+// Varför läcker programmet fortfarande minne?
+
+
+/////////////////////////////////////////////////////////////////
+//
+// 1.4
+//
+// Generellt är det ofta en god idé att låta konstruktorer som
+// tar ett argument deklareras som explicit. Varför? Ange ett
+// exempel där det annars kan bli dumt.
+
+
+// operatorn[] måste vara en konstant medlemsfunktion i vissa
+// fall. När och varför? Hur kopierar man vektorn?
+
+
