@@ -27,4 +27,29 @@ public:
     int result = must_follow_a(vek, 4, 'a', 'b');
     TS_ASSERT_EQUALS( result, 1);
   }
+
+
+  // additional test of my own
+  void test_a_is_second_and_fourth(void) 
+  {
+    char vek[] = { 'a','b','x','a','b'};
+    int result = must_follow_a(vek,5,'a','b');
+    TS_ASSERT_EQUALS( result, 2);
+  }
+
+  void test_is_failing (void) 
+  {
+    char vek[] = { 'a','b','a','b','a','b'};
+    int result = must_follow_a(vek,5,'a','b');
+    TS_ASSERT_EQUALS( result, 2);
+  }
+
+  void test_a_is_third(void)
+  {
+    char vek[] = {'b','b','a','b','b'};
+    int result = must_follow_a(vek,3,'a','b');
+    TS_ASSERT_EQUALS( result , 0);
+
+  }
+
 };

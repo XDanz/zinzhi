@@ -1,5 +1,7 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall
+OBJS = $(shell ls *.cpp)
+PROG = hello
 
 # These are the pattern matching rules. In addition to the automatic
 # variables used here, the variable $* that matches whatever % stands for
@@ -8,9 +10,15 @@ CFLAGS=-std=c++11 -Wall
 # $< - refers to the first prerequisite
 # $@ - refers to the target
 
+all: $(PROG)
+	echo "in all '$*'=" $*
+
 %.o: %.cpp
+	echo "'$*'=" $*
 	$(CC) $(CFLAGS) -c $< -o $@
-%: %.cpp
+
+$(PROG): $(OBJS)
+	echo "$*=" $*
 	$(CC) $(CFLAGS) -o $@ $<
 
 clean:

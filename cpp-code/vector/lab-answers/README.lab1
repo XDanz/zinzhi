@@ -11,9 +11,16 @@ danieltc@kth.se
 // 1.1
 //
 // vad betyder \$* i en makefile? 
-
+Expanderar till vad som matchades i % av ett mönste rmatchande mål ( target ).
 
 // vad gör -Wall och -g ?
+
+-g
+Producerar debug information i os format så att GDB kan jobba med
+informationen.
+
+-Wall
+Slår på de vissa kompilerings varningar men inte alla.
 
 
 /////////////////////////////////////////////////////////////////
@@ -44,11 +51,19 @@ danieltc@kth.se
 //         std::cout << z << "*" << x * x << " är inte 29" << std::endl;           
 // }
 // 
-// Varför blir värdet på variabeln w inte det man tror (0.29*100)? 
 
+// Varför blir värdet på variabeln w inte det man tror (0.29*100)?
+Trunkering av decimal tal vid konvertering från float till int gör att
+w blir 0.
 
-// Hur många varv körs for-loopen i funktionen powerof? 
+// Hur många varv körs for-loopen i funktionen powerof?
 
+1 gång körs uttrycket:
+
+res *= x;
+
+Loopen körs 3 gånger men i varje varv görs inget pga semikolon vilket
+innebär slutet på en rad för ett uttryck.
 
 // 1.2 b)
 //
@@ -63,9 +78,32 @@ danieltc@kth.se
 // 
 // Dina tre testfall
 
+ void test_a_is_second_and_fourth(void) 
+  {
+    char vek[] = { 'a','b','x','a','b'};
+    int result = must_follow_a(vek,5,'a','b');
+    TS_ASSERT_EQUALS( result, 2);
+  }
+
+  void test_is_failing (void) 
+  {
+    char vek[] = { 'a','b','a','b','a','b'};
+    int result = must_follow_a(vek,5,'a','b');
+    TS_ASSERT_EQUALS( result, 2);
+  }
+
+  void test_a_is_third(void)
+  {
+    char vek[] = {'b','b','a','b','b'};
+    int result = must_follow_a(vek,3,'a','b');
+    TS_ASSERT_EQUALS( result , 0);
+
+  }
+
 
 // Varför är det så viktigt att testa randvillkoren?
 
+För att det är lätt o "gå över kanten".
 
 /////////////////////////////////////////////////////////////////
 //
