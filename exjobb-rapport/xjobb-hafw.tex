@@ -10,8 +10,8 @@
 \subtitle{Duis autem vel eum iruire dolor in hendrerit in
           vulputate velit esse molestie consequat, vel illum
           dolore eu feugiat null}
-\foreigntitle{Lorem ipsum dolor sit amet, sed diam nonummy nibh eui
-              mod tincidunt ut laoreet dol}
+\foreigntitle{Design och implementering av en tillgänglighets kontroller}
+
 \author{Daniel Terranova}
 \date{20140501}
 \blurb{Master's Thesis at CSC\\
@@ -25,32 +25,39 @@ Examiner: Tjohej}
 \maketitle
 \selectlanguage{english}
 \begin{abstract}
-  Network devices and network management systems are mission critical.
-  Therefore these kind of systems are often configured in redundant modes,
-  one or several other systems can take over the function of a node which undergoes
-  a system crash of some kind. This is often called High-Availability.
+  Network devices and network management systems are mission critical
+  for network operators. Therefore these kind of systems are often configured
+  in redundant modes.
+  In a redundant system information is stored in various different locations.
+
+  This eliminate a single point of failure of the whole system. When one
+  primary system becomes unavailable a secondary could take over without
+  data loss and a higher availability is performed.
 
   The Tail-f System's Network Control System (NCS) is a network management
-  framework. NCS offers centralised network configuration management
-  functionality, along with providing options for extending the framework
-  with additional features. The provisioning information managed by NCS are
-  stored in its build in Configuration Database (CDB).
+  software and a framework for extending the framework with additional
+  features. NCS offers a centralised network configuration management.
+
+  The provisioning information managed by NCS are stored in its build in
+  Configuration Database (CDB).
 
   The NCS product support high-availability through a replication
-  architecture; one active master and a number of passive slaves.
-  Slaves initialises the replication through a active connect to
-  the master.
+  architecture; one active master and a number of passive slaves that
+  acts as standby in case of the primary master becomes unavailable.
 
-  The only thing NCS does is to replicate the CDB data amongst the members
-  in the HA group. It does not perform any of the otherwise High-Availability
+  When network state information is change on the master system replication is
+  done in CDB amongst the members in the high-availability group or slaves.
+
+  NCS as does not perform any of the otherwise high-availability
   related tasks such as running election protocols in order to elect a new
-  master. This is the task of a High-Availability Controller (HAC) which
-  must be in place and assume an external controller to take those decisions:
-  switching master/slave nodes based on some criteria.
+  master in case of unavailability of the primary system.
+
+  This is the task of a High-Availability Controller (HAC) which
+  take those decisions switching master/slave nodes based on some criteria.
 
   At any point in time a slave can take over the role from the master.
-  The decision is made by the controller which commands NCS to be
-  master or slave by API calls.
+  The decision is made by the controller which instructs NCS to be master
+  or slave by API calls.
 
   The background for this thesis work is to study the requirements and
   propose an implementation along with an evaluated prototype for a
@@ -64,30 +71,40 @@ Examiner: Tjohej}
 \end{abstract}
 \clearpage
 \begin{foreignabstract}{swedish}
-  Nätverks element och system för är konfigurering av nätverk är kritiska.
-  Vilket innebär ofta att dessa system är konfigurerade redundant.
-  En eller flera system kan ta över en funktion från ett system som genomgår en
-  system crash. Detta kallas oftast för hög tillgänglighet.
+  System för konfigurering av nätverk är idag kritiska för nätverks operatörer.
+  Detta innebär ofta att redundans byggs in i system för att möjligöra
+  en så står tillgänglighet så möjligt. System är oftast konfigurerade
+  redundant för att undvika att information förloras vid ett haveri.
 
-  Tail-f Systems NCS produkt är ett nätverk konfigurerings verktyg och ett ramverk. 
+  I ett system med flera noder som arbetar med samma upgifter används
+  en nod som det primära systemet och de övriga som sekundära.
+  Det primära systemet ger tillgång till tjänster som det totala system
+  erbjuder och speglar information till de övriga
+  sekundära systemen som agerar passivt. När det primära system inte länge är
+  tillgängligt på grund av haveri kan någon av de sekundära system ta över utan
+  att information förloras vilket innebär en högre tillgänglighet för det totala
+  systemet.
+
+  Tail-f Systems NCS är ett nätverk konfigurerings mjukvara.
   NCS är användbart som det är, men kan även byggas ut av användaren
-  med ytterligare funktioner. De enheter som hanteras av NCS lagras i 
-  konfigurationsdatabasen (CDB).  
-  
-  NCS stödjer replikering mellan noder men det fins ingen automatisk mekanism som 
-  avgör vilken nod som avgör vem ska vara den aktiv och passiv slav. Detta är en uppgift
-  åt en kontroller vilket måste finnas på plats och som tar dessa beslut baserat på
-  vissa kriterier.
-  
-  I en given tidpukt kan en passiv slav ta över rollen från den aktive noden.
-  
-  Bakgrunden för detta examens arbete är att studera krav som ställs på en sådan kontroller
-  och föreslå en implementation.
-  
-  Förutom att utveckla programvara för enhetsidentifiering, syftar detta projekt till att sammanfatta 
-  oika design och implementering befintliga metoder.
-  
-  \end{foreignabstract}
+  med ytterligare funktioner. De nätverks element som hanteras av NCS lagras i
+  konfigurationsdatabasen (CDB).
+
+  NCS stödjer spegling mellan noder men det finns ingen automatisk mekanism
+  som avgör vilken nod som vara det primära och vilket ska vara den
+  sekundära. Detta är en uppgift åt en externa mjukvara kontroller som tar
+  dessa beslut baserat på vissa kriterier.
+
+  Vid ett haveri av det primära systemet kan en sekundära systemet
+  ta över rollen från den primära. Beslutet om vem ska vara den nya aktive
+  noden bestäms av kontrollen genom API anrop.
+
+  Bakgrunden för detta examens arbete är att studera krav som ställs på en
+  sådan kontroller och föreslå en design och implementation.
+
+  Förutom att utveckla programvara för beslut hantering, syftar detta projekt
+  till att sammanfatta olika design och implementering befintliga kontroller.
+\end{foreignabstract}
 \clearpage
 \tableofcontents*
 \mainmatter
@@ -116,80 +133,84 @@ the network to operate. Instead of having this information stored at
 a single point in the system is made redundant.
 
 Network Control System (NCS), an NMS developed by Tail-f Systems, is a
-network management system and framework based on the
+network management system and framework based on the 
 Network Configuration Protocol (NETCONF) and YANG
 (a protocol that provides a unified interface to different devices and a
 modelling language utilized by this protocol) supports the replication
 mechanism between a master and a numer of passive slaves.
 
-NCS support replication of the CDB configuration as well as of the
-operational data kept in CDB. A group of NCS hosts consisting of a master,
+NCS support replication of the state information of a network 
+kept in CDB. A group of NCS hosts consisting of a single master,
 and one or more slaves, is referred to as an HA group and sometimes as an
-HA cluster.
+HA cluster. A master has the primary role of a node in a HA group where 
+modification to the state of the network is performed.
 
-A master has the primary role of a node in a HA cluster where modification
-to the state of the network should be performed. Each passive slave
-obtain the modifications done on the master node which means that
-transaction that occurs on the master is replicated to the slaves.
+Each passive slave obtain the modifications done on the master node through 
+replecation.
 
 When the master in some point in time faces a system crash the passive
 slaves should be able to take the role of the master. A decision is
-made by the controller which detect such failing situation and in turn
-appoint some passive slave to take over the role of a master. The
-remaning slaves should be notice of this situation by the controller in
+made by the high availability controller which detect such failing situation 
+and in turn appoints some slave to take over the role of the failing master.
+The remaning slaves should be notice of this situation by the controller in
 turns receive commands of the new role situation.
 
-\section{Problem Statement}
+\section{Problem Statement and project goals}
 
 The only thing NCS does is to replicate the CDB data amongst the members in
 the HA group. It doesn't perform any of the otherwise High-Availability
 related tasks such as running election protocols in order to elect a new
 master. This is the task of a High-Availability Framework controller which
-must be in place. The HAFWC must instruct NCS which nodes are up and down using
-API functions. Thus in order to use NCS configuration replication
-we must first have a HAFWC in place.
+must be in place. The controller must instruct NCS which nodes are up and down
+using API functions. Thus in order to use NCS configuration replication
+we must first have a controller in place.
 
 A HAFWC must detect when nodes fail and instruct NCS accordingly.
 If the master node fails, the HAFWC must elect one of the remaining slaves
 and appoint it the new master. The remaining slaves must also be informed
-by the HAFWC about the new master situation. NCS will never take any actions
-regarding master/slave-ness by itself.
+by the high availability controller about the new master situation. 
+NCS will never take any actions regarding master/slave-ness by itself.
 
-The HAFWC must also handle and detect a situation known as split brain which
-indicates data inconsistencies originating from the maintenance of two
+The high availability controller must also handle and detect a situation 
+known as in computer jargon as a split brain which indicates data 
+inconsistencies originating from the maintenance of two
 separate data sets with overlap in scope caused by network partition.
 
 When a network partiton occurs the nodes in a HA cluster will not be able
-to communicating with each other, believing that the other node is down will
-be appointed a new master. At this point in time we end up with multiple
-masters which could accept any modifications of the network state and failing
-to synchronizing with each other lead to inconsistencies with each other.
-
-A automatic reconciliation could not be performed without loosing
-network state a manual intervene must be made to solve
-the current situation.
+to communicating with each other, believing that they are the only node 
+running. Nodes will end up being master and could accept network 
+state modifiacations. The data sets of each master may randomly 
+serve clients by their own data set updates, without any coordination with 
+the other data sets which results in a data inconsistencies that might require
+operator intervention and cleanup. 
 
 The goal of this thesis work is to produce a prototype of High Availability
-Controller (HAC) which is aware of the HA states of the HA Pairs. The
-HAC should implement an internal state machine to keep track of the HA states.
-This makes it possible to preserve database consistency.
+Controller (HAC) which is aware of the HA states of two HA Pairs. 
 
-theoretical model of how
-a framework with two HA pairs should work and depict different events or
-scenarios that could occur with expecting results base on
-different criteria.
+The controller should implement an internal state machine to keep track of 
+the different HA states. This makes it possible to preserve database 
+consistency.
 
 The model will be the base of a prototype which will be implemented
 and tested.
 
-\subsection{Restrictions and limitations}
+\section{Methology}
+sdfdasfsdf
 
-This work is limited to only two nodes working as pairs. One master
-and the other is a standby slave.
+\section{Restrictions and limitations}
 
-\part{Important Results}
+Althrough a HA group could consist of multiple slaves this thesis 
+work is limited to a two-node cluster working as pairs which is the most 
+common size for a HA cluster since that is the minimum required to provide 
+redundancy two the system.
 
-\chapter{First One}
+One master and the other is a standby slave.
+
+\subsection{Structure of the report}
+\part{Background}
+
+\chapter{High Availability}
+
 
 Aliquam et ante. Vivamus ultricies, neque eget iaculis interdum, lacus
 quam hendrerit sapien, vel posuere justo nulla vitae arcu. Morbi
@@ -206,15 +227,57 @@ pretium arcu libero at odio.
 
 \section{Preliminaries}
 
-Vestibulum dolor dolor, interdum eu, iaculis scelerisque, auctor at,
-mi. Nullam ut erat quis sem bibendum dignissim. Vestibulum volutpat
-nisl in tortor. Etiam pretium nulla et elit. Integer tortor. Ut metus
-ligula, egestas non, ornare vel, bibendum eu, urna. Pellentesque
-rutrum dui vel orci. Aliquam lacus lacus, varius a, sodales vitae,
-egestas a, purus. Integer varius venenatis odio. Pellentesque dui
-mauris, lacinia in, placerat lobortis, tempor ac, lectus.
+A group of computers with running server applications with redendency could
+provide high availability of services that the application provides.
+Working togheter in a group or HA cluster minimzes the the overall systems
+of down time and with redundency could eliminate the single point of failure.
 
-\subsection{HA States}
+A system is not usefull without it services it provides so when we 
+define system High Availability we mean its service availability.
+
+
+A systems uptime U is the time the system is avilable wheres downtime D is the 
+time when the system is unavailable. So the total time could be 
+expressed by:
+
+(1) T = U + D
+
+
+A characteristic of a systems high-availability and definition 
+is measured by the equation.
+
+(2) A = U/T 
+
+Availability of a system is the percentage of time when system is operational.
+
+
+Combining (1) with (2) we obtain 
+
+(3) A = (T-D)/T = 1 - D/T
+
+Wich means that when we could measure the total downtime we could obtain 
+availability of a system within the time T.
+
+For example if we have a downtime of 3.65 days in a year we recieved
+a availability of 99 percent and for a downtime 3.15 sec we obtain
+99.99999 percent availability.
+
+The number of leading nines obtained by from a (3) is usually classifies
+eor referred to as ``class of nines ``.
+Each class corresponds to a maximum allowable amount of down time per 
+year. Wit the above 2 example could be interpreted as: For as system
+to be in the class 3 the maximum of tolerable downtime is 3.65 days whereas
+for a system to be in class 7 the maximum tolerable downtime is 3.15 sec
+per year.
+
+Electricity that is delivered without interruptions 
+(blackouts, brownouts or surges) 99.999 percent of the time would have 
+5 nines reliability, or class five.
+
+In practical network engineers when expressing availability in probability
+or downtime per year.
+
+\subsection{High Availability in NCS}
 
 Sed lobortis neque non mauris. Maecenas rhoncus tempor justo. Nunc vel
 diam at dolor luctus tincidunt. Ut egestas. Aliquam eu turpis eu nisl
@@ -276,7 +339,7 @@ Phasellus egestas lacus ut lorem. Suspendisse sapien. Fusce non dolor
 ac odio tempus placerat.
 
 
-\subsection{The Proof}
+\section{The Proof}
 
 Suspendisse aliquam fringilla tortor. Nullam lacinia rutrum orci. Cras
 pellentesque iaculis ligula. Fusce elit enim, nonummy ut, fermentum
