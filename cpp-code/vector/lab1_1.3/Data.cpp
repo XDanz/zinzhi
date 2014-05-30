@@ -11,28 +11,36 @@ struct Data { // 12 bytes 3*4 bytes
 
 Data ** foo(Data ** v, int x) {
   for (int i = 0; i < x; i++) {
-    //if (v[i] != 0)  {
+    if (v[i] != 0)
       v[i] = new Data;
-      
-    //   //} else {
-    //   std::cout << "v[" << i << "]=" << v[i] << "\n";
-    // }
   }
-  // ;
-
-
-    return v;
+  return v;
 }
+
+  
+  
+
+// }
 
 int main () {
     const int size = 5;
-    Data  **v = new Data * [size];
-    std::cout << "sizeof(Data)=" << sizeof(Data) << "\n";
-    std::cout << "sizeof(int)=" << sizeof(int) << "\n";
-    std::cout << "sizeof(v)/v[0]= "<< sizeof(Data)/sizeof(v[0]) << "\n";
-    //foo(v, size);
-    Data ** p = foo(v, size);
+    // allocate 5 new data objects on the heap
+    // Data *ptr = new Data[5];
+    // std::cout << sizeof (ptr[0]) << std::endl;
+    
+    Data  **v = new Data *[size];
+    foo(v,size);
+    
+    // for ( int i = 0; i < size ; i++ ) {
+    //   std::cout << "v[" << i << "]:" << v[i] << std::endl;
+    // }
+    
+    // std::cout << "sizeof( v[0] ) " <<  sizeof ( v[0] ) << std::endl;
+    
+    // std::cout << "sizeof( v[0][0] ) " <<  sizeof ( v[0][0] ) << std::endl;
+    // Data ** p = foo(v, size);
     // for ( int i = 0; i < size; i++)
-    //   delete p[i];
-    delete [] p;
+    //   delete v[i];
+    
+    delete [] v;
 }

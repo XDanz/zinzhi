@@ -42,6 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    node0.vm.synced_folder "/Users/dtc/dev/trunk-linux", "/confd"
    node0.vm.synced_folder "/Users/dtc/dev/zinzhi/work/java-conf-api-test","/test"
   node0.vm.synced_folder "/Users/dtc/dev/zinzhi/work/packages","/packages"
+  node0.vm.synced_folder "/Users/dtc/dev/zinzhi/cpp-code" , "/cpp-code"
 
 
   end

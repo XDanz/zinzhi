@@ -254,16 +254,83 @@ på ett objekt endast.
 // }
 
 // Hur ser valgrinds felmeddelande ut?  
+==9712== Conditional jump or move depends on uninitialised value(s)
+==9712==    at 0x4009C5: foo(Data**, int) (in /cpp-code/vector/lab1_1.3/Data)
+==9712==    by 0x400A51: main (in /cpp-code/vector/lab1_1.3/Data)
+==9712== 
+==9712== 
+==9712== HEAP SUMMARY:
+==9712==     in use at exit: 40 bytes in 1 blocks
+==9712==   total heap usage: 1 allocs, 0 frees, 40 bytes allocated
+==9712== 
+==9712== 40 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==9712==    at 0x4C2AC27: operator new[](unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==9712==    by 0x400A3C: main (in /cpp-code/vector/lab1_1.3/Data)
+==9712== 
+==9712== LEAK SUMMARY:
+==9712==    definitely lost: 40 bytes in 1 blocks
+==9712==    indirectly lost: 0 bytes in 0 blocks
+==9712==      possibly lost: 0 bytes in 0 blocks
+==9712==    still reachable: 0 bytes in 0 blocks
+==9712==         suppressed: 0 bytes in 0 blocks
+==9712== 
+==9712== For counts of detected and suppressed errors, rerun with: -v
+==9712== Use --track-origins=yes to see where uninitialised values come from
+==9712== ERROR SUMMARY: 6 errors from 2 contexts (suppressed: 2 from 2)
+
 
 
 // Blir det någon skillnad i hur mycket minne som läcker när man
 // kommenterar if-satsen?
 
+Ja det blir skillnad 
+
+Data ** v = new Data * [size];
+
+allokerar 40 bytes dvs 5 * 8 , 8 bytes for pekare. med if satsen 
+v[i] blir initialiserad till 0 vilket innebär att inga Data objekt kommer
+allokeras på heapen.
+
+varje element i v[i] initialiseras till 0 
+
+heap:       8 byte   8 byte  8 byte   8 byte   8 byte
+           --------x--------x--------x--------x--------x
+            0      | 0      | 0      | 0      |  0     |
+           --------x--------x--------x--------x--------x
+           ^
+           |
+          v 
+
+Kommenterar man bort if satsen kommer ytterligare 5 Data objekt allokeras på 
+heapen dvs 5 st sizeof ( Data ) = 12 alltså 60 bytes till
+
+
+heap:       8 byte   8 byte  8 byte   8 byte   8 byte
+           --------x--------x--------x--------x--------x
+            0x0b0  | 0x100  | 0x150  | 0x1f0  |  0x80  |
+           --------x--------x--------x--------x--------x
+           ^
+           |
+          v 
+
+
+totalt blir det 100 bytes utan if satsen dvs 60 bytes extra.
 
 // Borde det ha blivit någon skillnad?
 
 
 // Varför läcker programmet fortfarande minne?
+
+I fallet då vi har if satsen så läcker inte delete [] p minne.
+
+I fallet då vi har if satsen så missar vi att avalokera 60 bytes
+pga att delete [] p avalokerar bara blocket som inehåller pekarna.
+För att avalokera blocken för varje element:
+
+for ( int i = 0 ; i < size ; i++ ) 
+    delete v[i];
+
+   delete [] v;
 
 
 /////////////////////////////////////////////////////////////////

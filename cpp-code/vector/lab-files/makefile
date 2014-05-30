@@ -1,5 +1,14 @@
-%.out:	%.cpp
-	g++ -g -std=c++0x -Wall $*.cpp -o $*.out
+# Change these
+cxxtestpath = /info/cprog11/cxxtest/
+testcode    = example_test.h
+
+testcode.cpp: $(testcode)
+	python $(cxxtestpath)cxxtestgen.py --error-printer -o testcode.cpp $(testcode)
+
+runtest0%: testcode.cpp
+	g++ -I $(cxxtestpath) -o runtest0$* testcode.cpp Matrix0$*.o
 
 clean:
-	@rm -f *.out
+	touch runtest01 testcode.cpp
+	rm runtest0* testcode.cpp
+
