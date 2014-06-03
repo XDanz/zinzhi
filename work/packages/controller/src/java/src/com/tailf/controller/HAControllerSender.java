@@ -1,24 +1,9 @@
 package com.tailf.controller;
 
-import java.net.InetSocketAddress;
-import java.net.InetAddress;
-import java.net.Socket;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-import java.util.concurrent.ArrayBlockingQueue;
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
@@ -27,38 +12,26 @@ public class HAControllerSender {
         Logger.getLogger ( HAControllerSender.class );
 
     private Socket socket = null;
-    private int port;
-
-    private ArrayBlockingQueue<HAControllerRequest>  requestQueue = 
-        new ArrayBlockingQueue<HAControllerRequest>(10);
-
-    private ArrayBlockingQueue<HAControllerResponse>  responseQueue = 
-        new ArrayBlockingQueue<HAControllerResponse>(10);
-
     
     public static void main ( String arg[] ) {
         log.info(" starting send..");
-
+        
         try {
-            InetAddress addr = 
-                InetAddress
-                .getByAddress (
-                               new byte[] { (byte)192, (byte)168, 60, 3 });
 
-            
-            
-            HAControllerSender sender = 
-                new  HAControllerSender ( addr , 4545 ) ;
+           String strAddr = arg[0];
+           int port = Integer.parseInt(arg[1]);
+           InetAddress addr = 
+               InetAddress.getByName(strAddr);
 
-            
+            HAControllerConnector sender = 
+                HAControllerConnector.connector(new Socket ( addr, port));
             
             log.info (" writing request ..");
-            sender.sendRequest ( new HAControllerRequest ("status"));
-
+            sender.send("status");
             log.info (" writing request ..ok");
 
             Object response = 
-                sender.readResponse();
+                sender.recv();
 
             log.info ( " got response :" + response);
         } catch ( Exception e ) {

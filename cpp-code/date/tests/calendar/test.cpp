@@ -6,14 +6,15 @@
 
 using namespace std;
 using namespace lab2;
+
 int 
 main ( int argc, char ** argv ) 
 {
   set_k_time(NULL);
-  
+
   Calendar<Gregorian> cal;
   cal.set_date(2000, 12, 2);
-  std::cout << cal.get_date() << std::endl;
+  std::cout << "curr_date: " << cal.get_date() << std::endl;
   cal.add_event("Basketträning", 4, 12, 2000);
   cal.add_event("Nyårsfrukost", 1, 1, 2001);
   cal.add_event("Första advent", 1);          // year = 2000, month = 12
@@ -39,7 +40,5 @@ main ( int argc, char ** argv )
   list<Calendar<Gregorian>::Event> ll = cal.date_events();
   for ( auto a : ll )
     cout << "Event:" << a << endl;
-  // }
-  
-
 }
+

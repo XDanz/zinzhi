@@ -1,15 +1,13 @@
 package com.tailf.controller;
 
-import java.util.List;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.InterfaceAddress;
-import java.net.SocketException;
-
-import com.tailf.conf.ConfBuf;
 import org.apache.log4j.Logger;
 
 public class HAConfiguration {

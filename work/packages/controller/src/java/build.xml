@@ -1,4 +1,4 @@
-<project name="package" basedir="." default="all">
+<project name="ha-controller" basedir="." default="all">
   <property environment="env"/>
   <property name="build.dir" value="build"/>
   <property name="classes.dir" value="${build.dir}/classes"/>
@@ -7,8 +7,9 @@
   <property name="sharedjar.dir" value="../../shared-jar"/>
   <property name="privatejar.dir" value="../../private-jar"/>
   <property name="doc.dir" value="${build.dir}/javadoc"/>
-  <property name="ncs.dir" value="${env.NCS_DIR}/java/jar"/>
-  <property name="ncs.topdir" value="${env.NCS_DIR}"/>
+  <property name="ncs.topdir" value="${env.HOME}/dev/trunk-darwin/ncs_dir"/>
+  <property name="ncs.dir" value="${ncs.topdir}/java/jar"/>
+
   <property name="package" value="ha-controller"/>
 
   <path id="core-libs">

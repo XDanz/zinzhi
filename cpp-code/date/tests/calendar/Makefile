@@ -22,6 +22,7 @@ test: build
 cxxtest: calendar_test
 	./calendar_test
 
+
 calendar_test.cpp: calendar.cpp
 	$(CXXGEN) $(CXXGENFLAGS) $@ $< 
 

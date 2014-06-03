@@ -1,15 +1,12 @@
 package com.tailf.controller;
 
-import java.net.InetAddress;
 import java.net.Socket;
 
-import com.tailf.ha.Ha;
-import com.tailf.conf.ConfIP;
-import com.tailf.conf.ConfHaNode;
-import com.tailf.ncs.NcsMain;
-import com.tailf.ha.HaStateType;
 import com.tailf.cdb.CdbTxId;
-
+import com.tailf.conf.ConfIP;
+import com.tailf.ha.Ha;
+import com.tailf.ha.HaStateType;
+import com.tailf.ncs.NcsMain;
 
 public abstract class AbstractHANode implements HANode {
     protected String name;

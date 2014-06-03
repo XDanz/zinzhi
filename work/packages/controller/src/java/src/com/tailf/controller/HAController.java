@@ -1,46 +1,28 @@
 package com.tailf.controller;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import java.net.Socket;
-import java.net.InetAddress;
-
-import java.io.IOException;
 import java.io.File;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import com.tailf.cdb.Cdb;
-import com.tailf.cdb.CdbSession;
-import com.tailf.cdb.CdbDBType;
-import com.tailf.cdb.CdbTxId;
-
-
-import com.tailf.conf.ConfIP;
-import com.tailf.conf.ConfNoExists;
-import com.tailf.conf.ConfXMLParamValue;
-import com.tailf.conf.ConfXMLParamLeaf;
-import com.tailf.conf.ConfXMLParamCdbStart;
-import com.tailf.conf.ConfXMLParamStop;
-import com.tailf.conf.ConfXMLParam;
-import com.tailf.conf.ConfList;
-import com.tailf.conf.ConfUInt16;
-import com.tailf.conf.ConfBuf;
-import com.tailf.conf.ConfObject;
-import com.tailf.conf.ConfPath;
-import com.tailf.conf.ConfHaNode;
-import com.tailf.conf.ConfException;
-
-import com.tailf.notif.HaNotification;
-import com.tailf.notif.NotificationType;
-
-import com.tailf.ha.Ha;
-import com.tailf.ha.HaStateType;
-import com.tailf.ncs.NcsMain;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import com.tailf.cdb.Cdb;
+import com.tailf.cdb.CdbDBType;
+import com.tailf.cdb.CdbSession;
+import com.tailf.conf.ConfBuf;
+import com.tailf.conf.ConfIP;
+import com.tailf.conf.ConfList;
+import com.tailf.conf.ConfObject;
+import com.tailf.conf.ConfPath;
+import com.tailf.conf.ConfUInt16;
+import com.tailf.conf.ConfXMLParam;
+import com.tailf.conf.ConfXMLParamLeaf;
+import com.tailf.conf.ConfXMLParamValue;
+import com.tailf.ha.HaStateType;
+import com.tailf.ncs.NcsMain;
+import com.tailf.notif.HaNotification;
 
 public class HAController {
     private static final Logger log = Logger.getLogger ( HAController.class );
@@ -49,13 +31,11 @@ public class HAController {
 
     private HAConfiguration configurationData;
     private File path; // the current package path
-    private ExecutorService pool =
-        Executors.newSingleThreadExecutor();
 
     private static Object lock = new Object();
 
     /**
-     *  Returns the Current initialized singelton instance
+     *  Returns the Current initialized singleton instance
      *  HAController. (There could only be one).
      *  @return Instance of HAController
      */
@@ -68,7 +48,7 @@ public class HAController {
         }
         return haControllerInstance;
     }
-
+    // private constructor 
     private HAController () throws Exception {
         log.debug ( " xxx initializing HAController xxx ");
 
@@ -159,25 +139,16 @@ public class HAController {
     }
 
     void localNodeBeMaster () throws Exception {
-        switch ( getLocalHANode().getHaStatus() ) {
-        case MASTER:
-            //no op already master
-            return;
-        case NONE:
-        case SLAVE:
-            {
-                getLocalHANode().beMaster();
-                HAControllerVipManager vipManager = 
-                    HAControllerVipManager.getManager();
-
-                vipManager.initializeAvailableVips();
-                
-            }
-            break;
-        default:
-            break;
+        try {
+            getLocalHANode().beMaster();
+        } catch ( Exception e ) {
+            throw new HAControllerException ( e );
         }
 
+        HAControllerVipManager vipManager = 
+            HAControllerVipManager.getManager();
+        
+        vipManager.initializeAvailableVips();
     }
 
     void masterDown () throws Exception {
@@ -237,7 +208,7 @@ public class HAController {
 
     void determinationByTxId () throws Exception {
         log.info(" determinationByTxId () => ");
-        HANode remote = getRemoteHANode();
+
         if ( getRemoteHANode().isReachable () ) {
             reConciliation ();
         } else {
@@ -392,7 +363,7 @@ public class HAController {
 
                 } else {
                     try {
-                        Thread.currentThread().sleep(1000);
+                        Thread.sleep(1000);
                     } catch ( InterruptedException e ) {
                         log.error("",e);
                     }
@@ -409,7 +380,8 @@ public class HAController {
 
             }
             break;
-
+        case SLAVE_RELAY:
+            {} break;
         }
     }
 
@@ -434,7 +406,7 @@ public class HAController {
 
                             } else {
                                 try {
-                                    Thread.currentThread().sleep(1000);
+                                    Thread.sleep(1000);
                                 } catch ( InterruptedException e ) {
                                     log.error("",e);
                                 }
@@ -453,8 +425,8 @@ public class HAController {
                             // maybe we need to check HAStatus of the
                             // local node before promoting the local
                             // node to be slave.
-                            log.info(" CALL (" + getLocalHANode()
-                                     + ").beSlave() =>");
+                            log.info(" CALL (" + getLocalHANode() + 
+                                     ").beSlave =>");
                             HaStateType haState =
                                 getLocalHANode().getHaStatus();
                             switch ( haState ) {
@@ -470,10 +442,10 @@ public class HAController {
                                              + ").beSlave() =>");
                                     getLocalHANode()
                                         .beSlave( getRemoteHANode());
-
+                                    
                                     log.info(" CALL (" + getLocalHANode()
                                              + ").beSlave() => ok");
-
+                                    
                                 }
                                 break;
                             case NONE:
@@ -492,6 +464,8 @@ public class HAController {
                             case SLAVE:
                                 log.info (getLocalHANode() + " already slave!");
                                 break;
+                            case SLAVE_RELAY:
+                                log.info (" slave relay --");
                             }
                         }
                         break;
@@ -500,6 +474,10 @@ public class HAController {
                             log.info (" remote already slave! --");
                         }
                         break;
+                    case SLAVE_RELAY:
+                        {
+                            log.info(" slave relay --");
+                        } break;
                     }
                 }
             } else {

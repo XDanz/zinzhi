@@ -44,9 +44,7 @@ namespace lab2 {
         }
       }
       Calendar<C>::Event newEvent( date, str);
-      std::cout << " add event :" << newEvent << std::endl;
       events.push_back ( newEvent );
-      std::cout << " events.size() :" << events.size() << std::endl;
       return true;
     }
 

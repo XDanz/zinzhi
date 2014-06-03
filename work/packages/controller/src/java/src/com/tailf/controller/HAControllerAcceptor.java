@@ -1,23 +1,16 @@
 package com.tailf.controller;
 
-import java.net.InetSocketAddress;
 import java.net.InetAddress;
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import com.tailf.cdb.CdbTxId;
-import com.tailf.ha.HaStateType;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+
+import com.tailf.cdb.CdbTxId;
+import com.tailf.ha.HaStateType;
 
 public class HAControllerAcceptor {
     private static final Logger log =
@@ -27,7 +20,6 @@ public class HAControllerAcceptor {
     private static ExecutorService pool =
         Executors.newCachedThreadPool();
 
-    private int port;
     private static HAControllerAcceptor acceptor;
 
     protected ServerSocket getServerSocket() {
@@ -55,18 +47,21 @@ public class HAControllerAcceptor {
         }
         
     }
-
+    // Handler of incoming request from the remote 
+    // HAController NODE.
     class RequestHandler implements Runnable {
         private final Socket clientSock;
         RequestHandler ( Socket clientSock ) { this.clientSock = clientSock; }
 
         public void run () {
             try {
+                log.debug(" incomming request from " + clientSock );
                 HAControllerConnector cn =
                     HAControllerConnector.connector ( clientSock );
 
                 String req = (String)cn.recv();
                 Object resp = null;
+                log.debug (" req:" + req );
 
                 HAController ctrl = HAController.getController();
                 HALocalNode node = (HALocalNode)ctrl.getLocalHANode();
@@ -78,6 +73,7 @@ public class HAControllerAcceptor {
                     CdbTxId txid = node.getTxId();
                     resp = txid;
                 } else if (req.equals ("status")) {
+
                     HaStateType type = node.getHaStatus();
 
                     switch ( type ) {
@@ -89,6 +85,8 @@ public class HAControllerAcceptor {
                         break;
                     case SLAVE:
                         resp = "slave";
+                        break;
+                    default:
                         break;
                     }
                 } else if (req.equals ("ping")) {
@@ -140,7 +138,7 @@ public class HAControllerAcceptor {
             log.info ( "  XXX Acceptor Started! XXX ");
             log.info(" sock:" + srvSock );
             for ( ;; ) {
-                this.pool.execute ( new RequestHandler ( srvSock.accept()) );
+                pool.execute ( new RequestHandler ( srvSock.accept()) );
             }
 
         } catch (Throwable e) {
@@ -156,6 +154,6 @@ public class HAControllerAcceptor {
     }
 
     public ExecutorService executorService() {
-        return this.pool;
+        return pool;
     }
 }

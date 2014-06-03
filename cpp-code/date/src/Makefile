@@ -1,4 +1,4 @@
-# ./src Make file compiles all necessary src files to ../objs directory
+# ./SEC Make file compiles all necessary src files to ../objs directory
 CC = g++
 CFLAGS = -Wall -std=c++11 -I../includes
 SRC = $(wildcard *.cpp)

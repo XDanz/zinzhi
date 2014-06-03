@@ -6,7 +6,7 @@
             class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
-       value="[%-4p] [%d{dd-MMM-yyyy::HH:mm:ss.SSS}][%C{1}][%t]: - %m%n"/>
+       value="[%-4p] [%r][%C{1}][%t]: - %m%n"/>
 
     </layout>
   </appender>
@@ -34,6 +34,13 @@
     <level value="warn" />
     <appender-ref ref="A1"/>
   </logger>
+
+  <logger name="com.tailf.controller"
+          additivity="false" >
+    <level value="debug" />
+    <appender-ref ref="A1"/>
+  </logger>
+
 
   <root>
     <priority value ="info" />

@@ -42,6 +42,9 @@ const bool Gregorian::is_valid_date(int year,int month,int day)
     
 
 lab2::Gregorian& Gregorian::operator=(const Gregorian& d) {
+  curr_year = d.curr_year;
+  curr_month = d.curr_month;
+  curr_day = d.curr_day;
   return *this;
 }
 
