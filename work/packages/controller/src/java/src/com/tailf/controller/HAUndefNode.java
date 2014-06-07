@@ -23,9 +23,12 @@ public class HAUndefNode extends AbstractHANode {
         throw new  HAControllerDeterminationException();
     }
 
-    
-    public  void beSlave ( HANode master ) throws Exception {
+     public  void beSlave ( HANode master ) throws Exception {
         throw new  HAControllerDeterminationException();
+    }
+
+    public void saveTxId() throws Exception {
+        throw new HAControllerDeterminationException ();
     }
 
     public boolean isLocal () {

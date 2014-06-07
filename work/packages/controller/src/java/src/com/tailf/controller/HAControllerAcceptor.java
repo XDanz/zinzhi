@@ -33,8 +33,6 @@ public class HAControllerAcceptor {
                         try {
                             acceptor =
                                 new HAControllerAcceptor ( );
-                            log.info (" acceptor " + acceptor );
-                            log.info ( " Starting Acceptor !");
                             acceptor.acceptHARemoteConnections();
                             
                         } catch ( Exception e ) {
@@ -92,8 +90,7 @@ public class HAControllerAcceptor {
                 } else if (req.equals ("ping")) {
                     resp = "pong";
                 } else if (req.equals ("slave")) {
-                    ctrl.localNodeBeSlave ();
-
+                    ctrl.getLocalHANode().beSlave( ctrl.getRemoteHANode() );
                 }
                 cn.send (resp);
                 cn.close ();
@@ -140,7 +137,10 @@ public class HAControllerAcceptor {
             for ( ;; ) {
                 pool.execute ( new RequestHandler ( srvSock.accept()) );
             }
-
+        } catch ( HAControllerDeterminationException e ) {
+            log.error (" Please Configure /thc:ha-nodes/ha-node properly!");
+            log.warn ( " HAControllerAcceptor Not running ");
+           
         } catch (Throwable e) {
             log.error("",e);
 

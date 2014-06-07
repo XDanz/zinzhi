@@ -1,17 +1,13 @@
 package com.tailf.controller;
 
 
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.ConnectException;
 
-import com.tailf.ha.Ha;
-import com.tailf.conf.ConfIP;
-import com.tailf.conf.ConfHaNode;
-import com.tailf.ncs.NcsMain;
-import com.tailf.ha.HaStateType;
-import com.tailf.cdb.CdbTxId;
 import org.apache.log4j.Logger;
+
+import com.tailf.cdb.CdbTxId;
+import com.tailf.conf.ConfIP;
+import com.tailf.ha.HaStateType;
 
 public class HARemoteNode extends AbstractHANode {
     private static final Logger log = 
@@ -39,6 +35,18 @@ public class HARemoteNode extends AbstractHANode {
     public String getName() {
         return this.name;
     }
+    
+    public void saveTxId () throws Exception {
+        HAControllerConnector con = null;
+        try {
+            con = connector();
+            con.send ("savetxid");
+            
+        } finally {
+            if ( con != null ) 
+                con.close ();
+        }
+    }
 
     public boolean txDiff () throws Exception {
         HAControllerConnector con = null;
@@ -56,7 +64,6 @@ public class HARemoteNode extends AbstractHANode {
             }
         }
     }
-
 
     public HaStateType getHaStatus() throws Exception {
         HAControllerConnector con = null;

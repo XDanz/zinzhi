@@ -2,12 +2,6 @@ package com.tailf.controller;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.io.InputStream;
-import java.io.BufferedInputStream;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
@@ -24,8 +18,12 @@ public class HAControllerGratuitousArp extends HAControllerOSCommand
     HAControllerGratuitousArp ( HAControllerVip haCtrlVip ) {
         this.haCtrlVip = haCtrlVip;
     }
-    
-    public void arpReply (int count) throws Exception {
+
+    /**
+     *  Send count nummer of arpReply with arpsend os command
+     *   @trows HAControllerException 
+     */
+    public void arpReply (int count) throws HAControllerException {
         log.info ( " arpReply () => ");
         //sudo arpsend -P -i 192.168.60.33 -c 4 eth1:svip0
         addHead();
@@ -40,7 +38,7 @@ public class HAControllerGratuitousArp extends HAControllerOSCommand
 
     }
 
-    public void arpResponse (int count) throws Exception {
+    public void arpResponse (int count) throws HAControllerException {
         log.info ( " arpResponse () => ");
         //sudo arpsend -U -i 192.168.60.33 -c 4 eth1:svip0
         addHead();

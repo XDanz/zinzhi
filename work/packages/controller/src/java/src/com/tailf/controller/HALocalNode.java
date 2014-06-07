@@ -1,50 +1,57 @@
 package com.tailf.controller;
 
-import java.net.InetAddress;
-
-import java.net.Socket;
-import java.net.NetworkInterface;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
-
-import com.tailf.ha.Ha;
-import com.tailf.ha.HaStateType;
-import com.tailf.ha.HaStatus;
-import com.tailf.conf.ConfIP;
-import com.tailf.conf.ConfBuf;
-import com.tailf.conf.ConfHaNode;
-import com.tailf.ncs.NcsMain;
-import com.tailf.cdb.CdbTxId;
-import com.tailf.cdb.Cdb;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.NetworkInterface;
+import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
+import com.tailf.cdb.Cdb;
+import com.tailf.cdb.CdbTxId;
+import com.tailf.conf.ConfBuf;
+import com.tailf.conf.ConfHaNode;
+import com.tailf.conf.ConfIP;
+import com.tailf.ha.Ha;
+import com.tailf.ha.HaStateType;
+import com.tailf.ha.HaStatus;
 
 
 public class HALocalNode extends AbstractHANode {
     private static final Logger log =
         Logger.getLogger( HALocalNode.class );
-    
+
     private NetworkInterface ifc;
 
-    public HALocalNode (String name, ConfIP address,boolean preferredMaster ,
+    public HALocalNode (String name, ConfIP address, boolean preferredMaster,
                         int port ) {
         super ( name, address, preferredMaster, port );
-
+        ObjectInputStream is = null;
         try {
-            ObjectInputStream is =
+           is =
                 new ObjectInputStream ( new FileInputStream ( "txid" +
                                                               getName()));
-            this.eventTxId = (CdbTxId) is.readObject();
+           this.eventTxId = (CdbTxId) is.readObject();
             log.info("READING TXID "+ eventTxId);
         } catch ( Exception e ) {
             log.info("No eventTxId found!");
+        } finally {
+            try {
+                if ( is != null )
+                    is.close();
+            } catch ( IOException e ) { /** ignore **/ }
         }
     }
 
-    public  ConfIP getAddress () {
+    /**
+     *   Return the configured of this node.
+     *
+     *  @return Address of this node
+     */
+    public ConfIP getAddress () {
         return address;
     }
 
@@ -62,7 +69,6 @@ public class HALocalNode extends AbstractHANode {
     public boolean isLocal() {
         return this.isLocal;
     }
-
 
     public void setNetworkInterface ( NetworkInterface ifc ) {
         this.ifc = ifc;
@@ -128,6 +134,13 @@ public class HALocalNode extends AbstractHANode {
         Ha ha = getHASocket2Ncs(sock);
         ha.beMaster ( new ConfBuf ( getName() ));
         sock.close();
+        
+        try {
+            HAControllerVipManager.getManager()
+                .initializeAvailableVips();
+        } catch ( HAControllerException e ) {
+            log.warn ( "", e);
+        }
     }
 
     public void beNone () throws Exception {
@@ -135,6 +148,9 @@ public class HALocalNode extends AbstractHANode {
         Ha ha = getHASocket2Ncs(sock);
         ha.beNone();
         sock.close();
+
+        HAControllerVipManager.getManager()
+            .destroyVips();
     }
 
     public void saveTxId () throws Exception {
@@ -165,6 +181,10 @@ public class HALocalNode extends AbstractHANode {
                    masterConfHaNode,true) ;
 
         sock.close();
+
+        HAControllerVipManager.getManager()
+            .destroyVips();
+
     }
 
     public String toString () {

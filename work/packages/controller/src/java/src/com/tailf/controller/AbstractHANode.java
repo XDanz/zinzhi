@@ -48,10 +48,6 @@ public abstract class AbstractHANode implements HANode {
     public CdbTxId getTxId() throws Exception {
         throw new HAControllerDeterminationException();
     }
-    
-    
-                                   
-
 
     public abstract boolean isLocal();
 
