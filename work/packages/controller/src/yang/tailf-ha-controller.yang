@@ -57,6 +57,19 @@ module tailf-ha-controller {
       tailf:info "Order this NCS instance to be neither master nor slave";
       tailf:actionpoint "hapoint";
     }
+    
+    tailf:action vip {
+      tailf:actionpoint vipctrl;
+        input {
+          leaf controll {
+            type enumeration {
+              enum up;
+              enum down;
+            }
+          }
+        }
+      }
+
     leaf ha-status {
       type enumeration {
         enum "unknown" {

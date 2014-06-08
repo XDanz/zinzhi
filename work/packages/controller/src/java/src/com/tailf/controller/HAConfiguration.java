@@ -113,7 +113,7 @@ public class HAConfiguration {
         if ( this.currPkgDir != null )
             log.info(" using package directory " + this.currPkgDir );
 
-        recognizeNodeByInterfaces();
+        //recognizeNodeByInterfaces();
         log.debug ( " readInitData() => ok");
     }
 

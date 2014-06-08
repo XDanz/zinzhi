@@ -15,16 +15,16 @@ import java.io.File;
 import org.apache.log4j.Logger;
 
 public class HAControllerVipManager {
-    private static final Logger log = 
+    private static final Logger log =
         Logger.getLogger ( HAControllerVipManager.class);
     static HAControllerVipManager inst;
 
     Map<HAControllerVip, List<Future<Void>> >  vipsup =
         new HashMap<HAControllerVip, List<Future<Void>>> ();
 
-    private ExecutorService pool = 
+    private ExecutorService pool =
         Executors.newCachedThreadPool();
-    
+
     public static HAControllerVipManager getManager() {
         if ( inst == null ) {
             inst = new HAControllerVipManager();
@@ -40,11 +40,11 @@ public class HAControllerVipManager {
         HALocalNode localNode =
             (HALocalNode)HAController.getController().getLocalHANode();
 
-        final File path = 
+        final File path =
             HAController.getController().getHAConfiguration()
             .getPackageDirectory();
         int index = 0;
-        
+
 
         // if localNode does not have a network interface.
         if ( localNode.getNetworkInterface () != null ) {
@@ -54,25 +54,25 @@ public class HAControllerVipManager {
                     new HAControllerVip ( addr ,
                                           localNode.getNetworkInterface() ,
                                           index++);
-                log.info (" Initialize Vip " + vip.getInetAddress() + 
+                log.info (" Initialize Vip " + vip.getInetAddress() +
                           " on " + vip.getNetworkInterface() );
                 // throws if the operation could not be performed
                 vip.bringInterfaceUp();
-                
+
                 List<Future<Void>> futures = new ArrayList<Future<Void>>();
-                
+
                 // arpsend
-                Future<Void> future = 
+                Future<Void> future =
                     pool.submit( createIfDownCallable( vip , path));
-                
+
                 futures.add( future );
-                
-                Future<Void> garpFuture = 
+
+                Future<Void> garpFuture =
                     pool.submit( createGArpCallable(vip) );
-                
+
                 futures.add ( garpFuture );
                 log.info (" putting " + futures );
-                vipsup.put ( vip , futures );     
+                vipsup.put ( vip , futures );
             }
             log.info (" All VIP up and running!");
         } else {
@@ -82,7 +82,7 @@ public class HAControllerVipManager {
     }
 
     /**
-     * Create the Callable for this bring up the alias for 
+     * Create the Callable for this bring up the alias for
      * the VIP. This is used for launching the shell script
      * which blocks on read.
      *
@@ -96,28 +96,28 @@ public class HAControllerVipManager {
             public Void call () {
                 HAControllerAutoIfDown ifDown = null;
                 try {
-                    ifDown = 
+                    ifDown =
                         new HAControllerAutoIfDown (
                                                     path,
                                                     vip.getInetAddress(),
                                                     vip.getNetworkInterface(),
                                                     vip.getVipIndex() );
-                    
+
                     return null;
                 } catch ( Exception e ) {
                     log.error("",e);
                     try {
                         ifDown.process
                             .getOutputStream().close();
-                    } catch ( IOException ie ) {  
-                        
+                    } catch ( IOException ie ) {
+                        log.error("",e );
                     }
                 }
                 return null;
             }
         };
     }
-    
+
     public Callable<Void> createGArpCallable(final HAControllerVip vip) {
         return new Callable<Void>() {
             public Void call () {
@@ -127,18 +127,18 @@ public class HAControllerVipManager {
                 try {
                     // send arpReply 4 times
                     garpProvider.arpReply ( 4 );
-                    
+
                     // send arpRespone 4 times
                     garpProvider.arpResponse ( 4 );
 
-                    log.info (" Initialize Vip " + 
-                              vip.getInetAddress() + 
-                              " on " + 
-                              vip.getNetworkInterface()  + 
-                              " ok!");   
-                    
+                    log.info (" Initialize Vip " +
+                              vip.getInetAddress() +
+                              " on " +
+                              vip.getNetworkInterface()  +
+                              " ok!");
+
                     log.info ("garp() => ok");
-                    
+
                 } catch ( HAControllerException e ) {
                     log.error("",e );
                 }
@@ -153,12 +153,12 @@ public class HAControllerVipManager {
                  vipsup.entrySet() ) {
             List<Future<Void>> futures = e.getValue();
             log.info (" interrupting ..");
-            for ( Future<Void> future : futures ) 
+            for ( Future<Void> future : futures )
                 future.cancel (true);
         }
         vipsup.clear();
     }
-    
+
     public void destroy () {
         pool.shutdownNow();
     }

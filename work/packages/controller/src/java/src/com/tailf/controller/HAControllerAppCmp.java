@@ -13,11 +13,18 @@ import com.tailf.notif.HaNotification;
 import com.tailf.notif.Notif;
 import com.tailf.notif.NotificationType;
 
+// Application component implementation of the HAController driver
+//      init
+// 1.) starts the HAController which reads the configuration
+// 2.) Initial Determination which node should be who.
+//      Run
+// 3.)  Reads events from Notification socket
+//
 public class HAControllerAppCmp implements ApplicationComponent {
 
     private static final Logger log =
         Logger.getLogger ( HAControllerAppCmp.class );
-    
+
     private HAController haController;
     private volatile boolean shouldRun = true;
     private Notif notif = null;
@@ -27,19 +34,19 @@ public class HAControllerAppCmp implements ApplicationComponent {
     public void init () throws Exception {
         log.info("\n ----- HAController initializing  ----- ");
         try {
-            Thread.currentThread().dumpStack();
             haController = HAController.getController();
             notif = createNotifSocket ();
+
             log.info ( " CALL initalDetermination () =>");
             haController.initialDetermination ();
-             log.info ( " CALL initalDetermination () => ok");
+            log.info ( " CALL initalDetermination () => ok");
+
         } catch ( HAControllerException e ) {
             log.error("", e );
             shouldRun = false;
-            log.info("shouldRun:" + shouldRun );
             log.warn ( " HAController NOT Running! ");
         }
-        log.info("\n ----- HAController initializing  END ----- ");        
+        log.info("\n ----- HAController initializing  END ----- ");
     }
 
     public void run () {
@@ -48,10 +55,10 @@ public class HAControllerAppCmp implements ApplicationComponent {
             log.info("shouldRun:" + shouldRun );
             while ( shouldRun ) {
                 log.info ("\n ---- Running ---- START");
-
+                log.debug ( "notif.read() => ");
                 HaNotification notification =
                     (HaNotification)notif.read();
-
+                log.debug ( "notif.read() => got event!");
                 haController.haEvent ( notification );
 
             }
@@ -64,10 +71,7 @@ public class HAControllerAppCmp implements ApplicationComponent {
         } catch ( Exception e ) {
             log.error("", e );
         } finally {
-            try {
-                if ( notifSocket != null ) 
-                    notifSocket.close();
-            } catch ( IOException e ) { }
+            closeNotifSocket();
         }
         log.info ( " run method ended! "  );
     }
@@ -76,14 +80,15 @@ public class HAControllerAppCmp implements ApplicationComponent {
         log.info ("\n ---- Finish ---- START");
         HAControllerAcceptor.stopListening();
         shouldRun = false;
-        HAControllerVipManager vipMngr = 
+        closeNotifSocket();
+        HAControllerVipManager vipMngr =
             HAControllerVipManager.getManager();
         log.info ( " destroy All vips ");
         vipMngr.destroyVips();
         vipMngr.destroy();
         log.info ( " destroy All vips ok");
 
-        
+
         log.info ("\n ---- Finish ---- END");
     }
 
@@ -94,7 +99,14 @@ public class HAControllerAppCmp implements ApplicationComponent {
         notif =
             new Notif ( notifSocket ,
                         EnumSet.of(NotificationType.NOTIF_HA_INFO) );
-        
+
         return notif;
+    }
+
+    void closeNotifSocket () {
+            try {
+                if ( notifSocket != null && !notifSocket.isClosed() )
+                    notifSocket.close();
+            } catch ( IOException e ) { }
     }
 }

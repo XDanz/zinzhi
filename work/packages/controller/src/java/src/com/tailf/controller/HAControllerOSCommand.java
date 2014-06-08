@@ -30,25 +30,29 @@ public abstract class HAControllerOSCommand {
             processExit ( process.waitFor() ) ;
 
         } catch ( InterruptedException e ) {
-            try {
-                // When the current thread gets interrupted
-                // should we close the outputstream? how does
-                // this affect autoifdown.sh script if its
-                // blocks on read
-                process.getOutputStream().close();
+            log.error("",e );
 
-            } catch ( IOException ee ) {
-                // If an I/O error occurs when closing the
-                // outputstream.
-                log.error("",ee );
-            }
+            // When the current thread gets interrupted
+            // should we close the outputstream? how does
+            // this affect autoifdown.sh script if its
+            // blocks on read
+
         } catch ( HAControllerVipException e ) {
             throw e;
         } catch ( Exception e ) {
             log.error("",e );
             throw new HAControllerException ( e );
         }  finally {
-            process.destroy();
+            try {
+                // process.getInputStream().close();
+                // process.getErrorStream().close();
+                log.info (" closing process stdout ");
+                process.getOutputStream().close();
+                log.info (" destroy process ");
+                process.destroy();
+            } catch ( Exception e ) {
+                log.error("",e ) ;
+            }
         }
     }
 

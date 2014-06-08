@@ -13,4 +13,11 @@
       <java-class-name>com.tailf.controller.HAControllerAppCmp</java-class-name>
     </application>
   </component>
+  <component>
+    <name>ManualVip</name>
+    <callback>
+      <java-class-name>com.tailf.controller.actions.VipController
+      </java-class-name>
+    </callback>
+  </component>
 </ncs-package>

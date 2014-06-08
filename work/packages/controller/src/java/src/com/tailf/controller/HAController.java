@@ -120,30 +120,30 @@ public class HAController {
      *  where cause could be a ConfException or
      *  a IOException.
      */
-    void nodeBeMaster (HANode node) throws Exception {
+    // void nodeBeMaster (HANode node) throws Exception {
 
-        log.info( "nodeBeMaster() =>");
+    //     log.info( "nodeBeMaster() =>");
 
-        try {
-            node.beMaster();
-        } catch ( HaException e ) {
-            throw new HAControllerException ( e );
-        } catch ( IOException e ) {
-            throw new HAControllerException ( e );
-        }
+    //     try {
+    //         node.beMaster();
+    //     } catch ( HaException e ) {
+    //         throw new HAControllerException ( e );
+    //     } catch ( IOException e ) {
+    //         throw new HAControllerException ( e );
+    //     }
 
-        // ok bring up vips
-        try {
-            HAControllerVipManager vipManager =
-                HAControllerVipManager.getManager();
+    //     // ok bring up vips
+    //     try {
+    //         HAControllerVipManager vipManager =
+    //             HAControllerVipManager.getManager();
 
-            vipManager.initializeAvailableVips();
+    //         vipManager.initializeAvailableVips();
 
-        } catch ( HAControllerException e ) {
-            log.warn("VIPS not initialized!", e );
-        }
-        log.info( " localBeMaster() => ok");
-    }
+    //     } catch ( HAControllerException e ) {
+    //         log.warn("VIPS not initialized!", e );
+    //     }
+    //     log.info( " localBeMaster() => ok");
+    // }
 
     //  On event when master went down
     void masterDown () throws Exception {
@@ -167,16 +167,22 @@ public class HAController {
             HAControllerReConnector.execute();
         }
     }
-
+    
+    // When nodes has been split apart this method is called
+    // by the reconnector thread when it reconnects to the remote node.
+    // 
     // Callback method will be called when HA Node has been
     // reconnected i.e when HAControllerReConnector has done
-    // its job
+    // its job 
     public void reConnected ( ) throws Exception {
         log.info("reConnected() =>");
         reConciliation();
         log.info("reConnected() => ok");
     }
-
+    // Try to re conciliate with the remote node. Depending on if the 
+    // remote and local has txdiff which means that something has
+    // changed i.e a transaction has been issued on either nodes
+    // when nodes was apart so we don't want to loose transactions.
     void reConciliation () throws Exception {
         log.info ( "reconciliation() =>");
         HANode remote = getRemoteHANode();
@@ -185,6 +191,7 @@ public class HAController {
         if (local.txDiff() && remote.txDiff()) {
             log.info(" CASE 1 TX DIFF ON BOTH NODES");
             //   ERROR need manual intervention!
+            //   TODO: issue an alarm.
         }
         else if (local.txDiff() && !remote.txDiff()) {
             log.info(" CASE 2 LOCAL HAS TX DIFF");
@@ -298,7 +305,8 @@ public class HAController {
     }
 
     // is called first by the init-x thread to deterimine who should
-    // be master.
+    // be master. Exception could occure if the controller is not
+    // properly configured.
     void initialDetermination () throws Exception {
         log.info(" initialDetermination () =>");
         HANode remote = getRemoteHANode();
@@ -403,9 +411,5 @@ public class HAController {
         }
         log.info ("initialDetermination() => ok");
         return ;
-        // }  catch ( Exception e ) {
-        //     log.error("",e);
-        //     // TODO
-        // } 
     }
 }
