@@ -5,7 +5,7 @@ import com.tailf.conf.ConfIP;
 import com.tailf.ha.HaStateType;
 
 public interface  HANode {
-
+	public static final long serialVersionUID = 42L;
     public ConfIP getAddress ();
 
     public boolean isPreferredMaster();
@@ -23,7 +23,7 @@ public interface  HANode {
     public String getName();
 
     /**
-     *  Return the status of the node.
+     *  Return the ha status of the node.
      *  @return HA Status of the node
      */
     public HaStateType getHaStatus() throws Exception;
@@ -66,6 +66,7 @@ public interface  HANode {
     /**
      * Returns true wether the current transaction ID 
      * differs from the transaction ID from disk.
+     *
      * If there is no persist transaction ID on disk
      * the method returns false.
      * 
@@ -78,7 +79,7 @@ public interface  HANode {
     public boolean txDiff () throws Exception ;
 
     /**
-     * Return true wether the remote node is reachable this means
+     * Return true wether the remote node is reachable which means
      * that the remotes acceptor answered for a ping request.
      *
      * @return true wether the remote node is reachable

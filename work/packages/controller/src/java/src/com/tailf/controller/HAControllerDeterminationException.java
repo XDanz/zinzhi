@@ -4,7 +4,12 @@ package com.tailf.controller;
 
 public class HAControllerDeterminationException extends HAControllerException {
     
-    public HAControllerDeterminationException ( String msg ) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public HAControllerDeterminationException ( String msg ) {
         super ( msg );
     }
 

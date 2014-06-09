@@ -7,18 +7,22 @@
   <property name="sharedjar.dir" value="../../shared-jar"/>
   <property name="privatejar.dir" value="../../private-jar"/>
   <property name="doc.dir" value="${build.dir}/javadoc"/>
-  <property name="ncs.topdir" value="${env.HOME}/dev/trunk-darwin/ncs_dir"/>
-  <property name="ncs.dir" value="${ncs.topdir}/java/jar"/>
+  <property name="ncs.topdir" value="${env.W}/ncs_dir"/>
+  <property name="ncs.jar.dir"    value="${ncs.topdir}/java/jar"/>
 
   <property name="package" value="ha-controller"/>
 
   <path id="core-libs">
-    <fileset dir="${ncs.dir}">
+    <fileset dir="${ncs.jar.dir}">
       <include name="*.jar"/>
     </fileset>
   </path>
 
   <target name="all" depends="package" />
+
+  <target name="test">
+    <echo message="${ncs.jar.dir}"/>
+  </target>
 
 
   <target name="package" depends="compile">
@@ -101,7 +105,36 @@
     <arg value="${port}" />
     <!-- <jvmarg value="-verbose:class"/> -->
   </java>
+
 </target>
+  <target name="showifc" 
+          depends="compile">
+    <java classname="com.tailf.controller.test.ShowInterfaces"
+          failonerror="true"
+          fork="true">
+      <classpath refid="core-libs" />
+    <classpath location="build/classes"/>
+    <!-- <arg value="${addr}" /> -->
+    <!-- <arg value="${port}" /> -->
+    <!-- <jvmarg value="-verbose:class"/> -->
+  </java>
+</target>
+
+<target name="getifc" 
+          depends="compile">
+    <java classname="com.tailf.controller.test.GetInterface"
+          failonerror="true"
+          fork="true">
+      <classpath refid="core-libs" />
+    <classpath location="build/classes"/>
+    <arg value="${name}" />
+    <arg value="${index}" />
+    <!-- <arg value="${port}" /> -->
+    <!-- <jvmarg value="-verbose:class"/> -->
+  </java>
+</target>
+
+
 
 
 </project>

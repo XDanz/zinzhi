@@ -9,6 +9,8 @@ import com.tailf.ha.HaStateType;
 import com.tailf.ncs.NcsMain;
 
 public abstract class AbstractHANode implements HANode {
+    public static final long serialVersionUID = 42L;
+    
     protected String name;
     protected ConfIP address;
     protected boolean isLocal;

@@ -16,7 +16,7 @@ public class HAUndefNode extends AbstractHANode {
 
 
     public  void beMaster () throws Exception {
-        throw new  HAControllerDeterminationException();
+        throw new  HAControllerDeterminationException();	
     }
 
     public  void beNone () throws Exception {

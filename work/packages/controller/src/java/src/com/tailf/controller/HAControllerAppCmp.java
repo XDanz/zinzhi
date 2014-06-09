@@ -50,11 +50,12 @@ public class HAControllerAppCmp implements ApplicationComponent {
     }
 
     public void run () {
-
+        log.info ("\n ---- Running ---- START");
         try {
             log.info("shouldRun:" + shouldRun );
+
             while ( shouldRun ) {
-                log.info ("\n ---- Running ---- START");
+
                 log.debug ( "notif.read() => ");
                 HaNotification notification =
                     (HaNotification)notif.read();
@@ -73,7 +74,7 @@ public class HAControllerAppCmp implements ApplicationComponent {
         } finally {
             closeNotifSocket();
         }
-        log.info ( " run method ended! "  );
+        log.info ("\n ---- Running ---- END");
     }
 
     public void finish() throws Exception {

@@ -20,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network :forwarded_port, guest: 80, host: 8080
+  config.vm.network :forwarded_port, guest: 2024, host: 20240
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -39,16 +39,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-   node0.vm.synced_folder "/Users/dtc/dev/trunk-linux", "/confd"
+   node0.vm.synced_folder "/Users/dtc/dev/trunk-linux", "/confd", type: "nfs"
    node0.vm.synced_folder "/Users/dtc/dev/zinzhi/work/java-conf-api-test","/test"
-  node0.vm.synced_folder "/Users/dtc/dev/zinzhi/work/packages","/packages"
-  node0.vm.synced_folder "/Users/dtc/dev/zinzhi/cpp-code" , "/cpp-code"
+    node0.vm.synced_folder "/Users/dtc/dev/zinzhi/work/packages","/packages"
+    node0.vm.synced_folder "/Users/dtc/dev/zinzhi/cpp-code" , "/cpp-code"
 
 
   end
 
 
- config.vm.define :node1 do |node1|
+  config.vm.define :node1 do |node1|
   # Every Vagrant virtual environment requires a box to build off of.
   node1.vm.box = "created_box01"
 
@@ -60,6 +60,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network :forwarded_port, guest: 80, host: 8080
+  config.vm.network :forwarded_port, guest: 2024, host: 2024
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -78,7 +79,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-    node1.vm.synced_folder "/Users/dtc/dev/trunk-linux", "/confd"
+    node1.vm.synced_folder "/Users/dtc/dev/trunk-linux", "/confd", type: "nfs"
     node1.vm.synced_folder "/Users/dtc/dev/zinzhi/work/java-conf-api-test","/test"
     node1.vm.synced_folder "/Users/dtc/dev/zinzhi/work/packages","/packages"    
     

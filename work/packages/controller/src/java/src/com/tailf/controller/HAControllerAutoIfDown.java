@@ -1,14 +1,11 @@
 package com.tailf.controller;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.io.InputStream;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 // calls the bash script autoifdown.sh which blocks on bash built-in read

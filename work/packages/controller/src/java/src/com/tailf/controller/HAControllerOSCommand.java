@@ -1,10 +1,10 @@
 package com.tailf.controller;
 
-import java.util.List;
-
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -23,9 +23,9 @@ public abstract class HAControllerOSCommand {
      */
     public void runCommand (List<String> cmd) throws HAControllerException {
         String[] cmdArr = cmd.<String>toArray(new String[0]);
-
         Runtime r = Runtime.getRuntime();
         try {
+            log.debug("Running command:" + Arrays.toString(cmdArr));
             process = r.exec ( cmdArr );
             processExit ( process.waitFor() ) ;
 
@@ -44,11 +44,8 @@ public abstract class HAControllerOSCommand {
             throw new HAControllerException ( e );
         }  finally {
             try {
-                // process.getInputStream().close();
-                // process.getErrorStream().close();
-                log.info (" closing process stdout ");
                 process.getOutputStream().close();
-                log.info (" destroy process ");
+                log.debug (" destroy process " + process);
                 process.destroy();
             } catch ( Exception e ) {
                 log.error("",e ) ;
@@ -64,10 +61,9 @@ public abstract class HAControllerOSCommand {
      * @throw  HAcontrollerException
      */
     void processExit ( int exitValue ) throws HAControllerException {
-        log.info ( " osCommand " + process + " exit with " + exitValue );
+        log.debug ( " osCommand " + process + " exit with " + exitValue );
         if ( exitValue != 0 ) {
             String errMsg = retriveErrMsg();
-            log.info ( "ERROR-MSG :" + errMsg );
             if ( errMsg == null )
                 errMsg = "OSError";
             throw new HAControllerVipException ( errMsg );
@@ -86,7 +82,7 @@ public abstract class HAControllerOSCommand {
 
             BufferedReader br =
                 new BufferedReader ( iReader);
-
+            
             StringBuffer buf = new StringBuffer();
             String line = null;
 
@@ -96,6 +92,8 @@ public abstract class HAControllerOSCommand {
             errMsg = buf.toString().trim();
         } catch ( IOException e ) {
             log.error("",e);
+        } finally {
+            
         }
         return errMsg;
     }

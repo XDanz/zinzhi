@@ -56,8 +56,16 @@ public class HAControllerVipManager {
                                           index++);
                 log.info (" Initialize Vip " + vip.getInetAddress() +
                           " on " + vip.getNetworkInterface() );
-                // throws if the operation could not be performed
+
+                // clear previous settings.
+                try {
+                    vip.bringInterfaceDown ();
+                } catch ( HAControllerException e ) {
+                    log.warn("",e);
+                }
+                // Exception if the operation could not be performed
                 vip.bringInterfaceUp();
+                
 
                 List<Future<Void>> futures = new ArrayList<Future<Void>>();
 
