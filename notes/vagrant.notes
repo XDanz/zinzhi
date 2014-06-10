@@ -1,0 +1,173 @@
+How to create a Vagrant box from VirtualBox
+
+  # Change the hostname to: vagrant
+  sudo vi /etc/hostname
+  sudo vi /etc/hosts
+
+  # Add a vagrant user and (if non-existing) the admin group
+  sudo groupadd admin
+  sudo useradd -G admin -d /home/vagrant -s /bin/bash vagrant
+  sudo passwd vagrant
+
+  # Edit the sudoers file and add this lines to the file
+  Defaults env_keep="SSH_AUTH_SOCK"
+  %admin ALL=NOPASSWD: ALL
+
+  # Install vagrant's insecure key in the vagrant's account
+  sudo -iu vagrant
+  mkdir ~/.ssh
+  cd ~/.ssh
+  wget http://github.com/mitchellh/vagrant/raw/master/keys/vagrant
+   wget http://github.com/mitchellh/vagrant/raw/master/keys/vagrant.pub
+  mv vagrant.pub authorized_keys
+  chmod 0700 ~/.ssh
+  chmod 0640 ~/.ssh/authorized_keys
+  chmod 0640 ~/.ssh/vagrant
+
+  # Install VirtualBox guest additions
+  (use the Devices menu in VirtualBox)
+
+  # Add the Vagrant's SSH port
+  sudo vi /etc/ssh/sshd_config
+  # Add this line after the Port 22 declaration
+  Port 2222
+
+  # Create your box from the Host OS shell
+  vagrant package --base <name-of-virtual-box> --output <myname.box>
+  (example: vagrant package --base 'Debian 7.0' --output OpenFlow13.box )
+
+
+How to (completely) remove a vagrant box
+
+  # First check what we have
+  vagrant box list
+  # Then remove one of them (e.g OpenFlow13)
+  vagrant box remove OpenFlow13
+
+
+How to package a new vagrant box from a running one
+
+  vagrant package --output OpenFlow13.box
+
+
+
+-------------------------------------------
+
+vagrant reload node0  (restart vagrant node0)
+
+8 sets of numbers
+12    34    56  78   910  1112 1314 1516 = 16 bytes * 8 = 128 bits
+fd30:0000:0000:0001:ff4e:003e:0009:000e
+-----+--------|-+--|-----+-------------|
+     |         |         |
+    network  subnet     device address
+
+-network ,48 bit ( 3 sets)
+-subnet  ,16 bit ( 1 set )
+-device  ,64 bit ( 4 set ) 
+
+IPv6 addressing allows you to drop preceding zeros in the format, so the 
+above could be simplied as:  
+
+fd30:0000:0000:1:ff4e:3e:9:e
+
+And when you have a double-octet group that is nothing but zeros (0000) you 
+can replace the entire grouping with a ::, so this further simplies the 
+above to look like fd30::1:ff4e:3e:9:e  
+(note:  You can only have 1 set of :: in an IPv6 address, so if you have 
+2 groupings of zeros, you would put the :: on one set but not on the second 
+set to truncate.
+
+# sudo /sbin/ip -6 addr add 2001:0db8:0:f101::1/64 dev eth0 
+
+# sudo /sbin/ip -6 addr del fc00::3/7 dev eth2
+
+
+In the Ipv6 world, the ULA space is fc00::/7, or basically anything that 
+starts with FD in the IPv6 address, so fdxx:xxxx:xxxx…
+
+
+
+fc00:OOOO:OOO:OOOO:OOOO:OOO0:0000:0004/7
+
+
+
+$ VBoxManage list runningvm
+
+$ VBoxManage list hostonlyifs
+
+
+
+Name:            vboxnet0
+GUID:            786f6276-656e-4074-8000-0a0027000000
+DHCP:            Disabled
+IPAddress:       192.168.50.1
+NetworkMask:     255.255.255.0
+IPV6Address:     
+IPV6NetworkMaskPrefixLength: 0
+HardwareAddress: 0a:00:27:00:00:00
+MediumType:      Ethernet
+Status:          Up
+VBoxNetworkName: HostInterfaceNetworking-vboxnet0
+
+Name:            vboxnet1
+GUID:            786f6276-656e-4174-8000-0a0027000001
+DHCP:            Disabled
+IPAddress:       192.168.52.1
+NetworkMask:     255.255.255.0
+IPV6Address:     
+IPV6NetworkMaskPrefixLength: 0
+HardwareAddress: 0a:00:27:00:00:01
+MediumType:      Ethernet
+Status:          Down
+VBoxNetworkName: HostInterfaceNetworking-vboxnet1
+
+Name:            vboxnet2
+GUID:            786f6276-656e-4274-8000-0a0027000002
+DHCP:            Disabled
+IPAddress:       192.168.60.1
+NetworkMask:     255.255.255.0
+IPV6Address:     
+IPV6NetworkMaskPrefixLength: 0
+HardwareAddress: 0a:00:27:00:00:02
+MediumType:      Ethernet
+Status:          Up
+VBoxNetworkName: HostInterfaceNetworking-vboxnet2
+
+
+node0 2001:0:53aa:64c:c5f:a401:ac0e:5d75/32
+node1 2001:0:53aa:64c:1cb8:bbf:ac0e:5d75
+
+
+
+
+VBoxManage hostonlyif ipconfig
+
+
+VBoxManage hostonlyif ipconfig vboxnet2 --ipv6 fc00::1 --netmasklengthv6 7
+
+Vagrant.configure("2") do |config|
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["hostonlyif", "ipconfig", "vboxnet2", "--ipv6", "fc00::1","--netmasklengthv6", "7"]
+  end
+end
+
+
+
+sudo apt-get update
+sudo apt-get -q -y install python-dev
+
+install java 7
+-------------
+sudo apt-get install openjdk-7-jdk
+sudo update-alternatives --config java
+sudo update-alternatives --config javac
+
+
+install gcc 4.8
+--------------
+sudo apt-get install python-software-properties
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc-4.8
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50

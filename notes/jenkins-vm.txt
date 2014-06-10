@@ -1,0 +1,401 @@
+Jenkins Virtual Machine
+=======================
+v0.1, 2014-02-13
+:doctype: book
+
+
+
+[preface]
+Preface
+-------
+This document describes the necessary steps to set up a virtual
+machine for Jenkins. The machine will have all the tools installed to
+build and test NCS itself and its packages. A ready made VM for
+VirtualBox is stored at:
+----
+earth:/lab/software/jenkins/jenkins-1.0.tgz
+----
+
+Base VM
+-------
+
+Create the VM
+~~~~~~~~~~~~~
+
+A server installation is done to avoid the bloat from X
+applications. The final tar ball to be shipped is around 800MB this
+way.
+
+The VM is initially NATed and has two port forwarding rules setup. One
+for ssh, port 2222 on the host and 22 in the guest, and one for
+*jenkins*, port 8888 on the host and 8888 in the guest.
+
+The other values should be self explaining.
+
+Name of VM and place of the ISO the rest is the more or less the same
+every time and can be changed later.
+
+.Set environment variables
+----
+VM=jenkins
+LIVE="$HOME/Downloads/ubuntu-13.10-server-amd64.iso"
+----
+
+.Create the VM
+----
+export CONTROLLER="SATA"
+export PORT=0
+SIZE=20480
+ISO=$(echo $LIVE)
+VBoxManage createvm --name "$VM" --register
+VBoxManage modifyvm "$VM" --ostype Ubuntu
+VBoxManage modifyvm "$VM" --memory 2048
+VBoxManage modifyvm "$VM" --vram 12
+VBoxManage modifyvm "$VM" --boot1 disk
+VBoxManage modifyvm "$VM" --boot2 dvd
+VBoxManage modifyvm "$VM" --rtcuseutc on
+VBoxManage modifyvm "$VM" --nic1 nat
+VBoxManage modifyvm "$VM" --macaddress1 auto
+VBoxManage modifyvm "$VM" --natpf1 "ssh,tcp,,2222,,22"
+VBoxManage modifyvm "$VM" --natpf1 "jenkins,tcp,,8888,,8888"
+#
+VM_DIR=$(dirname "$(VBoxManage showvminfo "$VM" | \
+    grep "^Config file:" | cut -d: -f2 | xargs)")
+DISK_PATH="$VM_DIR/${VM}.vmdk"
+VBoxManage createhd --filename "$DISK_PATH" --size "$SIZE"
+
+VBoxManage storagectl "$VM" --name "SATA" --add sata
+VBoxManage storageattach "$VM" --storagectl "$CONTROLLER"  \
+    --port $PORT --device 0 --type hdd --medium "$DISK_PATH"
+VBoxManage storageattach "$VM" --storagectl "$CONTROLLER" \
+    --port 1 --device 0 --type dvddrive --medium "$ISO"
+----
+
+Now the VM is setup, start the virtual machine. This will boot from the
+Live CD/DVD.
+
+.Start the VM
+----
+VBoxManage startvm "$VM"
+----
+
+Follow the installation instructions from the live CD/DVD and answer to the
+relevant questions. For most of them you can choose the default
+alternative.
+
+.Ubuntu install
+----
+Language:  English
+Host name: jenkins
+Full name: Jenkins Distributed Test Center
+Name:      jenkins
+Password:  feedbabe00
+----
+
+When the installation is finished the VM will reboot. Log in and shut
+it down. After this the gui is not needed any more.
+
+.Start VM without GUI
+----
+VBoxHeadless --startvm "$VM"&
+----
+
+You can now reach the VM through,
+----
+ssh -p 2222 jenkins@127.0.0.1
+----
+the password is *feedbabe00*, and continue with the installation.
+
+Install dependencies
+^^^^^^^^^^^^^^^^^^^^
+The following packages are needed to be able to run tests and builds.
+
+.Install packages
+----
+sudo apt-get update
+sudo apt-get upgrade
+
+sudo apt-get install git emacs libxml2-utils
+
+sudo apt-get build-dep erlang
+sudo apt-get install subversion libncurses5-dev libpam0g-dev libssl-dev \
+  automake bison libtool openssl gpp xsltproc flex g++ python-libxml2 \
+  snmp-mibs-downloader ed fop python-dev python3-dev
+
+sudo apt-get install jenkins
+----
+
+Configuration
+~~~~~~~~~~~~~
+Some sub directories to +/etc+ directory are version controlled on
+the jenkins VM. The below changes are made from start.
+
+.Make git repo
+----
+cd /etc
+sudo git init .
+sudo git add default
+sudo git add ssh
+sudo git commit -m "Initial commit"
+----
+
+/etc/default/jenkins
+^^^^^^^^^^^^^^^^^^^^
+
+Make sure the file: +/etc/default/jenkins+ has the following entries set.
+
+.Jenkins configuration
+----
+PIDFILE=/home/jenkins/var/run/jenkins.pid
+JENKINS_HOME=/home/jenkins/var/lib
+JENKINS_RUN=/home/jenkins/var/run
+JENKINS_LOG=/home/jenkins/var/log/$NAME.log
+HTTP_PORT=8888
+HTTP_HOST=0.0.0.0
+----
+
+.Commit the changes to *git*
+----
+sudo git add -u
+sudo git commit -m "Jenkins configuration"
+----
+
+Open the firewall for access to the *jenkins* server and to *sshd*
+(this seems to be needed, ssh stops working after port 8888 is
+allowed)
+
+.Add rules to firewall
+----
+sudo ufw allow 22/tcp
+sudo ufw allow 8888/tcp
+----
+
+.Create directories for *jenkins*:
+----
+mkdir -p /home/jenkins/var/lib
+mkdir -p /home/jenkins/var/run
+mkdir -p /home/jenkins/var/log
+----
+
+.Restart *jenkins*
+----
+sudo service jenkins restart
+----
+
+
+Now it should be possible to reach *jenkins* from the host at URL
++http://127.0.0.1:8888/"
+
+Finally
+^^^^^^^
+
+As the virtual machine will be copied a lot so try to keep the size as
+small as possible.
+
+.Clean away some files which are not needed
+----
+sudo apt-get clean
+sudo apt-get autoremove
+localedef --list-archive | grep -v ^en_US | \
+  xargs localedef --delete-from-archive
+----
+
+With all the installation taking place the disk has become pretty
+fragmented. Defragment the disk and zero out the remainder so it can
+be compacted.
+
+.Boot from a live CD/DVD:
+----
+sudo bash
+cd /tmp
+mkdir disk
+mount /dev/jenkins-vg/root disk
+e4defrag disk
+cd disk
+dd if=/dev/zero of=./bigemptyfile bs=4096k
+rm bigemptyfile
+----
+Remove the live CD/DVD from the SATA Controller.
+When all the unused areas has been filled with zeros let VirtualBox
+compact the disk.
+
+.Set name of VM
+----
+VM="jenkins-1.1"
+----
+
+.Compact the disk
+----
+VM_HOME="/home/$USER/VirtualBox VMs"
+VM_DIR="$VM_HOME/$VM"
+DISK_NAME="jenkins"
+DISK_PATH="$VM_DIR/${DISK_NAME}.vmdk"
+TMP_DISK_PATH="${VM_DIR}/${DISK_NAME}.vdi"
+CONTROLLER="SATA"
+PORT=0
+#
+# Remove the virtual disk from VM
+#
+VBoxManage storageattach "$VM" --storagectl "$CONTROLLER" --port "$PORT" \
+  --medium "none"
+#
+# Clone the disk, this adds both the disks to the registry
+#
+VBoxManage clonehd "$DISK_PATH" "$TMP_DISK_PATH" --format vdi
+VBoxManage modifyhd  "$TMP_DISK_PATH" --compact
+#
+# Remove the original vdmk from the registry
+#
+VBoxManage closemedium disk "$DISK_PATH"
+#
+mv "$DISK_PATH" "${VM_DIR}.backup.$$.vmdk"
+VBoxManage clonehd "$TMP_DISK_PATH" "$DISK_PATH" --format vmdk
+#
+# Remove the temporary vdi from the registry and from file system
+#
+VBoxManage closemedium disk "$TMP_DISK_PATH"
+rm "$TMP_DISK_PATH"
+#
+# Attach virtual disk to VM
+#
+VBoxManage storageattach "$VM" --storagectl "$CONTROLLER" --port "$PORT" \
+  --type hdd \
+  --medium "$DISK_PATH"
+----
+
+If operation went well make a tar ball or the VM for distribution.
+Now when the virtual machine is ready for distribution the size of the
+gzipped tar ball is around 800MB.
+
+.Make tar ball
+----
+rm -f "$VM_DIR/Logs/"*
+rm -f "$VM_DIR/"*-prev
+(cd "$VM_HOME"; tar czvf "${VM}.tar.gz" "$VM")
+----
+
+It can be tempting to compact the vmdk directly as VirtualBox supports that
+but as of VirtualBox 4.3.6r91406 there is a gain to convert to vdi:
+
+.Just a compact of the vmdk file
+----
+-rw------- 1 dag dag 2506096640 feb 15 20:51 jenkins-1.0/jenkins.vmdk
+----
+
+.Converting vmdk to vdi, compacting vdi and then convert back yeilds:
+----
+-rw------- 1 dag dag 2260336640 feb 16 09:26 jenkins.vmdk
+----
+
+Later changes
+-------------
+
+Correct the installation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+No errors are known in jenkins-1.1.tar.gz
+
+Increase Storage
+~~~~~~~~~~~~~~~~
+
+The initial storage is 20GB. This is a dynamic disk so it will not
+take that amount on the host file system. In case you fill the disk
+and want to resize it to 40GB. The assumption is your machine has the
+name *jenkins* and your disk is *jenkins.vmdk*. Check this by:
+
+Check what disks you have in the VirtualBox registry:
+----
+VBoxManage list hdds
+----
+
+Before you can do anything with the disk it has to be unregistered, ie.
+not used by any VM. Use the UUID from the above output to see where it is
+used:
+----
+export UUID="ba3b10d6-acda-4620-87c9-d99e9a19d0e2"
+VBoxManage list vms | cut -d'"' -f2 | while read VM; do
+    VBoxManage showvminfo "$VM" | grep "$UUID"
+done
+----
+
+From the above output you get the name of the controller, the port number
+and the name of the VM the disk is attached to as well as the path to the
+virtual disk.
+
+.Set environment variables
+----
+export VM="jenkins"
+export CONTROLLER="SATA"
+export PORT=0
+export DISK_PATH="/home/dag/VirtualBox VMs/jenkins/jenkins.vmdk"
+----
+
+.Specify the new size in number of mega bytes:
+----
+export SIZE=40960
+----
+
+.Change the size of the disk:
+[source,shell]
+----
+#
+DISK_DIR=$(dirname "$DISK_PATH")
+DISK_BASE_NAME=$(basename "$DISK_PATH")
+DISK_NAME=$(echo "${DISK_BASE_NAME%%.*}")
+TMP_DISK_PATH="${DISK_DIR}/${DISK_NAME}.vdi"
+#
+# Remove the virtual disk from VM
+#
+VBoxManage storageattach "$VM" --storagectl "$CONTROLLER" --port "$PORT" \
+  --medium "none"
+#
+# Remove medium from registry
+#
+VBoxManage closemedium disk "$DISK_PATH"
+#
+VBoxManage clonehd "$DISK_PATH" "$TMP_DISK_PATH" --format vdi
+VBoxManage modifyhd "$TMP_DISK_PATH" --resize "$SIZE"
+mv "$DISK_PATH" "${DISK_PATH}.backup"
+VBoxManage clonehd "$TMP_DISK_PATH" "$DISK_PATH" --format vmdk
+#
+# Attach virtual disk to VM
+#
+VBoxManage storageattach "$VM" --storagectl "$CONTROLLER" --port "$PORT" \
+  --type hdd \
+  --medium "$DISK_PATH"
+----
+
+Start the virtual machine from a live CD/DVD iso and resize the the
+partition of the new bigger drive with gparted.
+
+Install VM
+----------
+
+Download tar ball
+~~~~~~~~~~~~~~~~~
+
+The jenkins tar balls are stored at:
+----
+earth:/lab/software/jenkins
+----
+and
+----
+https://wiki.tail-f.com/engineering/VMs/jenkins/
+----
+
+Find the latest version from earth and download it:
+----
+TAR_BALL="jenkins-1.1.tar.gz"
+VM_HOME="/home/$USER/VirtualBox VMs"
+pushd "$VM_HOME"
+scp "earth:/lab/software/jenkins/$TAR_BALL" .
+popd
+----
+
+Add a new VM
+~~~~~~~~~~~~
+
+Use the script +vb-create-machine+ to create new virtual machines:
+----
+vb-create-machine jenkins-1.1.tar.gz my-own-jenkins
+----
