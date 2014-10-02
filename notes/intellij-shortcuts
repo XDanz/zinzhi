@@ -1,0 +1,21 @@
+IntelliJ shortcuts
+-----------------
+Ctrl+F12 -      show methods
+Ctrl+Alt+T -    surround with
+Ctrl+Alt+M -     extract to method
+Alt+Arrow upp/down - Got o previous/next method
+Ctrl+U -            Goto interface declaration
+Ctrl+Alt+B    -     Goto imlementation
+Ctrl+T - update project from svn
+Ctrl+Shift+Numpad 7 - block comment
+Ctrl+Shift+F4 - close usage tab
+Alt+Shift+F9  - Debug
+
+Ubuntu Shortcuts
+---------------
+Ctrl+F1  - Open terminal
+Ctrl+Shift - Close terminal (Quit)
+Ctrl+Alt+l - Lock screen
+Ctrl+Alt+Arrow - switch workspace
+
+
