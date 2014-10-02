@@ -1,0 +1,45 @@
+check for unadded java files:
+
+$ svn status | grep ^\?.*\.java
+
+
+find out the model of your graphics card
+(NVIDIA Corporation GK107M [GeForce GT 755M])
+(lenovo Y510P)
+
+$ lspci -vnn | grep -i VGA -A 12
+
+
+find occurance and print filename and linenum:
+
+$ find -name *.java -exec grep -Hn "@Inheritance" {} \;
+
+$ find -name *.java -exec egrep -Hn "@Inheritance\(strategy\s*=\s*InheritanceType\..*\)" {} \; | wc -l
+
+
+
+diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java) <(cat ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java)
+
+
+"@ElementCollection\(fetch\s*=\s*FetchType\..*\)"
+"@CollectionTable\(name\s*=\s*.*\,\s*joinColumns\s*=\s*@JoinColumn\(name\s*=\s*.*\)\)"
+
+"@DiscriminatorColumn\(name\s*=\s*.*\)"
+"@Table\(name\s*=\s*.*\)"
+"@Embedded"
+
+
+@CollectionTable(name = "NEXTGEN_INSTRUMENT_UNDERLYING_SET")
+
+"@AttributeOverride\(name\s*=\s*.\,\s*column\s*=\s*@Column\(name\s*=\s*.*\)\)
+
+@CollectionTable\(name\s*=\s*.*\)"
+
+
+"@Column\(name\s*=\s*.*\)"
+@Embeddable
+
+"@Temporal\(TemporalType\.DATE\)"
+
+
+@Enumerated
