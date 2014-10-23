@@ -1,0 +1,8 @@
+branch: 
+git checkout -b <branch-name>
+
+
+rebase:
+
+git checkout <branch-name>
+git rebase master

@@ -16,6 +16,9 @@ $ find -name *.java -exec grep -Hn "@Inheritance" {} \;
 
 $ find -name *.java -exec egrep -Hn "@Inheritance\(strategy\s*=\s*InheritanceType\..*\)" {} \; | wc -l
 
+# -H --with-filename  print the file name for each match
+# -n --line-number    print the line number with output lines
+$ find . -name *.java -exec egrep -i -Hn 'transaction' {} \;
 
 
 diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java) <(cat ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java)
@@ -29,17 +32,13 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 "@Embedded"
 
 
-@CollectionTable(name = "NEXTGEN_INSTRUMENT_UNDERLYING_SET")
 
-"@AttributeOverride\(name\s*=\s*.\,\s*column\s*=\s*@Column\(name\s*=\s*.*\)\)
+"@AttributeOverride\(name\s*=\s*.\,\s*column\s*=\s*@Column\(name\s*=\s*.*\)\)"
 
-@CollectionTable\(name\s*=\s*.*\)"
+"@CollectionTable\(name\s*=\s*.*\)"
 
 
 "@Column\(name\s*=\s*.*\)"
-@Embeddable
 
 "@Temporal\(TemporalType\.DATE\)"
 
-
-@Enumerated

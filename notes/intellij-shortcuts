@@ -10,6 +10,16 @@ Ctrl+T - update project from svn
 Ctrl+Shift+Numpad 7 - block comment
 Ctrl+Shift+F4 - close usage tab
 Alt+Shift+F9  - Debug
+Ctrl+e - Recent used files
+Ctrl+j , "soutv" - insert System.out.println("value = " + .. )
+Ctrl+r , search and replace
+
+Debugging:
+
+F8 - step over
+F7 - step into
+F9 - resume (to next breakpoint)
+Ctrl+F2 - stop
 
 Ubuntu Shortcuts
 ---------------
