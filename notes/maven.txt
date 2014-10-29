@@ -1,0 +1,70 @@
+
+
+A Build Lifecycle is Made Up of Phases
+
+Each of these build lifecycles is defined by a different list of 
+build phases, wherein a build phase represents a stage in the lifecycle.
+
+For example, the default lifecycle has the following build phases 
+(for a complete list of the build phases, refer to the Lifecycle Reference):
+
+validate - validate the project is correct and all necessary information 
+           is available
+compile - compile the source code of the project
+
+test - test the compiled source code using a suitable unit testing framework.
+        These tests should not require the code be packaged or deployed
+package - take the compiled code and package it in its distributable format, 
+          such as a JAR.
+integration-test - process and deploy the package if necessary into an 
+                   environment where integration tests can be run
+verify - run any checks to verify the package is valid and meets quality 
+         criteria
+install - install the package into the local repository, for use as a 
+          dependency in other projects locally
+
+deploy - done in an integration or release environment, copies the final 
+        package to the remote repository for sharing with other developers 
+        and projects.
+
+These build phases (plus the other build phases not shown here) are executed 
+sequentially to complete the default lifecycle. 
+Given the build phases above, this means that when the default lifecycle is 
+used, Maven will first validate the project, then will try to compile the 
+sources, run those against the tests, package the binaries (e.g. jar), 
+run integration tests against that package, verify the package, install the 
+verifed package to the local repository, then 
+deploy the installed package in a specified environment.
+
+To do all those, you only need to call the last build phase to be executed, 
+in this case, deploy:
+
+$ mvn deploy
+
+That is because if you call a build phase, it will execute not only that 
+build phase, but also every build phase prior to the called build phase. 
+Thus, doing
+
+$ mvn integration-test
+
+will do every build phase before it (validate, compile, package, etc.), 
+before executing integration-test.
+
+There are more commands that are part of the lifecycle, which will be 
+discussed in the following sections.
+
+It should also be noted that the same command can be used in a multi-module
+scenario (i.e. a project with one or more subprojects). For example:
+
+$ mvn clean install
+
+This command will traverse into all of the subprojects and run clean,
+then install (including all of the prior steps). Run individual 
+integration test (all methods):
+
+$  mvn surefire:test -Dtest=com.so4it.nextgen.integration.test.api.account.StandardAccountIntegrationTest
+
+Run individual integration test (single method):
+
+$ mvn surefire:test -Dtest=com.so4it.nextgen.integration.test.api.account.StandardAccountIntegrationTest#\
+  testCreateStandardAccount
