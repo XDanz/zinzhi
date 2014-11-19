@@ -1,6 +1,5 @@
-
-
-A Build Lifecycle is Made Up of Phases
+1.) A Build Lifecycle is Made Up of Phases
+------------------------------------------
 
 Each of these build lifecycles is defined by a different list of 
 build phases, wherein a build phase represents a stage in the lifecycle.
