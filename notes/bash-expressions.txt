@@ -42,6 +42,7 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 
 "@Temporal\(TemporalType\.DATE\)"
 
+
 Network
 ------
 sniffar arp paket
@@ -53,6 +54,8 @@ $ sudo tcpdump -n -i wlan0 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
 listar arp cache
 $ arp -an
 
+Packge Management
+----------------
 
 dpkg --list openjdk-7-jdk:amd64
 
