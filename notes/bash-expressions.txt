@@ -65,5 +65,6 @@ dpkg-query --search openjdk-7-jdk
 visar vilka installerade paket
 $ dpkg --get-selections | grep -v deinstall
 
-
+Avinstallerar paket, tar bort paket
+$ dpkg --remove foo
 sudo update-alternatives --config java
