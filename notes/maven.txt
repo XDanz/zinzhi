@@ -58,8 +58,9 @@ scenario (i.e. a project with one or more subprojects). For example:
 $ mvn clean install
 
 This command will traverse into all of the subprojects and run clean,
-then install (including all of the prior steps). Run individual 
-integration test (all methods):
+then install (including all of the prior steps). 
+
+To Run individual integration test (all methods):
 
 $  mvn surefire:test -Dtest=com.so4it.nextgen.integration.test.api.account.StandardAccountIntegrationTest
 
