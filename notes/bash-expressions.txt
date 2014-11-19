@@ -67,4 +67,8 @@ $ dpkg --get-selections | grep -v deinstall
 
 Avinstallerar paket, tar bort paket
 $ dpkg --remove foo
+
+Raderar även konf filer 
+$ dpkg --purge foo
+
 sudo update-alternatives --config java
