@@ -56,8 +56,8 @@ $ arp -an
 
 Packge Management
 ----------------
-
-dpkg --list openjdk-7-jdk:amd64
+dpkg --list  Listar alla paket som är installerade ( går även med globbing dpkg --list 'foo*' )
+$ dpkg --list openjdk-7-jdk:amd64
 
 visar vilka filer som ingår i ett paket
 $ dpkg-query --listfiles openjdk-7-jdk:amd64
