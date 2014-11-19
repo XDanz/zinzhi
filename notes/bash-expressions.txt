@@ -74,4 +74,7 @@ $ dpkg --remove foo
 Raderar även konf filer 
 $ dpkg --purge foo
 
+installerar paket
+$dpkg --install foo_2.0.deb 
+
 sudo update-alternatives --config java
