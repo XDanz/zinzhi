@@ -14,6 +14,12 @@
 #include "memlib.h"
 #include "config.h"
 
+#ifdef DEBUG
+# define DBG(...) printf(__VA_ARGS__)
+#else
+# define DBG(...)
+#endif
+
 /* private variables */
 static char *mem_start_brk;  /* points to first byte of heap */
 static char *mem_brk;        /* points to last byte of heap */
@@ -57,12 +63,10 @@ void mem_reset_brk()
  *    by incr bytes and returns the start address of the new area. In
  *    this model, the heap cannot be shrunk.
  */
-
-void *mem_sbrk(int incr) {
-  fprintf(stdout,"TRACE: mem_sbr() Extending the heap with %d bytes \n",incr);
-
+void *mem_sbrk(int incr) 
+{
   char *old_brk = mem_brk;
-
+  DBG(stdout,"TRACE: mem_sbr() Extending the heap with %d bytes \n",incr);
   //fprintf(stdout,"(mem_brk + incr) : %x ", (unsigned*)(mem_brk+incr) );
   //fprintf(stdout,"(mem_max_addr) : %x ", (unsigned*)(mem_max_addr) );
   
@@ -74,7 +78,7 @@ void *mem_sbrk(int incr) {
     
     mem_brk += incr;
 
-    fprintf(stdout,"TRACE mem_sbrk(): Heap Size is : %d bytes \n",
+    DBG(stdout,"TRACE mem_sbrk(): Heap Size is : %d bytes \n",
             mem_heapsize());
 
     return (void *)old_brk;
@@ -83,21 +87,23 @@ void *mem_sbrk(int incr) {
 /*
  * mem_heap_lo - return address of the first heap byte
  */
-void *mem_heap_lo(){
+void *mem_heap_lo() 
+{
     return (void *)mem_start_brk;
 }
 
 /* 
  * mem_heap_hi - return address of last heap byte
  */
-void *mem_heap_hi(){
+void *mem_heap_hi() 
+{
     return (void *)(mem_brk - 1);
 }
 
 /*
  * mem_heapsize() - returns the heap size in bytes
  */
-size_t mem_heapsize(){
+size_t mem_heapsize() {
     return (size_t)(mem_brk - mem_start_brk);
 }
 
