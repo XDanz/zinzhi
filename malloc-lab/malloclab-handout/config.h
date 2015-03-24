@@ -13,7 +13,7 @@
  * default tracefiles. You can override it at runtime with the -t flag.
  */
 // TRACEDIR "/info/DD2486/sysprog08/labbar/lab2/traces/"
-#define TRACEDIR "/Users/dtc/dev/zinzhi/malloc-lab/malloclab-handout/"
+#define TRACEDIR "./"
 
 /*
  * This is the list of default tracefiles in TRACEDIR that the driver

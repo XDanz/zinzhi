@@ -1,11 +1,3 @@
-#
-# Students' Makefile for the Malloc Lab
-#
-
-TEAM = Rezzas
-VERSION = 1
-HANDINDIR = /info/DD2486/sysprog08/labbar/lab2/handin
-
 CC = gcc
 CFLAGS = -Wall -Wdeclaration-after-statement -O2
 
@@ -66,9 +58,6 @@ interact: $(INTOBJ) memlib.h mm.h
 
 test: $(SIMPLEOBJ) memlib.h mm.h
 	$(CC) $(SIMPLEOBJ) $(CFLAGS) -o $@
-
-handin:
-	cp mm.c $(HANDINDIR)/$(TEAM)-$(VERSION)-mm.c
 
 clean:
 	rm -f *~ *.o mdriver a.out

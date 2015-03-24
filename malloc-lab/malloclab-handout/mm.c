@@ -1,33 +1,40 @@
 /*
  * Simple, 32-bit and 64-bit clean allocator based on segregated fits.
- * The allocator maintains an array of free lists. Each free list
- * is associated with a size class and is organized of a explicit list.
+ * The allocator maintains an array of (pointers to) free lists. 
+ * Each free list is associated with a size class and is organized 
+ * of a explicit list.
  * The paload of a free block contains a pointer to the next free block
  * or NULL if the free block is the last in the list. Each list
- * contains different-sized blocks whose size are memebers of the size class.
+ * contains different-sized blocks whose size are members of the size class.
  *
+ * Allocation
+ * ----------
  * To allocate a free block the allocator determine the size class of the
- * request and do a first fit search of the apropriate free list for a block
- * that fits. If a free block is found then the block is split and insert the
- * fragment in the appropriate free list. If we cannot find a block that
+ * request and does a first fit search of the apropriate free list for a block
+ * that fits. If a free block is found then the block is split the fragment is 
+ * inserted in the appropriate free list. If we cannot find a block that
  * fits then the allocator searches the free list for the next larger
  * size class. If none of the free list yields a block that fits,
  * then allocator requests additional heap memory from the operating system
- * allocated the block out of this new heap memory and place the remainder
+ * and allocat the block out of this new heap memory and place the remainder
  * in the appropriate size class.
  *
- * To free block allocator coalesce and place the result on the appropriate
- * free list.
+ * Deallocation
+ * ------------
+ * To free a block the allocator coalesce and places the result on 
+ * the appropriate free list.
  *
+ * Structure
+ * ---------
  * The segregated list starts from mem_heap_lo() and extends to
  * mem_heap_lo()+640. The segregated list is composed of 2 levels where
  * the first level is composed of fixed size DELTA_FIXED (8) apart
  * ranging from size classes 16 to 512 indexed from 0 (16) to last 512 (62).
-
+ *
  * The next level is exponent based starting from 2^(9) index 63
  * to 2^(MAX_EXP) index 79.
  *
- * Blocks must be aligned to doubleword (8 byte) boundaries.
+ * Allocated blocks must be aligned to doubleword (8 byte) boundaries.
  * Minimum block size is 16 bytes and has the below layout when the
  * block is occupied.
  *
@@ -39,11 +46,11 @@
  *  |    |         |
  *  bp-4 bp        bp+blocksize-8
  *
- *  blocksize = HDDR(4 bytes) + FTTR(4 bytes) + payload >= 8
+ * blocksize = HDDR(4 bytes) + FTTR(4 bytes) + payload >= 16
  *
  * When a block is free the situation is as follow:
  *
- *  <----- blocksize --->
+ *  <----- blocksize ----->
  *  -----------------------
  *  |HDDR| next-addr |FTTR|
  *  -----------------------
@@ -53,19 +60,20 @@
  *
  * next-addr (8 bytes) points to next free block in list or NULL.
  *
- *
- * The mm_init function sets up the heap to look like this:
+ * Initiallization
+ * ---------------
+ * The mm_init() function sets up the heap to look like this:
  *
  *  ---------------------------
  *  Segregated lists  |P|H|F|E|
- *  --------------------------
+ *  ---------------------------
  *
  *  P) 4 bytes of padding
- *  H) header of a dummy block of total size 8 bytes
- *  c) footer of the dummy block
- *  d) epilogue-header of a nonexistant block signallying the end of the heap
+ *  H) Header of a dummy block of total size 8 bytes
+ *  F) Footer of the dummy block
+ *  E) Epilogue-header of a nonexistant block signallying the end of the heap
  *
- * When extend_heap is called it increases the size
+ * When extend_heap() is called it increases the size
  * of the heap by words many words.
  * It first asks the operating system for more memory
  * using mem_sbrk, which return a pointer to the beginning of this new
@@ -90,27 +98,27 @@
 #include "memlib.h"
 
 team_t team = {
-    /* Team name */
-    "DD",
-    /* First member's full name */
-    "Daniel Terranova",
-    /* First member's email address */
-    "danieltc@kth.se",
-    /* Second member's full name (leave blank if none) */
-    "Tommy Hagberg",
-    /* Second member's email address (leave blank if none) */
-    "thagber@kth.se"
+  /* Team name */
+  "DD",
+  /* First member's full name */
+  "Daniel Terranova",
+  /* First member's email address */
+  "danieltc@kth.se",
+  /* Second member's full name (leave blank if none) */
+  "Tommy Hagberg",
+  /* Second member's email address (leave blank if none) */
+  "thagber@kth.se"
 };
 
 
 /* Basic constants and macros */
 #define WSIZE       4       /* Word and header/footer size (bytes) */
 #define DSIZE       8       /* Doubleword size (bytes) */
-#define CHUNKSIZE  (1<<8)  /* Extend heap by this amount (bytes) */
+#define CHUNKSIZE  (1<<8)   /* Extend heap by this amount (bytes) */
 
 #define MIN_BLOCK_SIZE 16
 
-/*Some constants for segregated list*/
+/* Some constants for segregated list */
 #define MAX_FIXED 512
 #define MAX_INDEX 79
 
@@ -142,11 +150,10 @@ team_t team = {
 
 #define NEXT(ptr) *((char **)ptr)
 
-//#define DEBUG
 #ifdef DEBUG
-# define dbg(...) printf(__VA_ARGS__)
+# define DBG(...) printf(__VA_ARGS__)
 #else
-# define dbg(...)
+# define DBG(...)
 #endif
 
 /* Global variables */
@@ -168,110 +175,106 @@ static void segr_put(void * ptr);
 static void segr_remove();
 
 /**********************************************************************
- * segr_init - Initialize the segregated list with 2 levels
+ * segr_init() - Initialize the segregated list with 2 levels
  * first level is fixedsize with increment of 8,
  * second level is exponent based with base 2.
  * Initlaize the lists with NULL.
  */
 static int segr_init() {
-    unsigned int num;
-    unsigned int i;
-    int exp = 0;
-    size_t segr_init_size =  0;
+  unsigned int num;
+  unsigned int i;
+  int exp = 0;
+  size_t segr_init_size =  0;
 
-    //Initial size for the first level of segregated list (exact list).
-    //which contains blocks of fixed intervall starting from the first
-    //free list withsize 16 MIN_BLOCK_SIZE (at index 0).
-    //
-    //With a delta intervall of 8 DELTA_FIXED for
-    //then next free list i.e 16,24,32 ... , 512 MAX_FIXED (index 62).
-    // The maximum largest block in the first level is 512 which has
-    // the index 62 in the first level.
-    //
+  // Calculate the initial size for the first level of segregated list 
+  // (the exact list).
+  // Contains blocks of fixed intervall starting from the first
+  // free list with size MIN_BLOCK_SIZE(16 bytes at index 0).
+  //
+  // With a delta intervall of DELTA_FIXED(8 bytes) for
+  // then next free list i.e 16,24,32 ... , 512 MAX_FIXED (index 62).
+  // The maximum largest block in the first level is 512 which has
+  // the index 62 in the first level.
 
-    //504 bytes default
-    segr_init_size += (((MAX_FIXED - MIN_BLOCK_SIZE) / DELTA_FIXED)
-                       +1) * sizeof(void *);
+  // 504 bytes default when sizeof(void *) is 8 bytes
+  segr_init_size += (((MAX_FIXED - MIN_BLOCK_SIZE) / DELTA_FIXED)
+                     +1) * sizeof(void *);
 
-    //Calculate the smallest Exponent in then next level.
-    // 2^(9),2^(10),2^(11), ... 2^(25),
-    // so the smallest value would be 1024 and the largest 2^(25) (33554432)
+  // Calculate the smallest Exponent in then next level.
+  // 2^(9),2^(10),2^(11), ... 2^(25),
+  // so the smallest value would be 1024 (2^10) and the 
+  // largest 2^(25) (33554432)
 
-    for(; exp < MAX_EXP+1; exp++) {
-        num = EXP_BASE << exp;
+  for(; exp < MAX_EXP+1; exp++) {
+    num = EXP_BASE << exp;
 
-        if (num >= MIN_BLOCK_SIZE && num > MAX_FIXED)
-            break;
-    }
+    if (num >= MIN_BLOCK_SIZE && num > MAX_FIXED)
+      break;
+  }
 
-    //640 bytes
-    if (exp != MAX_EXP+1)
-        segr_init_size += (MAX_EXP - exp + 1) * sizeof(void *);
+  // 640 bytes
+  if (exp != MAX_EXP+1)
+    segr_init_size += (MAX_EXP - exp + 1) * sizeof(void *);
 
-    min_exp = exp;
+  min_exp = exp;
 
-    dbg("MIN_EXP=%d\n", min_exp);
-    //max_index = heap_init_size / sizeof(void *);
+  DBG("MIN_EXP=%d\n", min_exp);
 
-    //default case this returns same
+  heap_allocator_size = segr_init_size;
 
-    heap_allocator_size = segr_init_size;
+  if((heap_listp = mem_sbrk(segr_init_size)) == (void *)-1)
+    return -1;
 
-    if((heap_listp = mem_sbrk(segr_init_size)) == (void *)-1)
-        return -1;
+  DBG("SEGR heap_listp=%p \n", heap_listp);
+  DBG("mem_heap_lo()=%p \n", mem_heap_lo());
+  DBG("segr_init_size=%d \n", segr_init_size);
+  DBG("heap_start=%p \n", mem_heap_lo()+segr_init_size);
+  i = 0;
 
-    dbg("SEGR heap_listp=%p \n", heap_listp);
-    dbg("mem_heap_lo()=%p \n", mem_heap_lo());
-    dbg("segr_init_size=%d \n", segr_init_size);
-    dbg("heap_start=%p \n", mem_heap_lo()+segr_init_size);
-    i = 0;
+  while (i < (segr_init_size / sizeof(void *))) {
+    DBG("heap_listp+%d=%p \n",i,(char **)mem_heap_lo()+i);
 
+    NEXT(heap_listp + i++) = NULL;
+  }
 
-    while (i < (segr_init_size / sizeof(void *))){
-        dbg("heap_listp+%d=%p \n",i,(char **)mem_heap_lo()+i);
+  DBG("heap_listp+%d=%p \n",i,(char **)mem_heap_lo()+i);
 
-        NEXT(heap_listp + i++) = NULL;
-    }
-
-    dbg("heap_listp+%d=%p \n",i,(char **)mem_heap_lo()+i);
-
-    return 0;
-
+  return 0;
 }
+
 /**********************************************************************
- * mm_init - Initialize the memory manager and create inital empty heap
- * Create the segregated lists call to serg_init() following
- * Create:
- *   - Alignment (4 bytes)
- *   - Prologe header (4 bytes)
- *   - Prologe footer (4 bytes)
- *   - Epilogue header (4 bytes)
+ * mm_init() - Initialize the memory manager and create inital empty heap.
+ * Create the segregated lists (the call to segr_init()) and creates the
+ * following:
+ *
+ *   1) Alignment padding (4 bytes)
+ *   2) Prologe header (4 bytes)
+ *   4) Prologe footer (4 bytes)
+ *   5) Epilogue header (4 bytes)
  *
  * At last create the initial start block CHUNKSIZE bytes.
  */
 int mm_init(void) {
-  dbg("<==MM_INIT  \n");
-
-  //create segregated lists
+  // create the segregated lists
   segr_init();
 
-  //exend heap high water mark
-  if ((heap_listp = mem_sbrk(4*WSIZE)) == (void *)-1)  return -1;
+  // exend heap high water mark
+  if ((heap_listp = mem_sbrk(4*WSIZE)) == (void *)-1)
+    return -1;
 
-  dbg("== ALIGNMENT heap_listp=%p \n", heap_listp);
+  DBG("== ALIGNMENT heap_listp=%p \n", heap_listp);
   PUT(heap_listp, 0);                          /* Alignment padding */
   PUT(heap_listp + (1*WSIZE), PACK(DSIZE, 1)); /* Prologue header */
   PUT(heap_listp + (2*WSIZE), PACK(DSIZE, 1)); /* Prologue footer */
   PUT(heap_listp + (3*WSIZE), PACK(0, 1));     /* Epilogue header */
 
-  //make the heap_listp point to Prologe footer.
+  // make the heap_listp point to Prologe footer.
   heap_listp += (2*WSIZE);
 
   /* Extend the empty heap with a free block of CHUNKSIZE bytes */
-  if (extend_heap(CHUNKSIZE/WSIZE) == NULL)  return -1;
+  if (extend_heap(CHUNKSIZE/WSIZE) == NULL) 
+    return -1;
 
-
-  dbg("==>MM_INIT OK \n\n");
   return 0;
 }
 
@@ -285,7 +288,6 @@ int mm_init(void) {
  * size - requested size in bytes.
  */
 void *mm_malloc(size_t size) {
-  dbg("<==MALLOC START reqsize=%zu bytes \n", size);
 
   size_t asize;        /* Adjusted block size */
   size_t extendsize;   /* Amount to extend heap if no fit */
@@ -294,6 +296,7 @@ void *mm_malloc(size_t size) {
   void *addr2;
   unsigned int index;  //The index in the segregated list
   void * prev;
+  DBG("<==MALLOC START reqsize=%zu bytes \n", size);
 
   addr = NULL;
   addr2 = NULL;
@@ -312,38 +315,38 @@ void *mm_malloc(size_t size) {
     asize = DSIZE * ((size + (DSIZE) + (DSIZE-1)) / DSIZE);
   }
 
-  dbg("==MALLOC adjusted size=%u bytes \n", asize);
+  DBG("==MALLOC adjusted size=%u bytes \n", asize);
 
   // Search the segregated list for a free block that fits.
   addr_heap = mem_heap_lo();
   index = segr_index(asize);
 
   //If the size is in the exact range list. i level 1.
-  if (asize <= MAX_FIXED){
-    dbg("==MALLOC request in level 1 \n");
+  if (asize <= MAX_FIXED) {
+    DBG("==MALLOC request in level 1 \n");
     addr = NEXT(addr_heap + index);
     //check if some previous block was in the position addr.
     if (addr != NULL) {
       NEXT(addr_heap + index) = NEXT(addr);
       place(addr, asize);
-      dbg("==>MALLOC RETURN Addr=%p \n", addr);
+      DBG("==>MALLOC RETURN Addr=%p \n", addr);
       return addr;
-    }else{
-      //No free block found at the current index
-      //we need to search for a bigger block at next index
-      dbg("--MALLOC NO free block with size: %zd in free list \n", asize);
+    } else {
+      // No free block found at the current index
+      // we need to search for a bigger block at next index
+      DBG("--MALLOC NO free block with size: %zd in free list \n", asize);
     }
 
     //The size is in level 2 exponent range class.
-  }else {
-    dbg("==MALLOC request in level 2 \n");
+  } else {
+    DBG("==MALLOC request in level 2 \n");
     addr = NEXT(addr_heap + index);
     prev = NULL;
 
-    //In the corresponding link list
-    //at index (addr_heap + index) find a free block
-    //that fits and remove it from the current chain.
-    while(addr != NULL) {
+    // In the corresponding link list
+    // at index (addr_heap + index) find a free block
+    // that fits and remove it from the current chain.
+    while (addr != NULL) {
 
       if (GET_SIZE(HDRP(addr)) >= asize)
         break;
@@ -388,7 +391,7 @@ void *mm_malloc(size_t size) {
 
     if(addr != NULL && (GET_SIZE(HDRP(addr)) > asize)){
       place(addr, asize);
-      dbg("==>MALLOC RETURN Addr=%p \n", addr);
+      DBG("==>MALLOC RETURN Addr=%p \n", addr);
       return addr;
 
     }else{
@@ -419,10 +422,10 @@ void *mm_malloc(size_t size) {
 
       }else{
         //we need to handle the case when
-          //there is no free block that could handle a request with
-          //asize i.e when malloc request with big sizes.
+        //there is no free block that could handle a request with
+        //asize i.e when malloc request with big sizes.
 
-          /* No fit found. Get more memory and place the block */
+        /* No fit found. Get more memory and place the block */
         extendsize = MAX(asize,CHUNKSIZE);
 
         if ((addr = extend_heap(extendsize/WSIZE)) == NULL)
@@ -431,7 +434,7 @@ void *mm_malloc(size_t size) {
       }
 
       place(addr,asize);
-      dbg("==>MALLOC RETURN Addr=%p \n", addr);
+      DBG("==>MALLOC RETURN Addr=%p \n", addr);
       return addr;
     }
   } //if(addr == NULL)
@@ -466,57 +469,55 @@ void mm_free(void *bp){
  * and segr_put.
  */
 static void *coalesce(void *bp) {
-    size_t prev_alloc = GET_ALLOC(FTRP(PREV_BLKP(bp)));
-    size_t next_alloc = GET_ALLOC(HDRP(NEXT_BLKP(bp)));
-    size_t size = GET_SIZE(HDRP(bp));
-    //printf("CURRSIZE=%d \n", size);
-    void *prev_blkp;
-    void *next_blkp;
+  size_t prev_alloc = GET_ALLOC(FTRP(PREV_BLKP(bp)));
+  size_t next_alloc = GET_ALLOC(HDRP(NEXT_BLKP(bp)));
+  size_t size = GET_SIZE(HDRP(bp));
 
-    //printf("COALESCE -->");
-    if (prev_alloc && next_alloc) {            /* Case 1 */
-      //printf("case 1 \n");
-      segr_put(bp);
-      return bp;
+  void *prev_blkp;
+  void *next_blkp;
 
-    }else if (prev_alloc && !next_alloc) {      /* Case 2 */
-      //next block is free and should be in segregated list
-      //printf("case 2 \n");
-      next_blkp = NEXT_BLKP(bp);
-      segr_remove(next_blkp);
-      size += GET_SIZE(HDRP(NEXT_BLKP(bp)));
-      PUT(HDRP(bp), PACK(size, 0));
-      PUT(FTRP(bp), PACK(size,0));
-      segr_put(bp);
-
-
-    } else if (!prev_alloc && next_alloc) {      /* Case 3 */
-      //previous block is free and should be in segregrated list.
-      //printf("case 3 (prev free)\n");
-      prev_blkp = PREV_BLKP(bp);
-      segr_remove(prev_blkp);
-      size += GET_SIZE(HDRP(PREV_BLKP(bp)));
-      //printf("SIZE=%d \n", size);
-      PUT(FTRP(bp), PACK(size, 0));
-      PUT(HDRP(PREV_BLKP(bp)), PACK(size, 0));
-      bp = PREV_BLKP(bp);
-      segr_put(bp);
-
-    } else {                                     /* Case 4 */
-      //printf("case 4 \n");
-      size += GET_SIZE(HDRP(PREV_BLKP(bp))) + GET_SIZE(FTRP(NEXT_BLKP(bp)));
-      prev_blkp = PREV_BLKP(bp);
-      next_blkp = NEXT_BLKP(bp);
-      segr_remove(prev_blkp);
-      segr_remove(next_blkp);
-      segr_remove(bp);
-
-      PUT(HDRP(PREV_BLKP(bp)), PACK(size, 0));
-      PUT(FTRP(NEXT_BLKP(bp)), PACK(size, 0));
-      bp = PREV_BLKP(bp);
-      segr_put(bp);
-    }
+  if (prev_alloc && next_alloc) {            /* Case 1 */
+    //printf("case 1 \n");
+    segr_put(bp);
     return bp;
+
+  } else if (prev_alloc && !next_alloc) {      /* Case 2 */
+    //next block is free and should be in segregated list
+    next_blkp = NEXT_BLKP(bp);
+    segr_remove(next_blkp);
+    size += GET_SIZE(HDRP(NEXT_BLKP(bp)));
+    PUT(HDRP(bp), PACK(size, 0));
+    PUT(FTRP(bp), PACK(size,0));
+    segr_put(bp);
+
+
+  } else if (!prev_alloc && next_alloc) {      /* Case 3 */
+    //previous block is free and should be in segregrated list.
+    //printf("case 3 (prev free)\n");
+    prev_blkp = PREV_BLKP(bp);
+    segr_remove(prev_blkp);
+    size += GET_SIZE(HDRP(PREV_BLKP(bp)));
+    //printf("SIZE=%d \n", size);
+    PUT(FTRP(bp), PACK(size, 0));
+    PUT(HDRP(PREV_BLKP(bp)), PACK(size, 0));
+    bp = PREV_BLKP(bp);
+    segr_put(bp);
+
+  } else {                                     /* Case 4 */
+    //printf("case 4 \n");
+    size += GET_SIZE(HDRP(PREV_BLKP(bp))) + GET_SIZE(FTRP(NEXT_BLKP(bp)));
+    prev_blkp = PREV_BLKP(bp);
+    next_blkp = NEXT_BLKP(bp);
+    segr_remove(prev_blkp);
+    segr_remove(next_blkp);
+    segr_remove(bp);
+
+    PUT(HDRP(PREV_BLKP(bp)), PACK(size, 0));
+    PUT(FTRP(NEXT_BLKP(bp)), PACK(size, 0));
+    bp = PREV_BLKP(bp);
+    segr_put(bp);
+  }
+  return bp;
 }
 
 /*
@@ -534,99 +535,99 @@ static void *coalesce(void *bp) {
  *  In case 1 we need to check the next block if it is free
  *
  */
-void *mm_realloc(void *ptr, size_t size){
-    size_t blksize;
-    size_t diff;
-    void *newptr;
-    void *next;
+void *mm_realloc(void *ptr, size_t size) {
+  size_t blksize;
+  size_t diff;
+  void *newptr;
+  void *next;
 
-    //printf("REALLOC ptr=%p , size=%d \n", ptr, size);
-    /* If size == 0 then this is just free, and we return NULL. */
-    if(size == 0) {
-      mm_free(ptr);
-      return 0;
-    }
+  //printf("REALLOC ptr=%p , size=%d \n", ptr, size);
+  /* If size == 0 then this is just free, and we return NULL. */
+  if (size == 0) {
+    mm_free(ptr);
+    return 0;
+  }
 
-    /* If oldptr is NULL, then this is just malloc. */
-    if(ptr == NULL) {
-      return mm_malloc(size);
-    }
+  /* If oldptr is NULL, then this is just malloc. */
+  if (ptr == NULL) {
+    return mm_malloc(size);
+  }
 
-    if (size <= DSIZE) {
-      size = 2*DSIZE;
-    }else{
-      size = DSIZE * ((size + (DSIZE) + (DSIZE-1)) / DSIZE);
-    }
+  if (size <= DSIZE) {
+    size = 2*DSIZE;
+  } else {
+    size = DSIZE * ((size + (DSIZE) + (DSIZE-1)) / DSIZE);
+  }
 
-    //printf("REALLOC adjusted size=%d \n",size);
-    blksize = GET_SIZE(HDRP(ptr));
-    //printf("REALLOC current block blksize=%d \n" , blksize);
+  //printf("REALLOC adjusted size=%d \n",size);
+  blksize = GET_SIZE(HDRP(ptr));
+  //printf("REALLOC current block blksize=%d \n" , blksize);
 
-    if(size > blksize){
-      //if next block is free
-      if(!GET_ALLOC(HDRP(NEXT_BLKP(ptr)))) {
-        next = NEXT_BLKP(ptr);
-        size_t nextsize = GET_SIZE(HDRP(NEXT_BLKP(ptr)));
-        diff = size-blksize;
-        //printf("REALLOC diff=%d \n" , diff);
-        // The next block has room for the extension
-        if(nextsize >=diff){
-          //means next free block can fit extention
-          if(nextsize-diff >= MIN_BLOCK_SIZE){
-            //enough left over for more blocks?
-            segr_remove(next);
-            PUT(HDRP(ptr), PACK(size,1));
-            PUT(FTRP(ptr), PACK(size,1));
-            next = NEXT_BLKP(ptr);
+  if (size > blksize) {
+    //if next block is free
+    if (!GET_ALLOC(HDRP(NEXT_BLKP(ptr)))) {
+      next = NEXT_BLKP(ptr);
+      size_t nextsize = GET_SIZE(HDRP(NEXT_BLKP(ptr)));
+      diff = size-blksize;
+      //printf("REALLOC diff=%d \n" , diff);
+      // The next block has room for the extension
+      if (nextsize >=diff) {
+        //means next free block can fit extention
+        if (nextsize-diff >= MIN_BLOCK_SIZE) {
+          //enough left over for more blocks?
+          segr_remove(next);
+          PUT(HDRP(ptr), PACK(size,1));
+          PUT(FTRP(ptr), PACK(size,1));
+          next = NEXT_BLKP(ptr);
 
-            //split the reminder
-            PUT(HDRP(next), PACK(nextsize-diff,0));
-            PUT(FTRP(next), PACK(nextsize-diff,0));
-            //put the remainder back to segr list
-            segr_put( next);
-            return ptr;
+          //split the reminder
+          PUT(HDRP(next), PACK(nextsize-diff,0));
+          PUT(FTRP(next), PACK(nextsize-diff,0));
+          //put the remainder back to segr list
+          segr_put( next);
+          return ptr;
 
-          }else{//if not then allocate the whole block
-            PUT(HDRP(ptr), PACK(blksize+nextsize,1));
-            PUT(FTRP(ptr), PACK(blksize+nextsize,1));
-            segr_remove(next);
-            return ptr;
-          }
+        } else{//if not then allocate the whole block
+          PUT(HDRP(ptr), PACK(blksize+nextsize,1));
+          PUT(FTRP(ptr), PACK(blksize+nextsize,1));
+          segr_remove(next);
+          return ptr;
         }
       }
-      //either the next block is allocated or it was free but
-      //could not handle the extension which means that
-      //we need to move the allcated block so we could resize it
-      newptr = mm_malloc(size);
-
-      // If realloc() fails the original block is left untouched
-      if(!newptr) return 0;
-
-      /* Copy the old data. */
-      // blksize = GET_SIZE(HDRP(ptr));
-      /* printf("REALLOC COPY ptr=%p to newptr=%p, %d bytes \n", */
-      /*        ptr,newptr,blksize); */
-      memcpy(newptr, ptr, blksize);
-
-      /* Free the old block. */
-      mm_free(ptr);
-      return newptr;
-
-    }else if(size < blksize){
-      size_t diff = blksize - size;
-      //We need to check that the splitting blocks
-      //is not smaller than  MIN_BLOCK_SIZE
-      if(diff >= MIN_BLOCK_SIZE && size >= MIN_BLOCK_SIZE){
-        PUT(HDRP(ptr),PACK(size,1));
-        PUT(HDRP(ptr),PACK(size,1));
-        next = NEXT_BLKP(ptr);
-        PUT(HDRP(next),PACK(diff,0));
-        PUT(HDRP(next),PACK(diff,0));
-        segr_put(next);
-        return ptr;
-      }
     }
-    return ptr;
+    //either the next block is allocated or it was free but
+    //could not handle the extension which means that
+    //we need to move the allcated block so we could resize it
+    newptr = mm_malloc(size);
+
+    // If realloc() fails the original block is left untouched
+    if(!newptr) return 0;
+
+    /* Copy the old data. */
+    // blksize = GET_SIZE(HDRP(ptr));
+    /* printf("REALLOC COPY ptr=%p to newptr=%p, %d bytes \n", */
+    /*        ptr,newptr,blksize); */
+    memcpy(newptr, ptr, blksize);
+
+    /* Free the old block. */
+    mm_free(ptr);
+    return newptr;
+
+  } else if(size < blksize) {
+    size_t diff = blksize - size;
+    //We need to check that the splitting blocks
+    //is not smaller than  MIN_BLOCK_SIZE
+    if (diff >= MIN_BLOCK_SIZE && size >= MIN_BLOCK_SIZE) {
+      PUT(HDRP(ptr),PACK(size,1));
+      PUT(HDRP(ptr),PACK(size,1));
+      next = NEXT_BLKP(ptr);
+      PUT(HDRP(next),PACK(diff,0));
+      PUT(HDRP(next),PACK(diff,0));
+      segr_put(next);
+      return ptr;
+    }
+  }
+  return ptr;
 }
 
 /*
@@ -644,7 +645,6 @@ void mm_checkheap(int verbose)  {
 /*
  * extend_heap - Extend heap with free block and return its block pointer
  */
-/* $begin mmextendheap */
 static void *extend_heap(size_t words) {
 
   char *bp;
@@ -656,18 +656,11 @@ static void *extend_heap(size_t words) {
   if ((long)(bp = mem_sbrk(size)) == -1)
     return NULL;
 
-  //printf("extend heap bp=%p \n", bp);
-  //  printf("diff bp=%d \n", (bp-(heap_listp-(2*WSIZE))));
-  //line:vm:mm:endextend
-
   /* Initialize free block header/footer and the epilogue header */
 
-  PUT(HDRP(bp), PACK(size, 0));  /* Free block header */
+  PUT(HDRP(bp), PACK(size, 0));    /* Free block header */
   PUT(FTRP(bp), PACK(size, 0));    /* Free block footer */
   PUT(HDRP(NEXT_BLKP(bp)), PACK(0, 1)); /* New epilogue header */
-
-  //printf("  CALL segr_put with size: %zd \n", size);
-  //segr_put(bp);
 
   /* Coalesce if the previous block was free */
   return coalesce(bp);
@@ -682,13 +675,11 @@ static void *extend_heap(size_t words) {
  *
  */
 
-static void segr_put(void * ptr){
+static void segr_put(void * ptr) {
   char ** heap_ptr;
   char ** nxt;
   unsigned int index;
   size_t size = GET_SIZE(HDRP(ptr));
-
-  //printf("   SEGR_PUT segr_put() called \n");
 
   heap_ptr = mem_heap_lo();
   NEXT(ptr) = NULL;
@@ -696,7 +687,7 @@ static void segr_put(void * ptr){
 
   index = segr_index(size);
 
-  dbg("   SEGR_PUT put free block (%p) with size %zu bytes at index pos %u \n",  ptr,size,index);
+  DBG("   SEGR_PUT put free block (%p) with size %zu bytes at index pos %u \n",  ptr,size,index);
 
   //  nxt = NEXT(heap_ptr + index);
   //put an pointer (adress) in the payload block (pointed by ptr)
@@ -751,34 +742,25 @@ static void segr_remove(void *ptr){
  * which belongs.
  *
  */
- unsigned int segr_index(size_t size){
+unsigned int segr_index(size_t size) {
   unsigned int exp;
   unsigned int num;
   unsigned int index;
 
-  //if size is in the Level 1 class
- if (size <= MAX_FIXED) {
-   index = ((size - MIN_BLOCK_SIZE) / DELTA_FIXED);
-   return ((size - MIN_BLOCK_SIZE) / DELTA_FIXED);
- }
+  // if size is in the Level 1 class
+  if (size <= MAX_FIXED) {
+    index = ((size - MIN_BLOCK_SIZE) / DELTA_FIXED);
+    return ((size - MIN_BLOCK_SIZE) / DELTA_FIXED);
+  }
 
- //the size is in level 2 class
- exp = min_exp;
- while((num = (2 << exp++)) < size);
+  // the size is in level 2 class
+  exp = min_exp;
+  while((num = (2 << exp++)) < size);
 
- /* for(exp = min_exp; exp < MAX_EXP; exp++) {   */
- /*   num = 2 << exp;   */
- /*   if (num >= size)  */
- /*        break;   */
- /* }   */
- /* printf("--> num is %d \n", num); */
- /* printf("--> min_exp=%d \n", min_exp); */
- /* printf("--> exp is %d \n", exp); */
+  index = ((MAX_FIXED - MIN_BLOCK_SIZE) / DELTA_FIXED) + 1
+    + exp - min_exp;
 
- index = ((MAX_FIXED - MIN_BLOCK_SIZE) / DELTA_FIXED) + 1
-   + exp - min_exp;
-
- return index;
+  return index;
 }
 
 
@@ -790,7 +772,7 @@ static void segr_remove(void *ptr){
  */
 static void place(void *bp, size_t asize){
   size_t csize = GET_SIZE(HDRP(bp));
-  dbg(" PLACING %d bytes IN BLOCK (%p) with size %d bytes (diff: %d) \n",
+  DBG(" PLACING %d bytes IN BLOCK (%p) with size %d bytes (diff: %d) \n",
       asize,bp,csize,(csize-asize));
 
   if ((csize - asize) >= (2*DSIZE)) {
@@ -811,7 +793,7 @@ static void place(void *bp, size_t asize){
   //checkheap();
   //segr_check();
 
-  dbg(" PLACING %d bytes at %p DONE! \n", asize,bp);
+  DBG(" PLACING %d bytes at %p DONE! \n", asize,bp);
 }
 
 /*************************************************************
@@ -833,7 +815,7 @@ static void printblock(void *bp){
 
   }
 
-  dbg("blockp addr=%p: header:%p [%u bytes:%c] footer:%p [%d bytes:%c]\n",
+  DBG("blockp addr=%p: header:%p [%u bytes:%c] footer:%p [%d bytes:%c]\n",
       bp,
       HDRP(bp),
       (unsigned)hsize, (halloc ? 'a' : 'f'),
@@ -856,10 +838,10 @@ static void checkblock(void *bp){
   if(GET_ALLOC(HDRP(bp))==0){//on free blocks
 
     if(GET_ALLOC(HDRP(PREV_BLKP(bp))) == 0)//coalesce check
-      dbg("Previous block is not coalesced at %p", bp);
+      DBG("Previous block is not coalesced at %p", bp);
 
     if(GET_ALLOC(HDRP(NEXT_BLKP(bp)))==0)//coalesce check
-      dbg("Next block is not coalesced at %p",bp);
+      DBG("Next block is not coalesced at %p",bp);
   }
 }
 
@@ -873,14 +855,14 @@ void checkheap(int verbose){
   void* curr = mem_heap_lo();
   void* end = mem_heap_hi();
 
-  dbg("CHECKHEAP *****START ******\n");
-  dbg("\t HEAP size=%d \n", mem_heapsize());
+  DBG("CHECKHEAP *****START ******\n");
+  DBG("\t HEAP size=%d \n", mem_heapsize());
   //char *bp = heap_listp;
 
   if (verbose){
-    dbg("\t Heap (%p):\n", heap_listp);
-    dbg("\t heap_lo (%p):\n", mem_heap_lo());
-    dbg("\t heap_hi (%p):\n", mem_heap_hi());
+    DBG("\t Heap (%p):\n", heap_listp);
+    DBG("\t heap_lo (%p):\n", mem_heap_lo());
+    DBG("\t heap_hi (%p):\n", mem_heap_hi());
   }
 
   for(curr=heap_listp ; curr<=end+1; curr = NEXT_BLKP(curr)){
@@ -888,19 +870,19 @@ void checkheap(int verbose){
     //check that the end of the heap is right
     if(GET_SIZE(HDRP(curr))==0){
       if(curr != (end+1))
-	dbg("end of heap at %p should be %p\n",curr , (end+1));
+	DBG("end of heap at %p should be %p\n",curr , (end+1));
       break;//break loop
     }
     //    printf("MEM hi=%p \n", mem_heap_hi());
     //printf("MEM lo=%p \n", mem_heap_lo());
     if(curr > mem_heap_hi()){
-      dbg("%p (beyond mem_heap_hi()=%p) Not in heap! Failure! \n",
-             curr,mem_heap_hi());
+      DBG("%p (beyond mem_heap_hi()=%p) Not in heap! Failure! \n",
+          curr,mem_heap_hi());
       return;
     }
     if((curr < mem_heap_lo())){
-      dbg("%p (bellow mem_heap_lo()=%p Not in heap! Failure! \n",
-             curr,mem_heap_lo());
+      DBG("%p (bellow mem_heap_lo()=%p Not in heap! Failure! \n",
+          curr,mem_heap_lo());
       return;
     }
     checkblock(curr);
@@ -908,7 +890,7 @@ void checkheap(int verbose){
     if(verbose)
       printblock(curr);
   }
-  dbg("CHECKHEAP ***** END  ******\n");
+  DBG("CHECKHEAP ***** END  ******\n");
 }
 
 /*************************************************************
@@ -949,27 +931,27 @@ void segr_check(){
 
 void checkheap2() {
 
-    void *bp;
-    int i;
-    i= 0;
-    dbg("\n");
-    dbg("current heap_listp:0x%p\n",  heap_listp);
-    dbg("current heap:(%p: %p)(%u bytes)\n",mem_heap_lo(),
-        mem_heap_hi(),(unsigned)(mem_heap_hi()-mem_heap_lo()));
-    dbg("+------+-------------+-------------+-------------+-------------+-------+\n");
-    dbg("|index | header      | blockptr    | footer      | size(bytes) | Alloc |\n");
-    dbg("|------+-------------+-------------+-------------+-------------+-------|\n");
+  void *bp;
+  int i;
+  i= 0;
+  DBG("\n");
+  DBG("current heap_listp:0x%p\n",  heap_listp);
+  DBG("current heap:(%p: %p)(%u bytes)\n",mem_heap_lo(),
+      mem_heap_hi(),(unsigned)(mem_heap_hi()-mem_heap_lo()));
+  DBG("+------+-------------+-------------+-------------+-------------+-------+\n");
+  DBG("|index | header      | blockptr    | footer      | size(bytes) | Alloc |\n");
+  DBG("|------+-------------+-------------+-------------+-------------+-------|\n");
 
-    for(bp = heap_listp; GET_SIZE(HDRP(bp)) != 0; bp = NEXT_BLKP(bp)){
-        dbg("|%5d | %p | %p | %p |%12d | %4d  |\n",i++,HDRP(bp),bp,
-            FTRP(bp) ,GET_SIZE(HDRP(bp)),GET_ALLOC(HDRP(bp)) );
+  for(bp = heap_listp; GET_SIZE(HDRP(bp)) != 0; bp = NEXT_BLKP(bp)){
+    DBG("|%5d | %p | %p | %p |%12d | %4d  |\n",i++,HDRP(bp),bp,
+        FTRP(bp) ,GET_SIZE(HDRP(bp)),GET_ALLOC(HDRP(bp)) );
 
-        if(FTRP(bp) > (char *)mem_heap_hi())
-            dbg("Fail! last ftr is is beyond last heap\n");
-    }
-    dbg("|------+----------+-----------+----------+-------------+-------|\n");
-    dbg("bp=%p , HDRP(bp)=0x%p, SIZE=%d,alloc=%d \n",bp,HDRP(bp),
-        GET_SIZE(HDRP(bp)),GET_ALLOC(HDRP(bp)) );
-    //printf("New epilogue header size=%d,alloc=%d\n",
+    if(FTRP(bp) > (char *)mem_heap_hi())
+      DBG("Fail! last ftr is is beyond last heap\n");
+  }
+  DBG("|------+----------+-----------+----------+-------------+-------|\n");
+  DBG("bp=%p , HDRP(bp)=0x%p, SIZE=%d,alloc=%d \n",bp,HDRP(bp),
+      GET_SIZE(HDRP(bp)),GET_ALLOC(HDRP(bp)) );
+  //printf("New epilogue header size=%d,alloc=%d\n",
 
 }
