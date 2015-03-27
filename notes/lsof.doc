@@ -1,0 +1,14 @@
+List all network files in use by specific process:
+
+$ lsof -i -a -p <pid>
+
+or 
+
+$ lsof -i -a -c <pid-name>
+
+The above command will list the network files opened by the process
+starting with <pid-name>.
+
+list if one have open connection to specified host:
+
+$ lsof -i@<ip>
