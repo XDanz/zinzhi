@@ -6,6 +6,10 @@
 
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 (require 'iso-transl)
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
 (if window-system
       (set-frame-size (selected-frame) 80 43))

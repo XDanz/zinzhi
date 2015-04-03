@@ -7,7 +7,7 @@ all:
 clean:
 	rm -f $(CLEANFILES)
 
-tags: TAGS
+tags:
 	find . -name "*.[chCH]" -print | etags -
  
 distclean:
