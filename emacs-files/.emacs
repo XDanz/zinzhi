@@ -55,6 +55,9 @@
 ;;         (setq font-lock-maximum-decoration t)
 ;;         (font-lock-mode 3))))
 
+(setq c-default-style "linux" c-basic-offset 4)
+
+
 ;; (add-hook 'yang-mode-hook 'my-yang-mode-hook)
 (setq blink-matching-paren-distance nil)
 
