@@ -8,5 +8,4 @@ int main(int args, char **argv)
         mem_init();
         mm_init();
         exit(0);
-  
 }

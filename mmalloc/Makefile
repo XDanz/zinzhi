@@ -5,5 +5,5 @@ all:
 		$(MAKE) -C ./$${i} all || exit 1; \
 	done
 
-
-
+tags:
+	find . -name "*.[chCH]" -print | etags -

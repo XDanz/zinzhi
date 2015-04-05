@@ -1,13 +1,16 @@
 CC = gcc
-CFLAGS = -Wall -Wdeclaration-after-statement
+CFLAGS = -Wall -std=gnu99 -Wdeclaration-after-statement
 INCLUDE=../include
-LIB=../lib/libmalloc.a
+LIB=../lib/libmmalloc.a
 
 SRC = $(shell ls *.c)
 OBJS = $(SRC:.c=.o)
 EXEC = $(OBJS:.o=)
 
 all: $(OBJS)
+
+debug:
+	$(MAKE) "CFLAGS+= -g3" clean all
 
 %.o: %.c
 	$(CC) -I$(INCLUDE) -c -o $@ $< $(LIB) $(CFLAGS) 

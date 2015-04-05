@@ -220,7 +220,7 @@ segr_init()
 
         min_exp = exp;
 
-        DBG("MIN_EXP=%d\n", min_exp);
+        DBG("MIN_EXP=%d \n", min_exp);
 
         heap_allocator_size = segr_init_size;
 

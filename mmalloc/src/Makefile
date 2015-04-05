@@ -1,17 +1,19 @@
 CC = gcc
-CFLAGS = -Wall -Wdeclaration-after-statement
+CFLAGS = -Wall -std=gnu99 -Wdeclaration-after-statement
 
 OBJS = mm.o memlib.o
 
-all: $(OBJS) libmmalloc.a
+all: $(OBJS) ../lib/libmmalloc.a
+
+debug:
+	$(MAKE) "CFLAGS+= -g -gdwarf-2 -g3" all
+
 
 %.o: %.c ../include/%.h
 	$(CC) -I../include -c -o $@ $< $(CFLAGS)
 
-libmmalloc.a: $(OBJS)
-	ar rcs ../lib/libmalloc.a $(OBJS)
+../lib/libmmalloc.a: $(OBJS)
+	ar rcs ../lib/libmmalloc.a $(OBJS)
 
 clean:
-	rm -f *~ *.o
-
-
+	rm -f *~ *.o *.a

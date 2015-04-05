@@ -1,6 +1,6 @@
 /*
- * memlib.c - a module that simulates the memory system.  Needed because it 
- *            allows us to interleave calls from the student's malloc package 
+ * memlib.c - a module that simulates the memory system.  Needed because it
+ *            allows us to interleave calls from the student's malloc package
  *            with the system's malloc package in libc.
  */
 #include <stdio.h>
@@ -23,9 +23,9 @@
 /* private variables */
 static char *mem_start_brk;  /* points to first byte of heap */
 static char *mem_brk;        /* points to last byte of heap */
-static char *mem_max_addr;   /* largest legal heap address */ 
+static char *mem_max_addr;   /* largest legal heap address */
 
-/* 
+/*
  * mem_init - initialize the memory system model
  */
 void mem_init(void)
@@ -42,10 +42,11 @@ void mem_init(void)
 
 }
 
-/* 
+/*
  * mem_deinit - free the storage used by the memory system model
  */
-void mem_deinit(void)
+void
+mem_deinit(void)
 {
     free(mem_start_brk);
 }
@@ -53,33 +54,34 @@ void mem_deinit(void)
 /*
  * mem_reset_brk - reset the simulated brk pointer to make an empty heap
  */
-void mem_reset_brk()
+void
+mem_reset_brk()
 {
     mem_brk = mem_start_brk;
 }
 
-/* 
- * mem_sbrk - simple model of the sbrk function. Extends the heap 
+/*
+ * mem_sbrk - simple model of the sbrk function. Extends the heap
  *    by incr bytes and returns the start address of the new area. In
  *    this model, the heap cannot be shrunk.
  */
-void *mem_sbrk(int incr) 
+void *
+mem_sbrk(int incr)
 {
   char *old_brk = mem_brk;
-  DBG(stdout,"TRACE: mem_sbr() Extending the heap with %d bytes \n",incr);
+  DBG("TRACE: mem_sbr() Extending the heap with %d bytes \n", incr);
   //fprintf(stdout,"(mem_brk + incr) : %x ", (unsigned*)(mem_brk+incr) );
   //fprintf(stdout,"(mem_max_addr) : %x ", (unsigned*)(mem_max_addr) );
-  
+
   if ( (incr < 0) || ((mem_brk + incr) > mem_max_addr)) {
     errno = ENOMEM;
     fprintf(stderr, "ERROR: mem_sbrk failed. Ran out of memory...\n");
     return (void *)-1;
   }
-    
+
     mem_brk += incr;
 
-    DBG(stdout,"TRACE mem_sbrk(): Heap Size is : %d bytes \n",
-            mem_heapsize());
+    DBG("TRACE mem_sbrk(): Heap Size is : %uz bytes \n", mem_heapsize());
 
     return (void *)old_brk;
 }
@@ -87,15 +89,16 @@ void *mem_sbrk(int incr)
 /*
  * mem_heap_lo - return address of the first heap byte
  */
-void *mem_heap_lo() 
+void *
+mem_heap_lo()
 {
     return (void *)mem_start_brk;
 }
 
-/* 
+/*
  * mem_heap_hi - return address of last heap byte
  */
-void *mem_heap_hi() 
+void *mem_heap_hi()
 {
     return (void *)(mem_brk - 1);
 }
