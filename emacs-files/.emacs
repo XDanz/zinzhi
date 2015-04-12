@@ -1,4 +1,5 @@
 (setq-default indent-tabs-mode nil)
+(setq make-backup-files nil)
 (set-default-font "Ubuntu mono 12")
 (add-to-list 'default-frame-alist '(height . 43))
 (add-to-list 'default-frame-alist '(width . 80))
