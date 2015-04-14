@@ -11,9 +11,7 @@ test_run: $(OBJS)
 
 test: test_run
 	cat lab22c.in | ./test_run > utdata.txt
-	diff -q utdata.txt lab22c.out
-
-
+	diff -q utdata.txt lab22c.out --unchanged-line-format="" --old-line-format="" --new-line-format=":%dn: %L"
 
 # ../../objs/%.o:
 # 	make -C ../../src all

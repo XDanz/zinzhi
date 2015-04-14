@@ -20,11 +20,11 @@ test: build
 	./test_run
 
 cxxtest: calendar_test
-	./calendar_test
+	@./calendar_test -v
 
 
 calendar_test.cpp: calendar.cpp
-	$(CXXGEN) $(CXXGENFLAGS) $@ $< 
+	$(CXXGEN) $(CXXGENFLAGS) $@ $< 	
 
 calendar_test.o: calendar_test.cpp
 	$(CC) $(CFLAGS) -I$(CXX_INCLUDE) -I$(INCLUDE) -c $<
@@ -35,8 +35,6 @@ calendar_test.o: calendar_test.cpp
 #	(prerequisit) file
 %.o: %.cpp ../../includes/calendar.h
 	$(CC) -I$(INCLUDE) -c $< $(CFLAGS)
-
-
 
 clean: 
 	rm -rf *.o *~ test_run calendar_test calendar_test.cpp

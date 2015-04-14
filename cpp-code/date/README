@@ -1,0 +1,11 @@
+installation
+------------
+
+Need to have cxxtest for testing:
+
+sudo apt-get install cxxtest
+
+The cxxtest should be installed in /usr/include/cxxtest
+
+
+
