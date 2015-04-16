@@ -1,9 +1,9 @@
 /**
  * Simple, 32-bit and 64-bit clean allocator based on segregated fits.
- * The allocator maintains an array of (pointers) to free lists. 
- * Each free list is associated with a size class and is organized 
+ * The allocator maintains an array of (pointers) to free lists.
+ * Each free list is associated with a size class and is organized
  * of a explicit list.
- * 
+ *
  * The payload of a free block contains a pointer to the next free block
  * or NULL if the free block is the last in the list. Each list
  * contains different-sized blocks whose size are members of the size class.
@@ -12,7 +12,7 @@
  * ----------
  * To allocate a free block the allocator determine the size class of the
  * request and does a first fit search of the appropriate free list for a block
- * that fits. If a free block is found then the block is split the fragment is 
+ * that fits. If a free block is found then the block is split the fragment is
  * inserted in the appropriate free list. If we cannot find a block that
  * fits then the allocator searches the free list for the next larger
  * size class. If none of the free list yields a block that fits,
@@ -22,14 +22,14 @@
  *
  * Deallocation
  * ------------
- * To free a block the allocator coalesce and places the result on 
+ * To free a block the allocator coalesce and places the result on
  * the appropriate free list.
  *
  * Structure
  * ---------
  * The segregated list starts from mem_heap_lo() and extends to
  * mem_heap_lo()+640. The segregated list is composed of 2 levels.
- * 
+ *
  * The first level is of fixed size DELTA_FIXED (8) apart
  * ranging from size classes 16 to 512 indexed from index 0 (16) to last 512,
  * index 62.
@@ -50,7 +50,7 @@
  *  ^    ^         ^
  *  |    |         |
  *  bp-4 bp        bp+blocksize-8
- * 
+ *
  *  - To get the bp-4 (bp-WSIZE) ptr , use the macro HDRP(bp)
  *  - To get the bp+blocksize-8  ptr , use the macro FTRP(bp)
  *
@@ -127,7 +127,7 @@ team_t team = {
 #define MIN_BLOCK_SIZE 16
 
 /* Some constants for segregated list */
-#define MAX_FIXED 512      /* The max fixed size block */ 
+#define MAX_FIXED 512      /* The max fixed size block */
 #define MAX_INDEX 79      /*  The max index in segr list */
 
 #define DELTA_FIXED 8
@@ -182,13 +182,13 @@ static unsigned int segr_index(size_t size);
 static void segr_put(void * ptr);
 static void segr_remove();
 
-/*
- * segr_init - Initialize the segregated list with 2 levels
+/**
+ * segr_init() - Initialize the segregated list with 2 levels
  * first level is fixed size with increment of 8,
  * second level is exponent based with base 2.
  * Initialize the lists with NULL.
  */
-static int 
+static int
 segr_init()
 {
         unsigned int num;
@@ -196,7 +196,7 @@ segr_init()
         int exp = 0;
         size_t segr_init_size =  0;
 
-        // Calculate the initial size for the first level of segregated list 
+        // Calculate the initial size for the first level of segregated list
         // (the exact list).
         // Contains blocks of fixed interval starting from the first
         // free list with size MIN_BLOCK_SIZE(16 bytes at index 0).
@@ -205,14 +205,20 @@ segr_init()
         // then next free list i.e 16,24,32 ... , 512 MAX_FIXED (index 62).
         // The maximum largest block in the first level is 512 which has
         // the index 62 in the first level.
-        
+        // 
+        // For the index 0 <= i <= 62 the size of a free block S is :
+        //
+        // S = MIN_BLOCK_SIZE + DELTA_FIXED * i
+        //  
+        // 
+
         // 504 bytes default when sizeof(void *) is 8 bytes
         segr_init_size += (((MAX_FIXED - MIN_BLOCK_SIZE) / DELTA_FIXED)
                            +1) * sizeof(void *);
 
         // Calculate the smallest Exponent in then next level.
         // 2^(9),2^(10),2^(11), ... 2^(25),
-        // so the smallest value would be 1024 (2^10) and the 
+        // so the smallest value would be 1024 (2^10) and the
         // largest 2^(25) (33554432)
 
         for (; exp < MAX_EXP+1; exp++) {
@@ -226,21 +232,19 @@ segr_init()
         if (exp != MAX_EXP+1)
                 segr_init_size += (MAX_EXP - exp + 1) * sizeof(void *);
 
-        min_exp = exp;
-
-        DBG("min_exp %d \n", min_exp);
+        min_exp = exp; // 9
 
         heap_allocator_size = segr_init_size;
 
         if( (heap_listp = mem_sbrk(segr_init_size)) == (void *)-1)
                 return -1;
 
-        DBG("SEGR heap_listp=%p \n", heap_listp);
-        DBG("mem_heap_lo()=%p \n", mem_heap_lo());
-        DBG("segr_init_size=%d \n", segr_init_size);
-        DBG("heap_start=%p \n", mem_heap_lo()+segr_init_size);
+        DBG("heap_listp      %p \n", heap_listp);
+        DBG("mem_heap_lo()   %p \n", mem_heap_lo());
+        DBG("segr_init_size  %zu bytes\n", segr_init_size);
+        DBG("mem_heap_lo()+segr_init_size      %p \n", mem_heap_lo()+segr_init_size);
         i = 0;
-
+        // TODO: use memset
         while (i < (segr_init_size / sizeof(void *))) {
                 DBG("heap_listp+%d=%p \n",i,(char **)mem_heap_lo()+i);
 
@@ -252,10 +256,10 @@ segr_init()
         return 0;
 }
 
-/*
+/**
  * mm_init() - Initialize the memory manager and create initial empty heap.
- * Create the segregated lists (the call to segr_init()) and creates the
- * following:
+ * This must be the first method to call. Create the segregated lists 
+ * (the call to segr_init()) and creates the following:
  *
  *   1) Alignment padding (4 bytes)
  *   2) Prologue header (4 bytes)
@@ -264,8 +268,8 @@ segr_init()
  *
  * At last create the initial start block CHUNKSIZE bytes.
  */
-int 
-mm_init(void) 
+int
+mm_init(void)
 {
         // create the segregated lists
         segr_init();
@@ -274,7 +278,6 @@ mm_init(void)
         if ((heap_listp = mem_sbrk(4*WSIZE)) == (void *)-1)
                 return -1;
 
-        DBG("== ALIGNMENT heap_listp=%p \n", heap_listp);
         PUT(heap_listp, 0);                          /* Alignment padding */
         PUT(heap_listp + (1*WSIZE), PACK(DSIZE, 1)); /* Prologue header */
         PUT(heap_listp + (2*WSIZE), PACK(DSIZE, 1)); /* Prologue footer */
@@ -284,7 +287,7 @@ mm_init(void)
         heap_listp += (2*WSIZE);
 
         /* Extend the empty heap with a free block of CHUNKSIZE bytes */
-        if (extend_heap(CHUNKSIZE/WSIZE) == NULL) 
+        if (extend_heap(CHUNKSIZE/WSIZE) == NULL)
                 return -1;
 
         return 0;
@@ -299,7 +302,7 @@ mm_init(void)
  * size - requested size in bytes.
  */
 void *
-mm_malloc(size_t size) 
+mm_malloc(size_t size)
 {
 
         size_t asize;        /* Adjusted block size */
@@ -309,7 +312,6 @@ mm_malloc(size_t size)
         void *addr2;
         unsigned int index;  /* The index in the segregated list */
         void * prev;
-        DBG("<==MALLOC START reqsize=%zu bytes \n", size);
 
         addr = NULL;
         addr2 = NULL;
@@ -317,7 +319,7 @@ mm_malloc(size_t size)
         /* Ignore spurious requests */
         if (size == 0)
                 return NULL;
-        
+
         if(size == 448) size = 512;
         if(size == 112) size = 128;
 
@@ -328,7 +330,7 @@ mm_malloc(size_t size)
                 asize = DSIZE * ((size + (DSIZE) + (DSIZE-1)) / DSIZE);
         }
 
-        DBG("==MALLOC adjusted size=%u bytes \n", asize);
+        DBG("mm_malloc adjusted size %zu bytes \n", asize);
 
         // Search the segregated list for a free block that fits.
         addr_heap = mem_heap_lo();
@@ -459,7 +461,7 @@ mm_malloc(size_t size)
 /*
  * mm_free - Free a previously allocated block and coalesce.
  */
-void 
+void
 mm_free(void *bp)
 {
         size_t size;
@@ -480,7 +482,7 @@ mm_free(void *bp)
  * and segr_put.
  */
 static void *
-coalesce(void *bp) 
+coalesce(void *bp)
 {
         size_t prev_alloc = GET_ALLOC(FTRP(PREV_BLKP(bp)));
         size_t next_alloc = GET_ALLOC(HDRP(NEXT_BLKP(bp)));
@@ -546,7 +548,7 @@ coalesce(void *bp)
  *
  */
 void *
-mm_realloc(void *ptr, size_t size) 
+mm_realloc(void *ptr, size_t size)
 {
         size_t blksize;
         size_t diff;
@@ -649,9 +651,9 @@ void mm_checkheap(int verbose)  {}
  * extend_heap - Extend heap with free block and return its block pointer
  */
 static void *
-extend_heap(size_t words) 
+extend_heap(size_t words)
 {
-        
+
         char *bp;
         size_t size;
 
@@ -679,11 +681,10 @@ extend_heap(size_t words)
  * in the linked list at the index position in the segregated list
  *
  */
-static void 
-segr_put(void * ptr) 
+static void
+segr_put(void *ptr)
 {
-        char ** heap_ptr;
-        char ** nxt;
+        char **heap_ptr;
         unsigned int index;
         size_t size = GET_SIZE(HDRP(ptr));
 
@@ -718,8 +719,8 @@ segr_put(void * ptr)
  *  to search from by calling segr_index().
  *
  */
-static void 
-segr_remove(void *ptr) 
+static void
+segr_remove(void *ptr)
 {
         char ** heap_ptr;
         char ** addr;
@@ -751,8 +752,8 @@ segr_remove(void *ptr)
  * which belongs.
  *
  */
-unsigned int 
-segr_index(size_t size) 
+unsigned int
+segr_index(size_t size)
 {
         unsigned int exp;
         unsigned int num;
@@ -781,13 +782,13 @@ segr_index(size_t size)
  * If split occurs then put the remaining free block in the
  * segregated list.
  */
-static void 
+static void
 place(void *bp, size_t asize)
 {
         size_t csize = GET_SIZE(HDRP(bp));
-        DBG(" PLACING %d bytes IN BLOCK (%p) with size %d bytes (diff: %d) \n",
-            asize,bp,csize,(csize-asize));
-        
+        DBG("PLACING %zu bytes IN BLOCK (%p) with size %zu bytes (diff: %td) \n",
+            asize, bp, csize, (csize-asize));
+
         if ((csize - asize) >= (2*DSIZE)) {
                 segr_remove(bp);
                 PUT(HDRP(bp), PACK(asize, 1));
@@ -801,15 +802,13 @@ place(void *bp, size_t asize)
                 PUT(FTRP(bp), PACK(csize, 1));
                 segr_remove(bp);
         }
-
-        DBG(" PLACING %d bytes at %p DONE! \n", asize,bp);
 }
 
 /*************************************************************
  * print block - Prints a block used for debug purpose
  * bp points to payload of a allocated or freed block.
  */
-static void 
+static void
 printblock(void *bp)
 {
         size_t hsize, halloc, fsize, falloc;
@@ -839,18 +838,18 @@ printblock(void *bp)
  * debug purpose
  *
  */
-static void 
+static void
 checkblock(void *bp)
 {
         if ((size_t)bp % 8)
                 printf("Error: %p is not double word aligned\n", bp);
-        
+
         if(GET(HDRP(bp)) != GET(FTRP(bp)))
                 printf("Header footer does not match \n");
 
         if(GET_ALLOC(HDRP(bp))==0)
         {//on free blocks
-                
+
                 if(GET_ALLOC(HDRP(PREV_BLKP(bp))) == 0)//coalesce check
                         DBG("Previous block is not coalesced at %p", bp);
 
@@ -865,14 +864,14 @@ checkblock(void *bp)
 /*************************************************************
  * checkheap - Minimal check of the heap for consistency
  */
-void 
+void
 checkheap(int verbose)
 {
         void* curr = mem_heap_lo();
         void* end = mem_heap_hi();
 
         DBG("CHECKHEAP *****START ******\n");
-        DBG("\t HEAP size=%d \n", mem_heapsize());
+        DBG("\t HEAP size %zu \n", mem_heapsize());
         //char *bp = heap_listp;
 
         if (verbose){
@@ -909,15 +908,14 @@ checkheap(int verbose)
         DBG("CHECKHEAP ***** END  ******\n");
 }
 
-/*************************************************************
- * segr_check - Show whats in the segr list. For debug purpose
+/**
+ * segr_check() - Show whats in the segr list. For debug purpose
  */
-
 void segr_check()
 {
 
-        char ** heap_ptr = mem_heap_lo();
-        char ** addr;
+        char **heap_ptr = mem_heap_lo();
+        char **addr;
 
         unsigned int i = 0;
         //int numblocks = 0;
@@ -926,17 +924,17 @@ void segr_check()
         printf("*** Check for free blocks in segr_list *** \n");
 
         for(; i < heap_allocator_size/sizeof(void *); i++) {
-
                 addr = NEXT(heap_ptr + i);
                 assert(addr < mem_heap_hi());
 
-                while(addr != NULL) {
+                while (addr != NULL) {
                         found = 1;
-                        printf("*** free block found (%p) size %zu index %d *** \n",addr,
-                               GET_SIZE(HDRP(addr)),i);
+                        DBG("*** free block found (%p) size %u index %d *** \n", addr,
+                            GET_SIZE(HDRP(addr)),i);
                         addr = NEXT(addr);
                 }
         }
+
         if(!found)
                 printf("**No free block found in segr list \n");
 }
@@ -945,11 +943,12 @@ void segr_check()
  * segr_check - Another version of heap consistency checker.
  * Prints all the block in a table.
  */
-void 
-checkheap2() 
+void
+checkheap2()
 {
-
         void *bp;
+        int i = 0;
+
         DBG("\n");
         DBG("current heap_listp:0x%p\n",  heap_listp);
         DBG("current heap:(%p: %p)(%u bytes)\n",mem_heap_lo(),
