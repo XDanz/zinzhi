@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wdeclaration-after-statement
 INCLUDE=../include
-LIB=../lib/libmalloc.a
+LIB=../lib/libmmalloc.a
 
 OBJS = mdriver.o fsecs.o fcyc.o clock.o ftimer.o
 

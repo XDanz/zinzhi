@@ -30,15 +30,15 @@ static char *mem_max_addr;   /* largest legal heap address */
  */
 void mem_init(void)
 {
-    /* allocate the storage we will use to model the available VM */
-  if ((mem_start_brk = (char *)malloc(MAX_HEAP)) == NULL) {
-    fprintf(stderr, "mem_init_vm: malloc error\n");
-    exit(1);
-  }
+        /* allocate the storage we will use to model the available VM */
+        if ((mem_start_brk = (char *)malloc(MAX_HEAP)) == NULL) {
+                fprintf(stderr, "mem_init_vm: malloc error\n");
+                exit(1);
+        }
 
 
-  mem_max_addr = mem_start_brk + MAX_HEAP;  /* max legal heap address */
-  mem_brk = mem_start_brk;                  /* heap is empty initially */
+        mem_max_addr = mem_start_brk + MAX_HEAP;  /* max legal heap address */
+        mem_brk = mem_start_brk;                  /* heap is empty initially */
 
 }
 
@@ -48,7 +48,7 @@ void mem_init(void)
 void
 mem_deinit(void)
 {
-    free(mem_start_brk);
+        free(mem_start_brk);
 }
 
 /*
@@ -57,7 +57,7 @@ mem_deinit(void)
 void
 mem_reset_brk()
 {
-    mem_brk = mem_start_brk;
+        mem_brk = mem_start_brk;
 }
 
 /*
@@ -68,22 +68,20 @@ mem_reset_brk()
 void *
 mem_sbrk(int incr)
 {
-  char *old_brk = mem_brk;
-  DBG("TRACE: mem_sbr() Extending the heap with %d bytes \n", incr);
-  //fprintf(stdout,"(mem_brk + incr) : %x ", (unsigned*)(mem_brk+incr) );
-  //fprintf(stdout,"(mem_max_addr) : %x ", (unsigned*)(mem_max_addr) );
+        char *old_brk = mem_brk;
+        DBG("TRACE: mem_sbr() Extending the heap with %d bytes \n", incr);
 
-  if ( (incr < 0) || ((mem_brk + incr) > mem_max_addr)) {
-    errno = ENOMEM;
-    fprintf(stderr, "ERROR: mem_sbrk failed. Ran out of memory...\n");
-    return (void *)-1;
-  }
+        if ( (incr < 0) || ((mem_brk + incr) > mem_max_addr)) {
+                errno = ENOMEM;
+                fprintf(stderr, "ERROR: mem_sbrk failed. Ran out of memory...\n");
+                return (void *)-1;
+        }
 
-    mem_brk += incr;
+        mem_brk += incr;
 
-    DBG("TRACE mem_sbrk(): Heap Size is : %uz bytes \n", mem_heapsize());
+        DBG("TRACE: mem_sbrk(): Heap Size is : %zu bytes \n", mem_heapsize());
 
-    return (void *)old_brk;
+        return (void *)old_brk;
 }
 
 /*
@@ -92,28 +90,32 @@ mem_sbrk(int incr)
 void *
 mem_heap_lo()
 {
-    return (void *)mem_start_brk;
+        return (void *)mem_start_brk;
 }
 
 /*
  * mem_heap_hi - return address of last heap byte
  */
-void *mem_heap_hi()
+void *
+mem_heap_hi()
 {
-    return (void *)(mem_brk - 1);
+        return (void *)(mem_brk - 1);
 }
 
 /*
  * mem_heapsize() - returns the heap size in bytes
  */
-size_t mem_heapsize() {
-    return (size_t)(mem_brk - mem_start_brk);
+size_t 
+mem_heapsize() 
+{
+        return (size_t)(mem_brk - mem_start_brk);
 }
 
 /*
  * mem_pagesize() - returns the page size of the system
  */
-size_t mem_pagesize()
+size_t 
+mem_pagesize()
 {
-    return (size_t)getpagesize();
+        return (size_t)getpagesize();
 }
