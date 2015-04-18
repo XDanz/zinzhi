@@ -801,12 +801,10 @@ printblock(void *bp)
         falloc = GET_ALLOC(FTRP(bp));
 
         if (hsize == 0) {
-                //printf("%p: EOL\n", bp);
                 return;
-
         }
 
-        DBG("%-16p %-p [%-u:%c] %p [%-u:%c]\n",
+        DBG("%-16p %-p [%-u:%c] %p [%-u:%c]\n", 
             HDRP(bp),
             bp,
             (unsigned)hsize, (halloc ? 'a' : 'f'),
@@ -816,25 +814,22 @@ printblock(void *bp)
 
 /**
  * checkblock() - Block consistency checker used for
- * debug purpose
- *
+ * debug purpose.
  */
 static void
 checkblock(void *bp)
 {
         if ((size_t)bp % 8)
                 printf("Error: %p is not double word aligned\n", bp);
-
-        if(GET(HDRP(bp)) != GET(FTRP(bp)))
+        
+        if (GET(HDRP(bp)) != GET(FTRP(bp)))
                 printf("Header footer does not match \n");
-
-        if(GET_ALLOC(HDRP(bp))==0)
-        {//on free blocks
-
-                if(GET_ALLOC(HDRP(PREV_BLKP(bp))) == 0)//coalesce check
+        
+        if (GET_ALLOC(HDRP(bp)) == 0) {
+                if (GET_ALLOC(HDRP(PREV_BLKP(bp))) == 0) //coalesce check
                         DBG("Previous block is not coalesced at %p", bp);
 
-                if(GET_ALLOC(HDRP(NEXT_BLKP(bp)))==0)//coalesce check
+                if (GET_ALLOC(HDRP(NEXT_BLKP(bp)))==0)//coalesce check
                         DBG("Next block is not coalesced at %p",bp);
         }
 }
@@ -845,18 +840,17 @@ checkblock(void *bp)
 void
 checkheap(int verbose)
 {
-        void* curr = mem_heap_lo();
-        void* end = mem_heap_hi();
-
-        DBG("\t HEAP size %zu bytes \n", mem_heapsize());
-        //char *bp = heap_listp;
+        void *curr = mem_heap_lo();
+        void *end = mem_heap_hi();
+        
+        DBG("\n\nHEAP size %zu bytes \n", mem_heapsize());
 
         if (verbose) {
-                DBG("\t Heap start (%-p)\n", heap_listp);
-                DBG("\t heap_lo    (%-p)\n", mem_heap_lo());
-                DBG("\t heap_hi    (%-p)\n", mem_heap_hi());
+                DBG("Heap start (%-p)\n", heap_listp);
+                DBG("heap_lo()  (%-p)\n", mem_heap_lo());
+                DBG("heap_hi()  (%-p)\n", mem_heap_hi());
         }
-        DBG("header\t\t [bytes:a/f] \t\tfooter \t\t[bytes:a/f]\n");
+        DBG("header\t\t payload[bytes:a/f] \t\tfooter \t\t[bytes:a/f]\n");
         for (curr=heap_listp; curr<=end+1; curr = NEXT_BLKP(curr)) {
                 // check that the end of the heap is right
                 if (GET_SIZE(HDRP(curr))==0) {

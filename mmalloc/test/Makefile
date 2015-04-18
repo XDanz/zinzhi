@@ -7,7 +7,7 @@ SRC = $(shell ls *.c)
 OBJS = $(SRC:.c=.o)
 EXEC = $(OBJS:.o=)
 
-all: $(OBJS)
+all: $(OBJS) $(EXEC)
 
 debug:
 	$(MAKE) "CFLAGS+= -g3" clean all
