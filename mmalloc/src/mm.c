@@ -235,7 +235,7 @@ segr_init()
         min_exp = exp; // 9
 
         heap_allocator_size = segr_init_size;
-
+        // extends the heap with segr_init_size
         if( (heap_listp = mem_sbrk(segr_init_size)) == (void *)-1)
                 return -1;
 
@@ -243,6 +243,7 @@ segr_init()
         DBG("mem_heap_lo()   %p \n", mem_heap_lo());
         DBG("segr_init_size  %zu bytes\n", segr_init_size);
         DBG("mem_heap_lo()+segr_init_size      %p \n", mem_heap_lo()+segr_init_size);
+
         i = 0;
         // TODO: use memset
         while (i < (segr_init_size / sizeof(void *))) {
@@ -294,7 +295,7 @@ mm_init(void)
 }
 
 /**
- * mm_malloc - Allocate a block with at least size bytes of payload. The
+ * mm_malloc() - Allocate a block with at least size bytes of payload. The
  * function will adjust our malloc request to 8 byte alignment.
  * The function will determine the starting index call to segr_index(size)
  * and start searching from the corresponding list.
@@ -304,15 +305,14 @@ mm_init(void)
 void *
 mm_malloc(size_t size)
 {
-
         size_t asize;        /* Adjusted block size */
         size_t extendsize;   /* Amount to extend heap if no fit */
-        char ** addr_heap;
+        char **addr_heap;
         void *addr;         /* The address of the found free block */
         void *addr2;
         unsigned int index;  /* The index in the segregated list */
-        void * prev;
-
+        void *prev;
+        DBG("alloc size %zu bytes", size);
         addr = NULL;
         addr2 = NULL;
 
@@ -320,8 +320,8 @@ mm_malloc(size_t size)
         if (size == 0)
                 return NULL;
 
-        if(size == 448) size = 512;
-        if(size == 112) size = 128;
+        if (size == 448) size = 512;
+        if (size == 112) size = 128;
 
         /* Adjust block size to include overhead and alignment reqs. */
         if (size <= DSIZE) {
@@ -330,7 +330,7 @@ mm_malloc(size_t size)
                 asize = DSIZE * ((size + (DSIZE) + (DSIZE-1)) / DSIZE);
         }
 
-        DBG("mm_malloc adjusted size %zu bytes \n", asize);
+        DBG(", adjusted size %zu bytes \n", asize);
 
         // Search the segregated list for a free block that fits.
         addr_heap = mem_heap_lo();
@@ -338,23 +338,23 @@ mm_malloc(size_t size)
 
         //If the size is in the exact range list. i level 1.
         if (asize <= MAX_FIXED) {
-                DBG("==MALLOC request in level 1 \n");
+                DBG("search in level 1 \n");
                 addr = NEXT(addr_heap + index);
                 //check if some previous block was in the position addr.
                 if (addr != NULL) {
                         NEXT(addr_heap + index) = NEXT(addr);
                         place(addr, asize);
-                        DBG("==>MALLOC RETURN Addr=%p \n", addr);
+                        DBG("return bp %p \n", addr);
                         return addr;
                 } else {
                         // No free block found at the current index
                         // we need to search for a bigger block at next index
-                        DBG("--MALLOC NO free block with size: %zd in free list \n", asize);
+                        DBG("no block found of size %zd bytes in free list \n", asize);
                 }
 
                 //The size is in level 2 exponent range class.
         } else {
-                DBG("==MALLOC request in level 2 \n");
+                DBG("search in level 2 \n");
                 addr = NEXT(addr_heap + index);
                 prev = NULL;
 
@@ -406,7 +406,7 @@ mm_malloc(size_t size)
 
                 if(addr != NULL && (GET_SIZE(HDRP(addr)) > asize)){
                         place(addr, asize);
-                        DBG("==>MALLOC RETURN Addr=%p \n", addr);
+                        DBG("return bp %p \n", addr);
                         return addr;
 
                 } else {
@@ -416,7 +416,7 @@ mm_malloc(size_t size)
                         //In the corresponding link list
                         //at index (addr_heap + index) find a free block
                         //that fits and remove it from the current chain.
-                        while(addr2 != NULL) {
+                        while (addr2 != NULL) {
 
                                 if (GET_SIZE(HDRP(addr2)) >= asize)
                                         break;
@@ -435,7 +435,7 @@ mm_malloc(size_t size)
 
                                 addr = addr2;
 
-                        }else{
+                        } else {
                                 //we need to handle the case when
                                 //there is no free block that could handle a request with
                                 //asize i.e when malloc request with big sizes.
@@ -449,17 +449,16 @@ mm_malloc(size_t size)
                         }
 
                         place(addr,asize);
-                        DBG("==>MALLOC RETURN Addr=%p \n", addr);
+                        DBG("return bp %p \n", addr);
                         return addr;
                 }
-        } //if(addr == NULL)
+        } // if(addr == NULL)
         place(addr,asize);
-        //printf("--MALLOC RETURN Addr=%p \n", addr);
         return addr;
 }
 
-/*
- * mm_free - Free a previously allocated block and coalesce.
+/**
+ * mm_free() - Free a previously allocated block and coalesce.
  */
 void
 mm_free(void *bp)
@@ -476,8 +475,8 @@ mm_free(void *bp)
         coalesce(bp);
 }
 
-/*
- * coalesce - Boundary tag coalescing.
+/**
+ * coalesce() - Boundary tag coalescing.
  * Return ptr to coalesced block. coalesce calls segr_remove
  * and segr_put.
  */
@@ -638,8 +637,8 @@ mm_realloc(void *ptr, size_t size)
         return ptr;
 }
 
-/*
- * checkheap - We don't check anything right now.
+/**
+ * checkheap() - We don't check anything right now.
  */
 void mm_checkheap(int verbose)  {}
 
@@ -647,18 +646,17 @@ void mm_checkheap(int verbose)  {}
  * The remaining routines are internal helper routines
  */
 
-/*
- * extend_heap - Extend heap with free block and return its block pointer
+/**
+ * extend_heap() - Extend heap with rsz bytes and return its block pointer
  */
 static void *
-extend_heap(size_t words)
+extend_heap(size_t rsz)
 {
-
         char *bp;
         size_t size;
 
         /* Allocate an even number of words to maintain alignment */
-        size = (words % 2) ? (words+1) * WSIZE : words * WSIZE;
+        size = (rsz % 2) ? (rsz+1) * WSIZE : rsz * WSIZE;
 
         if ((long)(bp = mem_sbrk(size)) == -1)
                 return NULL;
@@ -674,7 +672,7 @@ extend_heap(size_t words)
 }
 
 /**
- * segr_put - put the free block in the segregated list. Does
+ * segr_put() - put the free block in the segregated list. Does
  * a lookup (call) to segr_index(size) to get a corresponding index.
  * The parameter passed is a pointer to a free block i.e the pointer
  * ptr should point to the free blocks payload which will be linked
@@ -690,31 +688,16 @@ segr_put(void *ptr)
 
         heap_ptr = mem_heap_lo();
         NEXT(ptr) = NULL;
-        //PREV(ptr) = NULL;//(heap_ptr + index);
 
         index = segr_index(size);
 
-        DBG("   SEGR_PUT put free block (%p) with size %zu bytes at index pos %u \n",  ptr,size,index);
-
-        //  nxt = NEXT(heap_ptr + index);
-        //put an pointer (address) in the payload block (pointed by ptr)
-        //to point to what the (heap_ptr + index) pointed at before.
-        //*((char**)ptr) = *((char**)(heap_ptr + index));
-
+        DBG("put free block (%p) with size %zu bytes at index pos %u \n", ptr,size,index);
         NEXT(ptr) = NEXT(heap_ptr + index);
-        //  PREV(ptr) = (heap_ptr+index);
-
-        //and let the (heap_ptr + index) point to free block
-        //pointed by ptr
         NEXT(heap_ptr + index) = ptr;
-        //PREV(nxt) = ptr;
-        //segr_check();
-        //printf("-->segr_put OK\n");
-
 }
 
-/*
- *  segr_remove - Removes a free block pointed by ptr
+/**
+ *  segr_remove() - Removes a free block pointed by ptr
  *  from the segregated list. It will determine which linked list
  *  to search from by calling segr_index().
  *
@@ -722,9 +705,9 @@ segr_put(void *ptr)
 static void
 segr_remove(void *ptr)
 {
-        char ** heap_ptr;
-        char ** addr;
-        char ** prev;
+        char **heap_ptr;
+        char **addr;
+        char **prev;
 
         unsigned int index;
         size_t size = GET_SIZE(HDRP(ptr));
@@ -743,14 +726,12 @@ segr_remove(void *ptr)
                 addr = NEXT(addr);
                 prev = NEXT(prev);
         }
-        //  printf(" SEGR_REMOVE BLOCK (%p) with size %d bytes \n" , ptr,size);
 }
 
-/****************************************************************
- * segr_index - Given the size in bytes
+/**
+ * segr_index() - Given the size in bytes
  * return a index in the range 0-79 corresponding a the size class
  * which belongs.
- *
  */
 unsigned int
 segr_index(size_t size)
@@ -762,12 +743,12 @@ segr_index(size_t size)
         // if size is in the Level 1 class
         if (size <= MAX_FIXED) {
                 index = ((size - MIN_BLOCK_SIZE) / DELTA_FIXED);
-                return ((size - MIN_BLOCK_SIZE) / DELTA_FIXED);
+                return index;
         }
 
         // the size is in level 2 class
         exp = min_exp;
-        while((num = (2 << exp++)) < size);
+        while ((num = (2 << exp++)) < size);
 
         index = ((MAX_FIXED - MIN_BLOCK_SIZE) / DELTA_FIXED) + 1
                 + exp - min_exp;
@@ -804,8 +785,8 @@ place(void *bp, size_t asize)
         }
 }
 
-/*************************************************************
- * print block - Prints a block used for debug purpose
+/**
+ * print block() - Prints a block used for debug purpose
  * bp points to payload of a allocated or freed block.
  */
 static void
@@ -825,16 +806,16 @@ printblock(void *bp)
 
         }
 
-        DBG("blockp addr=%p: header:%p [%u bytes:%c] footer:%p [%d bytes:%c]\n",
-            bp,
+        DBG("%-16p %-p [%-u:%c] %p [%-u:%c]\n",
             HDRP(bp),
+            bp,
             (unsigned)hsize, (halloc ? 'a' : 'f'),
             FTRP(bp),
             (unsigned)fsize, (falloc ? 'a' : 'f'));
 }
 
-/*************************************************************
- * checkblock - Block consistency checker used for
+/**
+ * checkblock() - Block consistency checker used for
  * debug purpose
  *
  */
@@ -858,11 +839,8 @@ checkblock(void *bp)
         }
 }
 
-
-
-
-/*************************************************************
- * checkheap - Minimal check of the heap for consistency
+/**
+ * checkheap() - Minimal check of the heap for consistency
  */
 void
 checkheap(int verbose)
@@ -870,32 +848,29 @@ checkheap(int verbose)
         void* curr = mem_heap_lo();
         void* end = mem_heap_hi();
 
-        DBG("CHECKHEAP *****START ******\n");
-        DBG("\t HEAP size %zu \n", mem_heapsize());
+        DBG("\t HEAP size %zu bytes \n", mem_heapsize());
         //char *bp = heap_listp;
 
-        if (verbose){
-                DBG("\t Heap (%p):\n", heap_listp);
-                DBG("\t heap_lo (%p):\n", mem_heap_lo());
-                DBG("\t heap_hi (%p):\n", mem_heap_hi());
+        if (verbose) {
+                DBG("\t Heap start (%-p)\n", heap_listp);
+                DBG("\t heap_lo    (%-p)\n", mem_heap_lo());
+                DBG("\t heap_hi    (%-p)\n", mem_heap_hi());
         }
-
-        for(curr=heap_listp ; curr<=end+1; curr = NEXT_BLKP(curr)){
-
-                //check that the end of the heap is right
-                if(GET_SIZE(HDRP(curr))==0){
-                        if(curr != (end+1))
+        DBG("header\t\t [bytes:a/f] \t\tfooter \t\t[bytes:a/f]\n");
+        for (curr=heap_listp; curr<=end+1; curr = NEXT_BLKP(curr)) {
+                // check that the end of the heap is right
+                if (GET_SIZE(HDRP(curr))==0) {
+                        if (curr != (end+1))
                                 DBG("end of heap at %p should be %p\n",curr , (end+1));
-                        break;//break loop
+                        break; //break loop
                 }
-                //    printf("MEM hi=%p \n", mem_heap_hi());
-                //printf("MEM lo=%p \n", mem_heap_lo());
-                if(curr > mem_heap_hi()){
+
+                if (curr > mem_heap_hi()) {
                         DBG("%p (beyond mem_heap_hi()=%p) Not in heap! Failure! \n",
                             curr,mem_heap_hi());
                         return;
                 }
-                if((curr < mem_heap_lo())){
+                if ((curr < mem_heap_lo())) {
                         DBG("%p (bellow mem_heap_lo()=%p Not in heap! Failure! \n",
                             curr,mem_heap_lo());
                         return;
@@ -905,7 +880,6 @@ checkheap(int verbose)
                 if(verbose)
                         printblock(curr);
         }
-        DBG("CHECKHEAP ***** END  ******\n");
 }
 
 /**

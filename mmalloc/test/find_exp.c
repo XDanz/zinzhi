@@ -15,10 +15,10 @@ main(int args, char **argv)
         int exp, num;
         exp = 0;
         
-        
+        fprintf(stdout, "%-5s, %5s\n", "exp" , "num");
         for (; exp < MAX_EXP+1; exp++) {
                 num = EXP_BASE << exp;
-                fprintf(stdout, " exp %d, num %d \n", exp , num);
+                fprintf(stdout, "%-5d %5d\n", exp , num);
                 if (num >= MIN_BLOCK_SIZE && num > MAX_FIXED)
                         break;
         }

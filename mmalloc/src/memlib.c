@@ -22,7 +22,7 @@
 
 /* private variables */
 static char *mem_start_brk;  /* points to first byte of heap */
-static char *mem_brk;        /* points to last byte of heap */
+static char *mem_brk;      /* (high water mark) points to last byte of heap,  */
 static char *mem_max_addr;   /* largest legal heap address */
 
 /**
@@ -36,10 +36,8 @@ void mem_init(void)
                 exit(1);
         }
 
-
         mem_max_addr = mem_start_brk + MAX_HEAP;  /* max legal heap address */
         mem_brk = mem_start_brk;                  /* heap is empty initially */
-
 }
 
 /**

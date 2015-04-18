@@ -5,7 +5,7 @@ OBJS = mm.o memlib.o
 
 all: $(OBJS) ../lib/libmmalloc.a
 
-debug:
+debug: clean
 	$(MAKE) "CFLAGS+= -g -gdwarf-2 -g3 -DDEBUG" all
 
 
