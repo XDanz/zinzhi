@@ -97,13 +97,13 @@ int main(int argc, char **argv) {
         /* Parse the command line */
         while ((c = getopt(argc, argv, "hvp")) != EOF) {
                 switch (c) {
-                case 'h':             /* print help message */
+                case 'h':                 /* Print help message */
                         usage();
                         break;
-                case 'v':             /* emit additional diagnostic info */
+                case 'v':                 /* emit additional diagnostic info */
                         verbose = 1;
                         break;
-                case 'p':             /* don't print a prompt */
+                case 'p':                 /* don't print a prompt */
                         emit_prompt = 0;  /* handy for automatic testing */
                         break;
                 default:
@@ -140,72 +140,61 @@ int main(int argc, char **argv) {
                 fflush(stdout);
                 fflush(stdout);
         } 
-
         exit(0); /* control never reaches here */
 }
   
-/* 
- * eval - Evaluate the command line that the user has just typed in
- * 
- * 
+/**
+ * eval() - Evaluate the command line that the user has just typed in
  */
-
-void eval(char *cmdline){
-        //printf("Test='%s' \n", cmdline);
-  
+void eval(char *cmdline) 
+{
         char *first;
         char *mellanslag;
         int bytes = 0;
         void *bp;
         int index;
   
-        if((first = strstr(cmdline,"malloc")) != 0){
-    
+        if ((first = strstr(cmdline,"malloc")) != 0) {
                 mellanslag = strtok(cmdline," ");
                 mellanslag = strtok(NULL," ");
     
                 bytes = atoi(mellanslag);
 
-                fprintf(stdout,"CALL mm_malloc(%d) -->\n",bytes);
+                fprintf(stdout,"CALL mm_malloc(%d) -->\n", bytes);
                 bp = mm_malloc(bytes);
                 fprintf(stdout,"CALL mm_malloc(%d) --> OK\n",bytes);
     
-                //printf("Allocated Ok!\n");
-
-                if((char *)bp != NULL){
-                        //      printf("blockpointer is NOT null \n");
+                if ((char *)bp != NULL) {
                         addblock(blocks, nextblockid++, bp);
-                }else{
+                } else {
                         printf("blockpointer is null\n");
                 }
     
     
-        }else if((first = strstr(cmdline,"free")) != 0){
+        } else if ((first = strstr(cmdline,"free")) != 0) {
                 printf("found free\n");
                 mellanslag = strtok(cmdline," ");
                 mellanslag = strtok(NULL," ");
                 index = atoi(mellanslag);
 
-                printf("numblocks=%d\n",index);
+                printf("numblocks=%d\n", index);
 
                 bp = blockptr(index);
     
-                if(bp != NULL){
+                if(bp != NULL) {
                         mm_free(bp);
                         deleteblock(blocks,index);
                 }
     
-        }else if((first = strncmp(cmdline,"sb2",3)) == 0){
+        } else if ((first = strncmp(cmdline,"sb2",3)) == 0) {
                 checkheap2();
-        }else if(strncmp(cmdline,"sb",2) == 0 ){
+        } else if (strncmp(cmdline,"sb",2) == 0 ) {
                 checkheap(1);
-        }else if((first = strstr(cmdline,"ls")) != 0){
+        } else if ((first = strstr(cmdline,"ls")) != 0) {
                 listblocks(blocks);
-        }else if((first = strstr(cmdline,"quit")) != 0){
+        } else if((first = strstr(cmdline,"quit")) != 0) {
                 exit(0);
         }
-
-  
         return;
 }
 
@@ -367,23 +356,19 @@ int maxblockid(struct block_t *blocks){
 **/
 
 
-int addblock(struct block_t *blocks, unsigned  blockid, void *blockptr){
-        int i ;
-
+int addblock(struct block_t *blocks, unsigned  blockid, void *blockptr) {
+        int i;
 
         printf("adding block..\n");
-        for(i = 0; i < MAXBLOCKS; i++){
-
-                if(blocks[i].blockid == -1){
+        for (i = 0; i < MAXBLOCKS; i++) {
+                if (blocks[i].blockid == -1) {
                         blocks[i].blockid = blockid;
                         blocks[i].blockptr = blockptr;
                         printf("added block with id: %d with blockptr: 0x%x\n",
                                blockid,(char *) blockptr);
                         return 1;
                 }
-
         }
-
 }
 
 /* deleteblock - Delete a block whose blockid block list */
@@ -404,7 +389,7 @@ int deleteblock(struct block_t *blocks, unsigned blockid) {
 
 
 
-struct block_t *getbyid(struct block_t *blocks,unsigned blockid){
+struct block_t *getbyid(struct block_t *blocks,unsigned blockid) {
 
         int i ; 
         if(blockid < 1)
@@ -417,7 +402,7 @@ struct block_t *getbyid(struct block_t *blocks,unsigned blockid){
         }
 }
 
-void *blockptr(unsigned blockid){
+void *blockptr(unsigned blockid) {
   
         int i ;
         if(blockid < 0)
@@ -429,11 +414,10 @@ void *blockptr(unsigned blockid){
                 }
         }
         return NULL;
-
 }
 
 /* listblock - Print the block list */
-void listblocks(struct block_t *jobs){
+void listblocks(struct block_t *jobs) {
         int i;
     
         for (i = 0; i < MAXBLOCKS; i++) {

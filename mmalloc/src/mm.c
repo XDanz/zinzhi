@@ -247,8 +247,6 @@ segr_init()
         i = 0;
         // TODO: use memset
         while (i < (segr_init_size / sizeof(void *))) {
-                DBG("heap_listp+%d=%p \n",i,(char **)mem_heap_lo()+i);
-
                 NEXT(heap_listp + i++) = NULL;
         }
 
@@ -458,7 +456,7 @@ mm_malloc(size_t size)
 }
 
 /**
- * mm_free() - Free a previously allocated block and coalesce.
+ * mm_free() - Free a block pointed by bp and coalesce.
  */
 void
 mm_free(void *bp)
@@ -468,8 +466,11 @@ mm_free(void *bp)
         if (bp == 0) return;
 
         size = GET_SIZE(HDRP(bp));
-        if (heap_listp == 0) mm_init();
+        DBG("free %p with size %zu \n", bp, size);
 
+        if (heap_listp == 0)
+                mm_init();
+        
         PUT(HDRP(bp), PACK(size, 0));
         PUT(FTRP(bp), PACK(size, 0));
         coalesce(bp);
@@ -502,8 +503,6 @@ coalesce(void *bp)
                 PUT(HDRP(bp), PACK(size, 0));
                 PUT(FTRP(bp), PACK(size,0));
                 segr_put(bp);
-
-
         } else if (!prev_alloc && next_alloc) {      /* Case 3 */
                 // previous block is free and should be in segregated list.
                 prev_blkp = PREV_BLKP(bp);
@@ -514,7 +513,6 @@ coalesce(void *bp)
                 PUT(HDRP(PREV_BLKP(bp)), PACK(size, 0));
                 bp = PREV_BLKP(bp);
                 segr_put(bp);
-
         } else {                                     /* Case 4 */
                 size += GET_SIZE(HDRP(PREV_BLKP(bp))) + GET_SIZE(FTRP(NEXT_BLKP(bp)));
                 prev_blkp = PREV_BLKP(bp);
@@ -532,7 +530,7 @@ coalesce(void *bp)
 }
 
 /**
- * mm_realloc
+ * mm_realloc()
  * size - Is the requested size. The size parameter could be greater
  * or less than the original
  * meaning that the block should be shrieked or extend.
@@ -757,8 +755,8 @@ segr_index(size_t size)
 }
 
 
-/*
- * place - Place block of asize bytes at start of free block pointed by
+/**
+ * place() - Place block of asize bytes at start of free block pointed by
  * bp and split if remainder would be at least minimum block size.
  * If split occurs then put the remaining free block in the
  * segregated list.
@@ -767,7 +765,7 @@ static void
 place(void *bp, size_t asize)
 {
         size_t csize = GET_SIZE(HDRP(bp));
-        DBG("PLACING %zu bytes IN BLOCK (%p) with size %zu bytes (diff: %td) \n",
+        DBG("place %zu bytes IN BLOCK (%p) with size %zu bytes (diff: %td) \n",
             asize, bp, csize, (csize-asize));
 
         if ((csize - asize) >= (2*DSIZE)) {
@@ -804,8 +802,7 @@ printblock(void *bp)
                 return;
         }
 
-        DBG("%-16p %-p [%-u:%c] %p [%-u:%c]\n", 
-            HDRP(bp),
+        DBG("%-16p %-16p [%7u:%c] %16p  [%7u:%c]\n", HDRP(bp),
             bp,
             (unsigned)hsize, (halloc ? 'a' : 'f'),
             FTRP(bp),
@@ -850,7 +847,7 @@ checkheap(int verbose)
                 DBG("heap_lo()  (%-p)\n", mem_heap_lo());
                 DBG("heap_hi()  (%-p)\n", mem_heap_hi());
         }
-        DBG("header\t\t payload[bytes:a/f] \t\tfooter \t\t[bytes:a/f]\n");
+        DBG("header\t\t payload \t  [bytes:a/f]\tfooter\t\t[bytes:a/f]\n");
         for (curr=heap_listp; curr<=end+1; curr = NEXT_BLKP(curr)) {
                 // check that the end of the heap is right
                 if (GET_SIZE(HDRP(curr))==0) {
