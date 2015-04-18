@@ -149,20 +149,18 @@ int main(int argc, char **argv) {
 void eval(char *cmdline) 
 {
         char *first;
-        char *mellanslag;
+        char *pch;
         int bytes = 0;
         void *bp;
         int index;
   
         if ((first = strstr(cmdline,"malloc")) != 0) {
-                mellanslag = strtok(cmdline," ");
-                mellanslag = strtok(NULL," ");
+                pch = strtok(cmdline," ");
+                pch = strtok(NULL," ");
     
                 bytes = atoi(mellanslag);
 
-                fprintf(stdout,"CALL mm_malloc(%d) -->\n", bytes);
                 bp = mm_malloc(bytes);
-                fprintf(stdout,"CALL mm_malloc(%d) --> OK\n",bytes);
     
                 if ((char *)bp != NULL) {
                         addblock(blocks, nextblockid++, bp);
@@ -172,18 +170,23 @@ void eval(char *cmdline)
     
     
         } else if ((first = strstr(cmdline,"free")) != 0) {
-                printf("found free\n");
-                mellanslag = strtok(cmdline," ");
-                mellanslag = strtok(NULL," ");
+                pch = strtok(cmdline," ");
+                pch = strtok(NULL," ");
+                if (!pch) {
+                        scanf ("%p",&bp);
+                } else {
+                        sscanf ("%p",&bp);
+                }
+
                 index = atoi(mellanslag);
 
                 printf("numblocks=%d\n", index);
 
                 bp = blockptr(index);
     
-                if(bp != NULL) {
-                        mm_free(bp);
-                        deleteblock(blocks,index);
+                if (bp != NULL) {
+                    mm_free(bp);
+                    deleteblock(blocks,index);
                 }
     
         } else if ((first = strncmp(cmdline,"sb2",3)) == 0) {
