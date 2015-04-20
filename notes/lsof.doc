@@ -12,3 +12,6 @@ starting with <pid-name>.
 list if one have open connection to specified host:
 
 $ lsof -i@<ip>
+
+
+netstat --tcp -n -p -o -e -e -v
