@@ -54,6 +54,19 @@ $ sudo tcpdump -n -i wlan0 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
 listar arp cache
 $ arp -an
 
+$ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
+
+for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
+
+ pstree -H 118879 gspaces
+
+
+ netstat -tan --inet
+ -t = tcp
+ -a = show all listening and none-listening
+
+
+
 Packge Management
 ----------------
 dpkg --list  Listar alla paket som är installerade 
