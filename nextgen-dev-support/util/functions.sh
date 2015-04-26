@@ -1,23 +1,22 @@
 
 
-function maven_deploy_pu() {
+function maven_deploy_nextgen() {
  pushd "${NEXTGEN_HOME}/nextgen-pu/nextgen-pu-deploy" > /dev/null
  mvn -Denv=local -Dtask=deploy install
  popd >/dev/null
 }
 
-function maven_deploy_nordea_pu() {
-    mvn_build_market_app_pu nordea
+function maven_deploy_nordea() {
+    maven_deploy_market_app_pu nordea
 }
 
 function maven_deploy_market_pu() {
-    mvn_build_market_app_pu omx
+    maven_deploy_market_app_pu omx
 }
 
 function maven_deploy_market_app_pu() {
     local app = $1
-    mvn_build_market_pu
-    pushd "${NEXTGEN_HOME}/nextgen-market/nextgen-market-pu-deploy"
+    pushd "${NEXTGEN_HOME}/nextgen-market/nextgen-market-pu/nextgen-market-pu-deploy"
     mvn -Denv=local -Dtask=deploy-${app} install >/dev/null || {
         echo "Deploy failed!"
         exit 1
@@ -26,19 +25,35 @@ function maven_deploy_market_app_pu() {
 }
 
 function maven_build() {
-    if [[ -n "$1" && "$1" == "quite" ]]; then
-        mvn clean install -T 1C >/dev/null || {
+    if [[ -n "$1" && "$1" == "verbose" ]]; then
+        mvn clean install -T 1C || {
             echo "Build failed!"
             exit 1;
-    }
+        }
     else
-       mvn clean install -T 1C
+        mvn clean install -T 1C 2>&1 >/dev/null || {
+            echo "Build failed!"
+            exit 1;
+        }
     fi
 }
 
+function maven_build_nextgen() {
+    pushd "${NEXTGEN_HOME}" > /dev/null
+    maven_build $1
+    popd > /dev/null
+}
+
+function maven_build_nextgen_pu() {
+    pushd "${NEXTGEN_HOME}/nextgen-pu" > /dev/null
+    maven_build $1
+    popd > /dev/null
+}
+
+
 function maven_build_market_pu() {                 
     pushd "${NEXTGEN_HOME}/nextgen-market/nextgen-market-pu" > /dev/null
-    maven_build
+    maven_build $1
     popd >/dev/null
 }
 
@@ -52,7 +67,7 @@ function clean_deploy_dir() {
 }
 
 function index_clean() {
-    curl -XDELETE http://localhost:9200/_all
+    curl -s -XDELETE http://localhost:9200/_all >/dev/null
 }
 
 function undeploy_nextgen() {

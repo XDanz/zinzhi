@@ -1,12 +1,14 @@
 #!/bin/bash
 
-databases=system-mirror esb-mirror party-mirror reference-mirror account-mirror transaction-mirror \
+databases="system-mirror esb-mirror party-mirror reference-mirror account-mirror transaction-mirror \
 price-mirror omx-tgw-inet-mirror omx-mdi-price-mirror audit-mirror execution-mirror nordea-tgw-mirror \
-nordea-mdi-mirror
+nordea-mdi-mirror"
 
-for $dbs in $databases
+source ${DEV_SUPPORT_HOME}/env.sh
+
+for dbs in $databases
 do
-   mongo $dbs --eval "db.dropDatabase()"
+   mongo $dbs --eval "db.dropDatabase()" > /dev/null || { echo "Failed to clean db!" >&2 ; exit 1; }
 done
 
 clean_deploy_dir
