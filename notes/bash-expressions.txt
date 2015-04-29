@@ -68,16 +68,23 @@ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i |
 
 
 Packge Management
-----------------
-dpkg --list  Listar alla paket som är installerade 
+-----------------
+$ dpkg --list  Listar alla paket som är installerade med beskrivning
              ( går även med globbing dpkg --list 'foo*' )
+
+$ dpkg --get-selection  Lista alla paket som är installerade
+
 $ dpkg --list openjdk-7-jdk:amd64
 
 visar vilka filer som ingår i ett paket
 $ dpkg-query --listfiles openjdk-7-jdk:amd64
 $ dpkg --listfiles openjdk-7-jdk
 
-dpkg-query --search openjdk-7-jdk
+$ dpkg-query --search openjdk-7-jdk
+
+$ dpkg -L <paket>  Listar vad ett paket har installerat
+
+
 
 visar vilka installerade paket
 $ dpkg --get-selections | grep -v deinstall
@@ -89,6 +96,6 @@ Raderar även konf filer
 $ dpkg --purge foo
 
 installerar paket
-$dpkg --install foo_2.0.deb 
+$ dpkg --install foo_2.0.deb 
 
 sudo update-alternatives --config java
