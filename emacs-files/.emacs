@@ -1,6 +1,6 @@
 (setq-default indent-tabs-mode nil)
 (setq make-backup-files nil)
-(set-default-font "Ubuntu mono 12")
+(set-default-font "Ubuntu mono 11")
 (add-to-list 'default-frame-alist '(height . 43))
 (add-to-list 'default-frame-alist '(width . 80))
 (add-to-list 'default-frame-alist '(font . "Ubuntu mono 12"))
@@ -26,7 +26,7 @@
 
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+             '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 
 (unless (package-installed-p 'smex)
@@ -145,10 +145,10 @@
 ;;   (add-to-list 'ac-modes m))
 ;; (ac-config-default)
 ;;;  Autocomplete config start 
-
-;; (global-auto-complete-mode t)
-;; (ac-set-trigger-key "TAB")
-;; (ac-set-trigger-key "<tab>")
+;; (require 'auto-complete)
+ (global-auto-complete-mode t)
+ (ac-set-trigger-key "TAB")
+ (ac-set-trigger-key "<tab>")
 
 
 (setq interprogram-paste-function 'x-selection-value)
