@@ -22,6 +22,6 @@ filldb: $(OBJS)
 	$(CC) -o	 $@  $(OBJS) $(LIBS)
 
 clean:
-	rm -f *~ *.o *.a
+	rm -f *~ $(OBJS) filldb
 
 

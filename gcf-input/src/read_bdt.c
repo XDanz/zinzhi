@@ -126,10 +126,9 @@ void read_BDt(char *line, BDt* tradable)
 static int read_name(char *tok, char *ret)
 {
         char *ptr = tok;
-        char *res;
         if ( *ptr++ == 'N' && *ptr++ == 'A' && *ptr++ == 'm')
         {
-                res = strcpy(ret,ptr);
+                strcpy(ret,ptr);
                 return 0;
         }
         return 1;
@@ -139,10 +138,9 @@ static int read_abbrev_name(char *tok , char *ret)
 {
 
         char *ptr = tok;
-        char *res;
         if ( *ptr++ == 'S' && *ptr++ == 'N' && *ptr++ == 'm')
         {
-                res = strcpy(ret,ptr);
+                strcpy(ret, ptr);
                 return 0;
         }
         return 1;

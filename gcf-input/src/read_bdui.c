@@ -10,12 +10,10 @@ static int read_UEi(char *tok, char *ret) ;
 void read_BDUi(char *line, BDUi* underlying)
 {
         char * pch;
-        fprintf(stdout,"%s\n", line);
         pch = strtok(line,";");
 
         while ( pch != NULL )
         {
-                fprintf(stdout,"tok=\"%s\"\n", pch);
                 if ( strstr(pch, "BDUi")) {
                         pch = strtok(NULL,";");
                         continue;
@@ -69,10 +67,10 @@ void read_BDUi(char *line, BDUi* underlying)
                         }
                 }
                 else if (pch[0] == 'M' && pch[1] == 'I' && pch[2] == 'c') {
-                        if (sscanf(pch,"MIc%s", &underlying->micCode) != 1)  {
-                          fprintf(stderr, "could not read MIc \n");
-                          exit (2);
-                  }
+                        if (sscanf(pch,"MIc%s", underlying->micCode) != 1)  {
+                                fprintf(stderr, "could not read MIc \n");
+                                exit (2);
+                        }
 
                 }
                 else if (pch[0] == 'C' && pch[1] == 'U' && pch[2] == 't') {
@@ -89,10 +87,9 @@ void read_BDUi(char *line, BDUi* underlying)
 static int read_CUt(char *tok, char *ret) 
 {
         char *ptr = tok;
-        char *res;
         if ( *ptr++ == 'C' && *ptr++ == 'U' && *ptr++ == 't')
         {
-                res = strcpy(ret,ptr);
+                strcpy(ret, ptr);
                 return 0;
         }
         return 1;
@@ -100,10 +97,9 @@ static int read_CUt(char *tok, char *ret)
 static int read_UEi(char *tok, char *ret) 
 {
         char *ptr = tok;
-        char *res;
         if ( *ptr++ == 'U' && *ptr++ == 'E' && *ptr++ == 'i')
         {
-                res = strcpy(ret,ptr);
+                strcpy(ret,ptr);
                 return 0;
         }
         return 1;

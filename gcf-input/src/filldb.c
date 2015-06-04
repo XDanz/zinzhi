@@ -7,15 +7,13 @@
 #include "gcf.h" 
 
 
-#define MAXENTRIES 20500
+#define MAXENTRIES 22500
 
 void finish_with_error(MYSQL *con);
 
 int
 main (int argc, char** argv)
 {
-        fprintf(stdout, "start \n");
-
         
         char line[BUFSIZ];
         BDt *tradables[MAXENTRIES];
@@ -24,16 +22,18 @@ main (int argc, char** argv)
         int i, j , c ,dryrun;
         i = 0, j = 0 , dryrun = 0;
 
-        for (i; i < MAXENTRIES; i++ ) {
+        for (; i < MAXENTRIES; i++ ) {
                 tradables[i] = (BDt *)calloc(MAXENTRIES, sizeof(BDt));
                 underlyings[i] = (BDUi *)calloc(MAXENTRIES, sizeof(BDUi));
         }
+
         // Ddtprc:
         i = 0;
+        j = 0;
         while ((c = getopt(argc, argv, "Ddtprc:")) != -1) {
                 switch (c) {
                 case 'd':
-                        fprintf(stdout,"d option set \n");
+                        fprintf(stdout,"d option set , dry run! \n");
                         dryrun = 1;
                         break;
                 case 'D':
