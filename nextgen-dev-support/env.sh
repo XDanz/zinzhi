@@ -53,8 +53,7 @@ fi
 
 export GSA_JAVA_OPTIONS="-Xmx128m"
 export GSM_JAVA_OPTIONS="-Xmx128m"
-export GSC_JAVA_OPTIONS="-Xmx6g -Xms256m -XX:MaxPermSize=1g -Darchaius.configurationSource.additionalUrls=file://${GIGASPACES_HOME}/bin/hystrix.properties"
+export GSC_JAVA_OPTIONS="-Xmx6g -XX:MaxPermSize=1g -Darchaius.configurationSource.additionalUrls=file://${GIGASPACES_HOME}/bin/hystrix.properties"
 
-export NUMBER_OF_GSCS=2
-echo "$DEV_SUPPORT_HOME"
+export NUMBER_OF_GSCS=4
 source ${DEV_SUPPORT_HOME}/util/functions.sh

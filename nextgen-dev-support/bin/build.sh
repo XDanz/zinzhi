@@ -5,8 +5,7 @@ source ${DEV_SUPPORT_HOME}/env.sh
 usage() 
 {
     cat <<EOF
-Usage: `basename $0` [[-b|--build] nextgen|market]
--b, --build
+Usage: `basename $0` [nextgen|nextgen_pu|nextgen_market_pu]
     Build nextgen, nextgen_pu, nextgen_market_pu.
 EOF
 }

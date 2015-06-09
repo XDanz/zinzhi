@@ -18,15 +18,16 @@
 
 #ulimit -n 655361
 
-if [[ -f environment-variables ]]; then
-    . environment-variables
-fi
+# if [[ -f environment-variables ]]; then
+#     . environment-variables
+# fi
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 #PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="GigaSpaces XAP Premium"
 NAME=gigaspaces
 DAEMON=$GIGASPACES_HOME/bin/gs-agent.sh
+echo $GIGASPACES_HOME
 # For a GigaSpaces management use the line below
 #DAEMON_ARGS="gsa.gsc 0 gsa.global.gsm 1 gsa.global.lus 1"
 # For a GigaSpaces container use the line below

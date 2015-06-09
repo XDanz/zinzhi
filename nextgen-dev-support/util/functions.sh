@@ -1,8 +1,11 @@
 
 
 function maven_deploy_nextgen() {
- pushd "${NEXTGEN_HOME}/nextgen-pu/nextgen-pu-deploy" > /dev/null
- mvn -Denv=local -Dtask=deploy install
+ pushd "${NEXTGEN_HOME}/nextgen-pu/nextgen-pu-deploy" &> /dev/null
+ mvn -Denv=local -Dtask=deploy install  &>/dev/null || {
+     echo "Deploy failed!"
+     exit 1
+ }
  popd >/dev/null
 }
 
@@ -16,7 +19,7 @@ function maven_deploy_market_pu() {
 
 function maven_deploy_market_app_pu() {
     local app = $1
-    pushd "${NEXTGEN_HOME}/nextgen-market/nextgen-market-pu/nextgen-market-pu-deploy"
+    pushd "${NEXTGEN_HOME}/nextgen-market/nextgen-market-pu/nextgen-market-pu-deploy" &> /dev/null
     mvn -Denv=local -Dtask=deploy-${app} install >/dev/null || {
         echo "Deploy failed!"
         exit 1
@@ -45,8 +48,10 @@ function maven_build_nextgen() {
 }
 
 function maven_build_nextgen_pu() {
-    pushd "${NEXTGEN_HOME}/nextgen-pu" > /dev/null
+    pushd "${NEXTGEN_HOME}/nextgen-pu" &> /dev/null
+    echo -n "Building nextgen_pu ..."
     maven_build $1
+    echo " success!"
     popd > /dev/null
 }
 
