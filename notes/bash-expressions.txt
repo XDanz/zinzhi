@@ -43,6 +43,19 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 "@Temporal\(TemporalType\.DATE\)"
 
 
+for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
+
+pstree -H <pid> gspaces
+
+netstat -tan --inet
+ -t = tcp
+ -a = show all listening and none-listening
+ -c = continues show
+
+
+ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
+
+
 Network
 ------
 sniffar arp paket
@@ -56,7 +69,7 @@ $ arp -an
 
 $ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
-for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
+$ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 
  pstree -H 118879 gspaces
 
@@ -99,3 +112,8 @@ installerar paket
 $ dpkg --install foo_2.0.deb 
 
 sudo update-alternatives --config java
+
+An alternative way to install your public key in the remote machine's authorized_keys:
+------------------------------------------------------------------------
+cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
+
