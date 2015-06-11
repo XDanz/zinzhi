@@ -65,7 +65,8 @@ do_start()
 	echo "Starting GigaSpaces"
 	$GS_START_LINE > $LOGFILE1 2>&1 &
 
-	GSC_JAVA_OPTIONS_BASE=$GSC_JAVA_OPTIONS
+	GSC_JAVA_OPTIONS_BASE=${GSC_JAVA_OPTIONS}
+        echo "Using JAVA_OPTIONS_BASE to \"${GSC_JAVA_OPTIONS_BASE}\""
 
 	#export GSC_JAVA_OPTIONS="$GSC_JAVA_OPTIONS_BASE -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"
 	export GSC_JAVA_OPTIONS="$GSC_JAVA_OPTIONS_BASE "

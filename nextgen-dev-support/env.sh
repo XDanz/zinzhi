@@ -20,8 +20,8 @@ dirn=`dirname $earg`
 p=`abspath $dirn`
 export DEV_SUPPORT_HOME=$p
 
-if [[ -z "${GIGASPACES_HOME}" ]]; then 
-    export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+if [[ -z "${JAVA_HOME}" ]]; then 
+    export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 fi
 
 if [[ -z "{ANT_HOME}" ]]; then
@@ -29,7 +29,7 @@ if [[ -z "{ANT_HOME}" ]]; then
 fi
 
 if [[ -z "${GIGASPACES_HOME}" ]]; then
-    export GIGASPACES_HOME=/home/danter/gigaspaces-xap-premium-9.7.2-ga
+    export GIGASPACES_HOME=/home/danter/gigaspaces-xap-premium-10.1.1-ga
 fi
 
 if [[ -z "${NEXTGEN_HOME}" ]]; then 
@@ -53,7 +53,7 @@ fi
 
 export GSA_JAVA_OPTIONS="-Xmx128m"
 export GSM_JAVA_OPTIONS="-Xmx128m"
-export GSC_JAVA_OPTIONS="-Xmx6g -XX:MaxPermSize=1g -Darchaius.configurationSource.additionalUrls=file://${GIGASPACES_HOME}/bin/hystrix.properties"
+export GSC_JAVA_OPTIONS="-Xmx3g -XX:MaxPermSize=1g -Darchaius.configurationSource.additionalUrls=file://${GIGASPACES_HOME}/bin/hystrix.properties"
 
 export NUMBER_OF_GSCS=4
 source ${DEV_SUPPORT_HOME}/util/functions.sh
