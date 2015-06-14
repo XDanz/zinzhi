@@ -18,15 +18,9 @@
 
 #ulimit -n 655361
 
-<<<<<<< HEAD
-# if [[ -f environment-variables ]]; then
-#     . environment-variables
-# fi
-=======
 if [[ -f "${DEV_SUPPORT_HOME}/env.sh" ]]; then
     . ${DEV_SUPPORT_HOME}/env.sh
 fi
->>>>>>> env script
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 #PATH=/sbin:/usr/sbin:/bin:/usr/bin
@@ -34,11 +28,7 @@ VSN=$(echo `basename $GIGASPACES_HOME` | sed 's/gigaspaces-xap-premium-//' | sed
 DESC="GigaSpaces XAP Premium ${VSN}"
 NAME=gigaspaces
 <<<<<<< HEAD
-DAEMON=$GIGASPACES_HOME/bin/gs-agent.sh
 echo $GIGASPACES_HOME
-=======
-DAEMON=${GIGASPACES_HOME}/bin/gs-agent.sh
->>>>>>> env script
 # For a GigaSpaces management use the line below
 #DAEMON_ARGS="gsa.gsc 0 gsa.global.gsm 1 gsa.global.lus 1"
 # For a GigaSpaces container use the line below
