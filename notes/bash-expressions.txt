@@ -117,3 +117,6 @@ An alternative way to install your public key in the remote machine's authorized
 ------------------------------------------------------------------------
 cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
 
+java -jar FastProxy.jar --local_port=10901 --remote_port=30501 --remote_host=nextver1.test.ngm.se --fast_templates=f│ERROR (out): java.net.SocketException: Socket closed
+ile:////home/danter/dev/nextgen/nextgen-market/nextgen-market-common/nextgen-market-common-ngm/src/main/resources/FAST_templates_1.13.1│Accepting connection on: 0.0.0.0/0.0.0.0:10900
+.xml --input_text_file=in_ch2.txt --output_text_file=out_ch2.txt
