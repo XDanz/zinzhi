@@ -49,14 +49,14 @@
 #undef	HAVE_DEV_ZERO
 
 /* Define the following to the appropriate datatype, if necessary */
-#undef	int8_t				/* <sys/types.h> */
-#undef	int16_t				/* <sys/types.h> */
-#undef	int32_t				/* <sys/types.h> */
-#undef	uint8_t				/* <sys/types.h> */
-#undef	uint16_t				/* <sys/types.h> */
-#undef	uint32_t				/* <sys/types.h> */
-#undef	size_t				/* <sys/types.h> */
-#undef	ssize_t				/* <sys/types.h> */
+/* #undef	int8_t				/\* <sys/types.h> *\/ */
+/* #undef	int16_t				/\* <sys/types.h> *\/ */
+/* #undef	int32_t				/\* <sys/types.h> *\/ */
+/* #undef	uint8_t				/\* <sys/types.h> *\/ */
+/* #undef	uint16_t				/\* <sys/types.h> *\/ */
+/* #undef	uint32_t				/\* <sys/types.h> *\/ */
+/* #undef	size_t				/\* <sys/types.h> *\/ */
+/* #undef	ssize_t				/\* <sys/types.h> *\/ */
 
 #undef	POSIX_IPC_PREFIX
 #undef	RPCGEN_ANSIC			/* defined if rpcgen groks -C option */

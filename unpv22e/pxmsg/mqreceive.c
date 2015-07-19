@@ -6,7 +6,7 @@ main(int argc, char **argv)
 	int		c, flags;
 	mqd_t	mqd;
 	ssize_t	n;
-	uint_t	prio;
+	unsigned int	prio;
 	void	*buff;
 	struct mq_attr	attr;
 

@@ -1,0 +1,11 @@
+mqcreate
+mqcreate1
+mqgetattr
+mqnotifysig1
+mqnotifysig2
+mqnotifysig3
+mqnotifysig4
+mqnotifysig5
+mqnotifysig1
+mqsend
+mqreceive
