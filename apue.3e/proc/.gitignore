@@ -1,0 +1,14 @@
+echoall
+exec[1-2]
+fork[1-2]
+vfork
+nice
+pruids
+wait1
+pracct
+tellwait1
+tellwait2
+times1
+systest1
+vfork1
+systest3
