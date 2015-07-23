@@ -40,7 +40,10 @@
 
 (setq ispell-program-name "/opt/local/bin/ispell")
 
-(require 'yang-mode nil t)
+(require 'autopair)
+(autopair-global-mode 1)
+(setq autopair-autowrap t)
+
 
 ;; (require 'lux-mode)
 
@@ -145,7 +148,7 @@
 ;;   (add-to-list 'ac-modes m))
 ;; (ac-config-default)
 ;;;  Autocomplete config start 
-;; (require 'auto-complete)
+(require 'auto-complete)
  (global-auto-complete-mode t)
  (ac-set-trigger-key "TAB")
  (ac-set-trigger-key "<tab>")
