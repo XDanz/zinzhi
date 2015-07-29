@@ -17,10 +17,15 @@ function maven_deploy_market_pu() {
     maven_deploy_market_app_pu omx
 }
 
+function maven_deploy_ngm() {
+    maven_deploy_market_app_pu ngm
+}
+
 function maven_deploy_market_app_pu() {
-    local app = $1
+    echo "'$1'=$1" 
+    local app=$1
     pushd "${NEXTGEN_HOME}/nextgen-market/nextgen-market-pu/nextgen-market-pu-deploy" &> /dev/null
-    mvn -Denv=local -Dtask=deploy-${app} install >/dev/null || {
+    mvn -Denv=local -Dtask=deploy-${app} install  || {
         echo "Deploy failed!"
         exit 1
     }

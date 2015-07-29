@@ -27,8 +27,8 @@ fi
 VSN=$(echo `basename $GIGASPACES_HOME` | sed 's/gigaspaces-xap-premium-//' | sed 's/-ga//')
 DESC="GigaSpaces XAP Premium ${VSN}"
 NAME=gigaspaces
-<<<<<<< HEAD
-echo $GIGASPACES_HOME
+echo "Using installed GigaSpace in \"${GIGASPACES_HOME}\""
+DAEMON=$GIGASPACES_HOME/bin/gs-agent.sh
 # For a GigaSpaces management use the line below
 #DAEMON_ARGS="gsa.gsc 0 gsa.global.gsm 1 gsa.global.lus 1"
 # For a GigaSpaces container use the line below
@@ -60,7 +60,7 @@ do_start()
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
 
-	pushd $GIGASPACES_HOME
+	pushd $GIGASPACES_HOME > /dev/null
 
 	GS_START_LINE="$DAEMON $DAEMON_ARGS"
 	echo "Starting GigaSpaces"

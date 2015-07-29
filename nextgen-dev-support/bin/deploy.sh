@@ -27,6 +27,10 @@ while [ $# -gt 0 ]; do
         nordea)
             maven_deploy_nordea
             ;;
+        ngm)
+            maven_deploy_ngm
+            ;;
+
     esac
     shift
 done
