@@ -6,6 +6,8 @@ all:
 	for i in $(DIRS); do \
 		(cd $$i && echo "making $$i" && $(MAKE) ) || exit 1; \
 	done
+tags:
+	find . -name "*.[chCH]" -print | etags -
 
 clean:
 	for i in $(DIRS); do \
