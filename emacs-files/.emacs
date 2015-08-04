@@ -158,6 +158,11 @@
 
 
 
+; man page lookup (by default, f1 is help, but I
+; already know how to bring that up using C-h)
+(define-key global-map [f1]
+  (lambda () (interactive)
+    (manual-entry (current-word))))
 
 ;;; yasnippet
 ;;; should be loaded before auto complete so that they can work together
