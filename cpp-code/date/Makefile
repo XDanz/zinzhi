@@ -19,6 +19,10 @@ test: build
 tt:
 	$(MAKE) -C src tt
 
+TAGS:
+	find . -name \*.h -print -o -name \*.cpp -print | etags -
+
+
 # $@ -- references to .o file, $< referneces the .cpp file
 %.o: %.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)

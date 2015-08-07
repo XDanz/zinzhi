@@ -3,7 +3,7 @@ mdriver
 *~
 *DS_Store
 [#]*[#]
-#*
+\.#*
 test[1-10]
 TAGS
 test

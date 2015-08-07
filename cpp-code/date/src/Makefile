@@ -8,9 +8,8 @@ all: build
 
 build: $(OBJS)
 
-tt:
-	@echo "SRC=$(SRC)"
-	@echo "objs=\"$(OBJS)\""
+TAGS:
+	find . -name \*.h -print -o -name \*.cpp -print | etags -
 
 
 # $@ -- references to .o file, $< referneces the .cpp file

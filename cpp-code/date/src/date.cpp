@@ -84,7 +84,6 @@ Date& Date::operator++() {
     return *this;
 }
 
-
 // decrements the current date with one day
 // return the new date decremented by one day.
 Date& Date::operator--() {
@@ -113,4 +112,3 @@ std::ostream& operator<<(std::ostream& os, const Date& d) {
     d.toString(os);
     return os;
 }
-
