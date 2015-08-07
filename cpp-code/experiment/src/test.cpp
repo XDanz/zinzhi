@@ -1,16 +1,16 @@
 #include <iostream>
-
+using namespace std;
 namespace ABC {
     class A {
     public:
         A() { 
-            std::cout << "A::A() " << std::endl;
+            cout << "A::A() " << endl;
         };
     
         A& operator=(const A& a)  {
-            std::cout << "A::operator=(const &A) =>" << std::endl;
+            cout << "A::operator=(const &A) =>" << endl;
             this->adjust_values(a.calc());
-            std::cout << "A::operator=(const &A) => ok" << std::endl;
+            cout << "A::operator=(const &A) => ok" << endl;
             return *this;
         }
 

@@ -1,24 +1,29 @@
 # tests/test1 --
 CC = g++
-CFLAGS = -Wall -std=c++11 -I../../includes
-SRC = $(wildcard *.cpp)
-OBJS = ../../objs/date.o ../../objs/gregorian.o ../../objs/julian.o test.o
-OBJS+= ../../objs/kattistime.o
-all: $(OBJS) test_run TAGS
+CFLAGS = -Wall -std=c++11
+INCLUDES=includes
+SRC = $(wildcard src/*.cpp)
+OBJS = $(SRC:src/%.cpp=objs/%.o)
+  # ../../objs/date.o ../../objs/gregorian.o ../../objs/julian.o test.o
+# OBJS+= ../../objs/kattistime.o
+tt:
+	echo "$(OBJS)"
+
+all: $(OBJS)
+
 
 test_run: $(OBJS)
 	$(CC) $(OBJS) -o $@
 
-test:
-	./test_run
-
-../../objs/%.o:
-	make -C ../../src all
 # $@ -- references to .o file, $< referneces the .cpp file
+objs/%.o: $(SRC)
+	$(CC) -c $< -o $@ $(CFLAGS) -I$(INCLUDES)
+
+test: objs/test.o
+	$(CC) -o $@ $< $(CFLAGS)
+
 %.o: %.cpp
 	$(CC) -c $< $(CFLAGS)
-TAGS:
-	find . -name \*.h -print -o -name \*.cpp -print | etags -
 
 clean: 
-	rm -rf *.o *~ test_run
+	rm -rf *.o *~
