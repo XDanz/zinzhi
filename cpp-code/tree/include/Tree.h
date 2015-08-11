@@ -1,13 +1,16 @@
+#include <list>
+
+using namespace std;
 
 class Tree {
     struct Node;
-    List<Node*> nodes;
+    list<Node*> nodes;
 public:
     class Iterator;
     Tree();
     Tree(const Tree&);
     Tree(const Type&);
-    Tree(const Type&, const List<Tree*>&);
+    Tree(const Type&, const list<Tree*>&);
     ~Tree();
     Tree& operator=(const Tree& t);
     bool operator=(const Tree&t) const;
@@ -43,7 +46,7 @@ public:
 
     friend class Iterator {
         Tree* tree;
-        List<Node*>::Iterator lit;
+        list<Node*>::Iterator lit;
     public:
         Iterator();
         Iterator(const Iterator&);
@@ -62,14 +65,14 @@ public:
     };
 protected:
     int inernal_leaves() const;
-    List<Node*> level(int n);
-    List<Node*>::Iterator litn(Node*);
-    List<Node*>::Iterator litp(Node*);
-    List<Node*>Iterator nextSibling(List::Iterator);
+    list<Node*> level(int n);
+    list<Node*>::Iterator litn(Node*);
+    list<Node*>::Iterator litp(Node*);
+    list<Node*>Iterator nextSibling(list<Node*>::Iterator);
 };
 
-bint n(Node*);
-int h(Node*);
+// bint n(Node*);
+// int h(Node*);
 //int l(Node*,It);
 //Node* clone(Node*, List&, Node*);
 
