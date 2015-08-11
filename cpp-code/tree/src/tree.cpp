@@ -72,7 +72,7 @@ Tree::~Tree() {
 Tree& Tree::operator=(const Tree& t) {
     clear();
     Tree* p = new Tree(t); // use cpy constructor
-    nodes = p->_nodes();
+    nodes = p->nodes;
     return *this;
 }
 
@@ -83,7 +83,7 @@ void Tree::clear() {
     nodes.clear();
 }
 
-bool Tree::operator==(const Tree* t ) const {
+bool Tree::operator==(const Tree* t) const {
     if ( nodes.size() != t.nodes.size())
         return false;
     
@@ -100,7 +100,7 @@ bool Tree::operator!=(const Tree* t) const {
 }
 
 void Tree::clear() {
-    for (List<Node*> lit =nodes.begin(); lit!=nodes.end(); lit++) {
+    for (List<Node*> lit = nodes.begin(); lit!=nodes.end(); lit++) {
         delete *lit;
     }
     nodes.clear();
@@ -114,7 +114,7 @@ int Tree::size() const {
     return nodes.size();
 }
 
-int Tree::internal_leaves() const {
+int Tree::leaves() const {
     return internal_leaves(nodes.front());
 }
 
@@ -159,33 +159,124 @@ int Tree::level(It it) const {
     List<Node*> plist = p->childen;
     for (List<Node*>::Iterator lit = plist.begin(); lit!= plist.end(); lit++) {
         int lc = level (*lit, it);
-        if (lc > -1) return lc+1;
+        if (lc > -1)
+            return lc+1;
     }
 }
 
-// public function of the Tree::Iterator
+// protected members
+List<Node*> Tree::level(int n) {
+    List<Node*> listn;
+    if (lisn.empty())
+        return listn;
 
-void Tree::print() const {
+    queue<List*> q;
+    Node* root = *(nodes.begin());
 
 }
-  int leaves() const;
-  int height() const;
-  int level(Iterator it) const;
-  int pathLenght();
-  int width(int);
-  int width();
-  void print();
-  Type& root() const;
-  void reflect();
-  void defoliate();
-  Iterator insert(Iterator, const Type& = Type());
-  void erase(Iterator);
-  Iterator grow(Iterator, const Type&);
-  void prune(Iterator);
-  Iterator attach(Iterator, Tree&);
-  int generations(Iterator, Iterator);
-  Iterator begin();
-  Iterator end();
+
+// Iterator
+
+Iterator::Iterator() {
+}
+
+Iterator::Iterator(const Iterator& it) :
+    tree(it.tree), lit(it.lit) {
+}
+
+Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
+    List<Node*> nodes = tree->nodes;
+    lit = find(nodes.begin(), nodes.end(), p);
+}
+
+Iterator::Iterator(Tree* tree, List<Tree*> lit): tree(tree), lit(lit) {
+}
+
+void Iterator::operator=(const Iterator& it) {
+    tree = it.tree;
+    lit = it.lit;
+}
+
+bool Iterator::operator==(const Iterator& it) {
+    return tree == it.tree && lit == it.lit;
+}
+
+bool Iterator::operator!=(const Iterator& it) {
+    return tree != it.tree || it.lit != lit;
+}
+
+Iterator& Iterator::operator++() {
+    ++lit;
+    return *this;
+}
+
+Iterator Iterator::operator++(int) {
+    Iterator it (*this);
+    operator++();
+    return it;
+}
+
+string& Iterator::operator*() const {
+    return (*lit)->value;
+}
+
+////// public function of the Tree::Iterator
+void Tree::print() const {
+    
+}
+
+int Tree::pathLenght() {
+    return 0;  // TODO: Implement
+}
+
+int Tree::width(int) {
+    return 0; // TODO: Implement
+}
+
+int Tree::width() {
+    return 0; // TODO: Implement
+}
+
+string& Tree::root() const {
+     // TODO: Implement
+}
+
+void Tree::reflect() {
+    // TODO: Implement
+}
+
+void Tree::defoliate() {
+    // TODO: Implement
+}
+
+Iterator Tree::insert(Iterator, const Type& = Type()) {
+
+}
+
+void erase(Iterator) {
+}
+Iterator grow(Iterator, const Type&) {
+}
+
+void prune(Iterator) {
+}
+
+Iterator attach(Iterator, Tree&) {
+}
+
+int generations(Iterator, Iterator) {
+}
+
+Iterator Tree::begin() {
+    return Iterator(this, nodes.begin());
+}
+
+Iterator Tree::end() {
+    
+}
+
+Iterator end() {
+}
   static bool isRoot(Iterator it);
   static bool isLeaf(Iterator it);
   static bool isOldestChild(Iterator it);
@@ -194,23 +285,6 @@ void Tree::print() const {
   static Iterator parent (Iterator it);
   static num numChildren(Iterator it);
 
-  friend class Iterator {
-    Tree* _tree;
-    LIt _lit;
-  public:
-      Iterator();
-      Iterator(const Iterator&);
-      Iterator(Tree*, Node* = 0);
-      Iterator(Tree*, LIt);
-      void operator=(const Iterator& it);
-      bool operator==(const Iterator& it);
-      bool operator!=(const Iterator& it);
-      Iterator& operator++();  // prefix operator
-      Iterator  operator++(); // postfix increment
-      Type& operator*() const;
-      bool operator!();
-      friend class Tree;
-  };
 protected:
     List level(int n );
     LIt litn(Node*);

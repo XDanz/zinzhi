@@ -3,17 +3,20 @@
 namespace ABC {
     class A {
     public:
-        A(): _a{0},_b{0},_c{0}
-            { 
-                std::cout << "A::A() " << std::endl;
-            };
-        A(const A& obj)
-            {
-                std::cout << "A::A(const &A) =>" << std::endl;
-                _a = obj._a; _b = obj._b; _c = obj._c;
-                std::cout << "A::A(const &A) => ok" << std::endl;
-            };
-    
+      A(): _a{0},_b{0},_c{0} {
+        std::cout << "A::A() " << std::endl;
+      };
+        A(const A& obj)            {
+            
+            std::cout << "A::A(const &A) =>" << std::endl;
+            _a = obj._a; _b = obj._b; _c = obj._c;
+            std::cout << "A::A(const &A) => ok" << std::endl;
+        };
+
+        A(A&& obj) {
+            
+        }
+        
         A& operator=(const A& a)  {
             std::cout << "A::operator=(const &A) =>" << std::endl;
             // this->adjust_values(a.calc());
