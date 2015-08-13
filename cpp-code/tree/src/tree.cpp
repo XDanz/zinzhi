@@ -139,15 +139,19 @@ int Tree::internal_leaves(Node* p) const {
 }
 
 int Tree::height() const {
-    Node* p = nodes.front();
+    return internal_height(nodes.front());
+}
+
+int internal_height(Node* p) {
     list<Node*> plist = p->children;
+
     if (plist.empty())
         return 0;
+  
+    int h0 = 0;
 
-    int h0=0;
-
-    for (list<Node*>::Iterator plit=plist.begin(); plit!=plist.end(); plit++) {
-        int h1 = height(*plit);
+    for (list<Node*>::Iterator plit = plist.begin(); plit != plist.end(); plit++) {
+        int h1 = internal_height(*plit);
         if ( h1 > h0)
             h0 = h1;
     }
@@ -168,69 +172,42 @@ int Tree::level(It it) const {
     }
 }
 
+
+void Tree::print() const {
+    
+}
+
+
 // protected members
 list<Node*> Tree::level(int n) {
     list<Node*> listn;
+
     if (lisn.empty())
         return listn;
 
     queue<list*> q;
     Node* root = *(nodes.begin());
+
+    if (n == 0)
+        return List(1,root);
+
+    q.push(&(root->children));
+    while (!q.empty()) {
+        List<Node*>* p = q.front();
+        List<Node*>& list = *p;
+        for (List<Node*>::Iterator lit = list.begin(); lit!=list.end(); lit++) {
+            Node* p = *lit;
+            Iterator it (this, *lit);
+            if (level(it) == n)
+                listn.push_back(*lit);
+            q.push(&((*lit)->children));
+        }
+        q.pop();
+    }
+    return listn;
 }
 
-// Iterator
 
-Tree::Iterator::Iterator() {
-}
-
-Tree::Iterator::Iterator(const Iterator& it) :
-    tree(it.tree), lit(it.lit) {
-}
-
-Tree::Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
-    list<Node*> nodes = tree->nodes;
-    lit = find(nodes.begin(), nodes.end(), p);
-}
-
-Tree::Iterator::Iterator(Tree* tree, list<Tree*> lit): tree(tree), lit(lit) {
-}
-
-Tree::void Iterator::operator=(const Iterator& it) {
-    tree = it.tree;
-    lit = it.lit;
-}
-
-bool Tree::Iterator::operator==(const Iterator& it) {
-    return tree == it.tree && lit == it.lit;
-}
-
-bool Tree::Iterator::operator!=(const Iterator& it) {
-    return tree != it.tree || it.lit != lit;
-}
-
-Iterator& Tree::Iterator::operator++() {
-    ++lit;
-    return *this;
-}
-
-Iterator Iterator::operator++(int) {
-    Iterator it (*this);
-    operator++();
-    return it;
-}
-
-string& Iterator::operator*() const {
-    return (*lit)->value;
-}
-
-////// public function of the Tree::Iterator
-void Tree::print() const {
-    
-}
-
-int Tree::pathLenght() {
-    return 0;  // TODO: Implement
-}
 
 int Tree::width(int) {
     return 0; // TODO: Implement
@@ -241,37 +218,7 @@ int Tree::width() {
 }
 
 string& Tree::root() const {
-     // TODO: Implement
-}
-
-void Tree::reflect() {
     // TODO: Implement
-}
-
-void Tree::defoliate() {
-    // TODO: Implement
-}
-
-Iterator Tree::insert(Iterator, const Type& = Type()) {
-
-}
-
-void erase(Iterator) {
-}
-
-Iterator grow(Iterator, const string&) {
-}
-
-void prune(Iterator) {
-    // TODO:
-}
-
-Iterator attach(Iterator, Tree&) {
-    return 0;
-}
-
-int generations(Iterator, Iterator) {
-    return 0;
 }
 
 Iterator Tree::begin() {
@@ -279,5 +226,5 @@ Iterator Tree::begin() {
 }
 
 Iterator Tree::end() {
-    
+    return Iterator(this, nodes.end());
 }

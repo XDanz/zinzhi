@@ -1,4 +1,5 @@
 #include <list>
+#include <string>
 
 using namespace std;
 
@@ -9,8 +10,8 @@ public:
     class Iterator;
     Tree();
     Tree(const Tree&);
-    Tree(const Type&);
-    Tree(const Type&, const list<Tree*>&);
+    Tree(const string&);
+    Tree(const string&, const list<Tree*>&);
     ~Tree();
     Tree& operator=(const Tree& t);
     bool operator=(const Tree&t) const;
@@ -21,19 +22,10 @@ public:
     int leaves() const;
     int height() const;
     int level(Iterator it) const;
-    int pathLenght();
     int width(int);
     int width();
     void print();
     string& root() const;
-    void reflect();
-    void defoliate();
-    Iterator insert(Iterator, const string& = string());
-    void erase(Iterator);
-    Iterator grow(Iterator, const string&);
-    void prune(Iterator);
-    Iterator attach(Iterator, Tree&);
-    int generations(Iterator, Iterator);
     Iterator begin();
     Iterator end();
     static bool isRoot(Iterator it);
@@ -68,14 +60,5 @@ protected:
     list<Node*> level(int n);
     list<Node*>::Iterator litn(Node*);
     list<Node*>::Iterator litp(Node*);
-    list<Node*>Iterator nextSibling(list<Node*>::Iterator);
+    list<Node*>::Iterator nextSibling(list<Node*>::Iterator);
 };
-
-// bint n(Node*);
-// int h(Node*);
-//int l(Node*,It);
-//Node* clone(Node*, List&, Node*);
-
-
-
-
