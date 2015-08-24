@@ -22,7 +22,7 @@ Tree::Node::Node(string x, Node* p): value(x), parent(p) {
 Tree::Tree() {
 }
 
-Tree::(const string& x) {
+Tree::Tree(const string& x) {
     nodes.push_back(new Node(x));
 }
 
@@ -44,9 +44,9 @@ Tree::Tree(const string& x, const list<Tree*>& list) {
             Node* p = tp->nodes.front(); // points to root 
             root->children.push_back(p);
             p->parent = root;
-            list<Tree*>::Iterator lit1 = tp->nodes.begin();
-            list<Tree*>::Iterator lit2 = tp->nodes.end();
-            list<Tree*>::Iterator lit3 = nodes.end();
+            list<Tree*>::iterator lit1 = tp->nodes.begin();
+            list<Tree*>::iterator lit2 = tp->nodes.end();
+            list<Tree*>::iterator lit3 = nodes.end();
             nodes.insert(lit3,lit1,lit2);   //append *tp's nodes
         }
     }
@@ -60,7 +60,7 @@ Node* Tree::clone(Node* p, list<Node*>& nodes, Node* parent) {
     list<Node*>& l = p->children;
     list<Node*>& cl = cp->children;
 
-    for (list<Node*>::Iterator LIt = l.begin(); LIt!=l.end(); LIt++)
+    for (list<Node*>::iterator LIt = l.begin(); LIt!=l.end(); LIt++)
         cl.push_back( clone(*Lit, nodes, cp));
 
     return cp;
@@ -68,7 +68,7 @@ Node* Tree::clone(Node* p, list<Node*>& nodes, Node* parent) {
 
 // Destructor    
 Tree::~Tree() {
-    for (list<Node*> lit = nodes.begin(); lit!=nodes.end(); lit++) {
+    for (list<Node*>::iterator lit = nodes.begin(); lit!=nodes.end(); lit++) {
         delete *lit;
     }
 }
@@ -81,7 +81,7 @@ Tree& Tree::operator=(const Tree& t) {
 }
 
 void Tree::clear() {
-    for (list<Node*>::Iterator lit = nodes.begin(); lit != lit.end(); lit++ ) {
+    for (list<Node*>::iterator lit = nodes.begin(); lit != nodes.end(); lit++ ) {
         delete *lit;
     }
     nodes.clear();
@@ -142,7 +142,7 @@ int Tree::height() const {
     return internal_height(nodes.front());
 }
 
-int internal_height(Node* p) {
+int Tree::internal_height(Node* p) {
     list<Node*> plist = p->children;
 
     if (plist.empty())
@@ -195,16 +195,16 @@ list<Node*> Tree::level(int n) {
     while (!q.empty()) {
         List<Node*>* p = q.front();
         List<Node*>& list = *p;
-        for (List<Node*>::Iterator lit = list.begin(); lit!=list.end(); lit++) {
+        for (List<Node*>::iterator lit = list.begin(); lit!=list.end(); lit++) {
             Node* p = *lit;
-            Iterator it (this, *lit);
+            iterator it (this, *lit);
             if (level(it) == n)
                 listn.push_back(*lit);
             q.push(&((*lit)->children));
         }
         q.pop();
     }
-    return listn;
+    return listn
 }
 
 
