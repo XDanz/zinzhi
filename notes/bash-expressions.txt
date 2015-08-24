@@ -125,4 +125,9 @@ ile:////home/danter/dev/nextgen/nextgen-market/nextgen-market-common/nextgen-mar
 for i in $(ls); do sed -i 's#file:///home/gspaces/deploy/grid/hystrix.properties#file:///home/gspaces/nextgen-support/nextgen-environment-scripts/src/main/resources/scripts/deploy/hystrix.properties#g' "$i" ; done
 
 
-for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i"; done 
+for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i"; done
+
+
+
+
+undeploy-application nextgen-market-ngm
