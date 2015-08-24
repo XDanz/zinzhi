@@ -4,7 +4,12 @@
 using namespace std;
 
 class Tree {
-    struct Node;
+    struct Node {
+        string value;
+        list<Node*> children;
+        Node* parent;
+        Node(string = string(), Node* = 0);
+    };
     list<Node*> nodes;
 public:
     class Iterator;
@@ -13,8 +18,8 @@ public:
     Tree(const string&);
     Tree(const string&, const list<Tree*>&);
     ~Tree();
-    Tree& operator=(const Tree& t);
-    bool operator=(const Tree&t) const;
+    Tree& operator=(const Tree&);
+    bool operator==(const Tree&) const;
     bool operator!=(const Tree&) const;
     void clear();
     bool empty() const;
@@ -24,7 +29,7 @@ public:
     int level(Iterator it) const;
     int width(int);
     int width();
-    void print();
+    void print() const;
     string& root() const;
     Iterator begin();
     Iterator end();
@@ -35,8 +40,7 @@ public:
     static Iterator youngestChild(Iterator it);
     static Iterator parent (Iterator it);
     static int numChildren(Iterator it);
-
-    friend class Iterator {
+    class Iterator {
         Tree* tree;
         list<Node*>::iterator lit;
     public:
@@ -48,17 +52,20 @@ public:
         bool operator==(const Iterator& it);
         bool operator!=(const Iterator& it);
         Iterator& operator++();  // prefix operator
-        Iterator  operator++(); // postfix increment
-        std::sring& operator*() const {
+        Iterator  operator++(int); // postfix increment
+        std::string& operator*() const {
             return (*lit)->value;
         }
         bool operator!();
         friend class Tree;
     };
 protected:
-    int inernal_leaves() const;
+    int internal_height(Node* p) const;
+    int internal_leaves(Node* p) const;
+    int internal_level(Node* p, Iterator it) const;
+    Node* tree_clone(Node* p, list<Node*>& nodes, Node* parent);
     list<Node*> level(int n);
     list<Node*>::iterator litn(Node*);
     list<Node*>::iterator litp(Node*);
-    list<Node*>::iterator nextSibling(list<Node*>::Iterator);
+    list<Node*>::iterator nextSibling(list<Node*>::iterator);
 };
