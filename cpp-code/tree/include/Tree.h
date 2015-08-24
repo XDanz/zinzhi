@@ -34,16 +34,16 @@ public:
     static bool isYoungestChild(Iterator it);
     static Iterator youngestChild(Iterator it);
     static Iterator parent (Iterator it);
-    static num numChildren(Iterator it);
+    static int numChildren(Iterator it);
 
     friend class Iterator {
         Tree* tree;
-        list<Node*>::Iterator lit;
+        list<Node*>::iterator lit;
     public:
         Iterator();
         Iterator(const Iterator&);
         Iterator(Tree*, Node* = 0);
-        Iterator(Tree*, lit);
+        Iterator(Tree*, Iterator lit);
         void operator=(const Iterator& it);
         bool operator==(const Iterator& it);
         bool operator!=(const Iterator& it);
@@ -58,7 +58,7 @@ public:
 protected:
     int inernal_leaves() const;
     list<Node*> level(int n);
-    list<Node*>::Iterator litn(Node*);
-    list<Node*>::Iterator litp(Node*);
-    list<Node*>::Iterator nextSibling(list<Node*>::Iterator);
+    list<Node*>::iterator litn(Node*);
+    list<Node*>::iterator litp(Node*);
+    list<Node*>::iterator nextSibling(list<Node*>::Iterator);
 };
