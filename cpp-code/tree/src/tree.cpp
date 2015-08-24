@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 Tree::Node::Node(string x, Node* p): value(x), parent(p) {
     if (!parent)
         parent = this;
@@ -186,7 +185,7 @@ list<Tree::Node*> Tree::level(int n) {
         list<Node*>* p = q.front();
         list<Node*>& list = *p;
 
-        for (list<Node*>::iterator lit = list.begin(); lit!=list.end(); lit++) {
+        for (std::list<Node*>::iterator lit = list.begin(); lit!=list.end(); lit++) {
             Node* p = *lit;
             Iterator it (this, *lit);
             if (level(it) == n)
@@ -213,10 +212,24 @@ string& Tree::root() const {
     return nodes.front()->value;
 }
 
-Iterator Tree::begin() {
-    return Iterator(this, nodes.begin());
+Tree::Iterator::Iterator() {
 }
 
-Iterator Tree::end() {
+Tree::Iterator::Iterator(const Iterator& it) :
+    tree(it.tree), lit(it.lit) {
+}
+
+Tree::Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
+    list<Node*> nodes = tree->nodes;
+}
+
+Tree::Iterator Tree::begin() {
+  return Tree::Iterator(this, nodes.begin());
+}
+
+Tree::Iterator::Iterator Tree::end() {
     return Iterator(this, nodes.end());
 }
+
+
+
