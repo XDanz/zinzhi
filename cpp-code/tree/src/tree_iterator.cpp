@@ -11,7 +11,7 @@ Tree::Iterator::Iterator(const Iterator& it) :
 
 Tree::Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
     list<Node*> nodes = tree->nodes;
-    lit = find(nodes.begin(), nodes.end(), p);
+    lit = std::find(nodes.begin(), nodes.end(), p);
 }
 
 Tree::Iterator::Iterator(Tree* tree, list<Tree*> lit): tree(tree), lit(lit) {
@@ -30,7 +30,7 @@ bool Tree::Iterator::operator!=(const Iterator& it) {
     return tree != it.tree || it.lit != lit;
 }
 
-Iterator& Tree::Iterator::operator++() {
+TreeIterator& Tree::Iterator::operator++() {
     ++lit;
     return *this;
 }

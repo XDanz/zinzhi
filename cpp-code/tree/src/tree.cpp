@@ -1,5 +1,6 @@
 #include <string>
 #include <list>
+#include <algorithm>
 #include <string>
 #include <queue>
 #include "Tree.h"
@@ -221,14 +222,15 @@ Tree::Iterator::Iterator(const Iterator& it) :
 
 Tree::Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
     list<Node*> nodes = tree->nodes;
+    lit = find(nodes.begin(), nodes.end(), p);
 }
 
 Tree::Iterator Tree::begin() {
-  return Tree::Iterator(this, nodes.begin());
+    return Tree::Iterator::Iterator(this, *nodes.begin());
 }
 
-Tree::Iterator::Iterator Tree::end() {
-    return Iterator(this, nodes.end());
+Tree::Iterator Tree::end() {
+    return Iterator(this, *nodes.end());
 }
 
 
