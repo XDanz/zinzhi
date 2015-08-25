@@ -131,3 +131,5 @@ for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i";
 
 
 undeploy-application nextgen-market-ngm
+
+cat out_ch[1-5].txt | sed 's/<\/Instrument>/<\/Instrument>\n/g' > sum_out.txt
