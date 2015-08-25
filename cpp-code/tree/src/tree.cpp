@@ -225,8 +225,13 @@ Tree::Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
     lit = find(nodes.begin(), nodes.end(), p);
 }
 
+Tree::Iterator::Iterator(Tree* tree, list<Node*>::iterator it) :
+  tree(tree), lit(it) {
+  
+}
+
 Tree::Iterator Tree::begin() {
-    return Tree::Iterator::Iterator(this, *nodes.begin());
+    return Tree::Iterator(this, nodes.begin());
 }
 
 Tree::Iterator Tree::end() {

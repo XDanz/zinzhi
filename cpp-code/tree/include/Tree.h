@@ -47,7 +47,7 @@ public:
         Iterator();
         Iterator(const Iterator&);
         Iterator(Tree*, Node* = 0);
-        Iterator(Tree*, Iterator);
+        Iterator(Tree*, list<Node*>::iterator it);
         void operator=(const Iterator& it);
         bool operator==(const Iterator& it);
         bool operator!=(const Iterator& it);
