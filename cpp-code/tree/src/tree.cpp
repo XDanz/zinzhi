@@ -1,5 +1,6 @@
 #include <string>
 #include <list>
+#include <iostream>
 #include <algorithm>
 #include <string>
 #include <queue>
@@ -29,6 +30,7 @@ Tree::Tree(const Tree& tree) {
 
 // Constructor add list as the children of x
 Tree::Tree(const string& x, const list<Tree*>& list) {
+  std::cout << "here" << std::endl;
     Node *root = new Node(x);
     nodes.push_back(root);
 
