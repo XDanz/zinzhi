@@ -30,12 +30,16 @@ Tree::Tree(const Tree& tree) {
 
 // Constructor add list as the children of x
 Tree::Tree(const string& x, const list<Tree*>& list) {
-  std::cout << "here" << std::endl;
     Node *root = new Node(x);
     nodes.push_back(root);
-
+    cout << " root = " << root->value << endl;
     for ( std::list<Tree*>::const_iterator cit = list.begin(); cit!= list.end(); cit++) {
-        if (!((*cit)->nodes).empty()) {
+        Tree* t = *cit;
+        Tree tt = *t;
+        cout << " cit = " << t->root() << endl;
+        cout << "  empty = " << !((*cit)->nodes).empty() << endl;
+        cout << "  size = " << ((*cit)->nodes).size() << endl;
+        if (!( (*cit)->nodes ).empty()) {
             Tree* tp = new Tree(**cit);  
             Node* p = tp->nodes.front(); // points to root 
             root->children.push_back(p);
@@ -165,16 +169,30 @@ int Tree::internal_level(Node* p, Iterator it) const {
     return -1;
 }
 
+void Tree::print()  {
+  int h = height();
+  cout << "nodes.size = " << nodes.size() << endl;
+  cout << "height = " << h << endl;
+  for ( int level=0; level<=h; level++)
+      print(level , string ("X",level));
+  cout << "\n";
+}
 
-void Tree::print() const {
-    
+void Tree::print(int n, string d)  {
+    cout << d << "print(" << n << ") -->" << endl;
+
+  list<Node*> chld = level(n);
+  cout << "size = " << chld.size() << endl;
+  for (list<Node*>::iterator it = chld.begin(); it!=chld.end(); it++)
+      cout << (*it)->value << " ";
+  cout << d << "print(" << n << ") --> ok" << endl;
 }
 
 // protected members
 list<Tree::Node*> Tree::level(int n) {
     list<Node*> listn;
 
-    if (listn.empty())
+    if (empty())
         return listn;
 
     queue<list<Node*>*> q;
@@ -182,14 +200,13 @@ list<Tree::Node*> Tree::level(int n) {
 
     if (n == 0)
         return list<Tree::Node*>(1,root);
-
+    
     q.push(&(root->children));
     while (!q.empty()) {
         list<Node*>* p = q.front();
         list<Node*>& list = *p;
 
         for (std::list<Node*>::iterator lit = list.begin(); lit!=list.end(); lit++) {
-            Node* p = *lit;
             Iterator it (this, *lit);
             if (level(it) == n)
                 listn.push_back(*lit);
@@ -199,7 +216,6 @@ list<Tree::Node*> Tree::level(int n) {
     }
     return listn;
 }
-
 
 
 int Tree::width(int) {

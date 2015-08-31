@@ -29,7 +29,7 @@ public:
     int level(Iterator it) const;
     int width(int);
     int width();
-    void print() const;
+    void print();
     string& root() const;
     Iterator begin();
     Iterator end();
@@ -40,6 +40,7 @@ public:
     static Iterator youngestChild(Iterator it);
     static Iterator parent (Iterator it);
     static int numChildren(Iterator it);
+
     class Iterator {
         Tree* tree;
         list<Node*>::iterator lit;
@@ -68,4 +69,5 @@ protected:
     list<Node*>::iterator litn(Node*);
     list<Node*>::iterator litp(Node*);
     list<Node*>::iterator nextSibling(list<Node*>::iterator);
+    void print(int,string);
 };
