@@ -2,7 +2,6 @@
 #include <list>
 #include <iostream>
 #include <algorithm>
-#include <string>
 #include <queue>
 #include "Tree.h"
 
@@ -22,25 +21,22 @@ Tree::Tree(const string& x) {
 }
 
 // cpy constructor
-Tree::Tree(const Tree& tree) {
-    if ( tree.nodes.empty() )
+Tree::Tree(const Tree& tree)
+{
+    if (tree.nodes.empty())
         return;
     tree_clone(tree.nodes.front(), nodes, 0);
 }
 
-// Constructor add list as the children of x
-Tree::Tree(const string& x, const list<Tree*>& list) {
+// Constructor. Add the list as the children of x
+Tree::Tree(const string& x, const list<Tree*>& list)
+{
     Node *root = new Node(x);
     nodes.push_back(root);
-    cout << " root = " << root->value << endl;
-    for ( std::list<Tree*>::const_iterator cit = list.begin(); cit!= list.end(); cit++) {
-        Tree* t = *cit;
-        Tree tt = *t;
-        cout << " cit = " << t->root() << endl;
-        cout << "  empty = " << !((*cit)->nodes).empty() << endl;
-        cout << "  size = " << ((*cit)->nodes).size() << endl;
-        if (!( (*cit)->nodes ).empty()) {
-            Tree* tp = new Tree(**cit);  
+
+    for (const auto tree: list) {
+        if (!(tree->nodes).empty()) {
+            Tree* tp = new Tree(*tree);
             Node* p = tp->nodes.front(); // points to root 
             root->children.push_back(p);
             p->parent = root;
@@ -53,24 +49,25 @@ Tree::Tree(const string& x, const list<Tree*>& list) {
 }
 
 // p copy to (dest), nodes - copy from (src)
-Tree::Node* Tree::tree_clone(Node* p, list<Node*>& nodes, Node* parent) {
+Tree::Node* Tree::tree_clone(Node* p, list<Node*>& nodes, Node* parent)
+{
     Node* cp = new Node(p->value, parent);
     nodes.push_back(cp);
 
     list<Node*>& l = p->children;
     list<Node*>& cl = cp->children;
 
-    for (list<Node*>::iterator LIt = l.begin(); LIt != l.end(); LIt++)
-        cl.push_back( tree_clone(*LIt, nodes, cp));
+    for (auto child: l)
+        cl.push_back( tree_clone(child, nodes, cp));
 
     return cp;
 }
 
 // Destructor    
-Tree::~Tree() {
-    for (list<Node*>::iterator lit = nodes.begin(); lit!=nodes.end(); lit++) {
-        delete *lit;
-    }
+Tree::~Tree()
+{
+    for (auto node: nodes)
+        delete node;
 }
 
 Tree& Tree::operator=(const Tree& t) {
@@ -97,8 +94,8 @@ bool Tree::operator!=(const Tree& t) const {
 }
 
 void Tree::clear() {
-    for (list<Node*>::iterator lit = nodes.begin(); lit!= nodes.end(); lit++) {
-        delete *lit;
+    for (auto node : nodes) {
+        delete node;
     }
     nodes.clear();
 }
@@ -107,8 +104,8 @@ bool Tree::empty() const {
     return nodes.empty();
 }
 
-int Tree::size() const {
-    return nodes.size();
+size_t Tree::size() const {
+    return (unsigned int) nodes.size();
 }
 
 int Tree::leaves() const {
@@ -125,8 +122,8 @@ int Tree::internal_leaves(Node* p) const {
         return 1; //*p is a leaf
 
     int n0 = 0;
-    for (list<Node*>::iterator lit = plist.begin(); lit != plist.end(); lit++) {
-        n0 += internal_leaves(*lit);
+    for (auto node : plist) {
+        n0 += internal_leaves(node);
     }
     return n0;
 }
@@ -143,8 +140,8 @@ int Tree::internal_height(Node* p) const {
   
     int h0 = 0;
 
-    for (list<Node*>::iterator plit = plist.begin(); plit != plist.end(); plit++) {
-        int h1 = internal_height(*plit);
+    for (auto node : plist) {
+        int h1 = internal_height(node);
         if ( h1 > h0)
             h0 = h1;
     }
@@ -160,9 +157,9 @@ int Tree::internal_level(Node* p, Iterator it) const {
         return -1; // the empty tree has height -1
     if (p->value == *it)
         return 0;
-    list<Node*> plist = p->children;
-    for (list<Node*>::iterator lit = plist.begin(); lit!= plist.end(); lit++) {
-        int lc = internal_level (*lit, it);
+
+    for (auto node: p->children) {
+        int lc = internal_level (node, it);
         if (lc > -1)
             return lc+1;
     }
@@ -170,22 +167,16 @@ int Tree::internal_level(Node* p, Iterator it) const {
 }
 
 void Tree::print()  {
-  int h = height();
-  cout << "nodes.size = " << nodes.size() << endl;
-  cout << "height = " << h << endl;
-  for ( int level=0; level<=h; level++)
-      print(level , string ("X",level));
-  cout << "\n";
+    int h = height();
+    for ( int level=0; level<=h; level++)
+        print(level);
+    cout << "\n";
 }
 
-void Tree::print(int n, string d)  {
-    cout << d << "print(" << n << ") -->" << endl;
-
-  list<Node*> chld = level(n);
-  cout << "size = " << chld.size() << endl;
-  for (list<Node*>::iterator it = chld.begin(); it!=chld.end(); it++)
-      cout << (*it)->value << " ";
-  cout << d << "print(" << n << ") --> ok" << endl;
+void Tree::print(int n)  {
+    list<Node*> level_nodes = level(n);
+    for (auto node: level_nodes)
+        cout << (node)->value << " ";
 }
 
 // protected members
@@ -206,11 +197,11 @@ list<Tree::Node*> Tree::level(int n) {
         list<Node*>* p = q.front();
         list<Node*>& list = *p;
 
-        for (std::list<Node*>::iterator lit = list.begin(); lit!=list.end(); lit++) {
-            Iterator it (this, *lit);
+        for (auto lit : list) {
+            Iterator it (this, lit);
             if (level(it) == n)
-                listn.push_back(*lit);
-            q.push(&((*lit)->children));
+                listn.push_back(lit);
+            q.push(&lit->children);
         }
         q.pop();
     }
@@ -244,7 +235,7 @@ Tree::Iterator::Iterator(Tree* tree, Node* p) : tree(tree) {
 }
 
 Tree::Iterator::Iterator(Tree* tree, list<Node*>::iterator it) :
-  tree(tree), lit(it) {
+    tree(tree), lit(it) {
   
 }
 
@@ -255,6 +246,3 @@ Tree::Iterator Tree::begin() {
 Tree::Iterator Tree::end() {
     return Iterator(this, *nodes.end());
 }
-
-
-
