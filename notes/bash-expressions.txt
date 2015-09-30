@@ -42,6 +42,26 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 
 "@Temporal\(TemporalType\.DATE\)"
 
+http://openstack03:9200/_status?pretty=true
+
+http://testnextgen03:9200/_status?pretty=1
+
+curl http://openstack02.test.aza.se:9200/orderbooks/_search?pretty=1&q=*SE0005704053
+
+jps -v | grep "com.gs.zones=${NIC_ADDR}_$ENV" | cut -d' ' -f1 | xargs kill
+
+
+
+ps aux | egrep ".*services=GSC$" --color | cut -d ' ' -f3 | wc -l
+
+
+tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-support/nextgen-jenkins/src
+ | sudo -u gssupervisor ssh -o StrictHostKeyChecking=no gspaces@openstack03.test.aza.se "tar -zx -C ~/test"
+
+
+
+
+http://openstack02.test.aza.se:8081/nextgen/client/
 
 for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 

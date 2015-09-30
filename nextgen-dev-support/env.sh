@@ -53,7 +53,8 @@ fi
 
 # export GSA_JAVA_OPTIONS="-Xmx128m"
 # export GSM_JAVA_OPTIONS="-Xmx128m"
-export GSC_JAVA_OPTIONS="-Xmx6g -Xms1g -Darchaius.configurationSource.additionalUrls=file://${GIGASPACES_HOME}/bin/hystrix.properties"
+export GSC_JAVA_OPTIONS="-Xmx6g -Xms1g -Darchaius.configurationSource.additionalUrls=file://${GIGASPACES_HOME}/bin/hystrix.properties -Dnextgen.market.properties.file=file:///home/danter/dev/nextgen/nextgen-market/nextgen-market-pu/nextgen-market-pu-deploy/src/main/resources/nextgen-local.properties -Dnextgen.properties.file=file:///home/danter/dev/nextgen/nextgen-pu/nextgen-pu-deploy/src/main/resources/nextgen-local.properties"
 
-export NUMBER_OF_GSCS=4
+
+export NUMBER_OF_GSCS=6
 source ${DEV_SUPPORT_HOME}/util/functions.sh
