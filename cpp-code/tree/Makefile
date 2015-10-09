@@ -19,7 +19,7 @@ TAGS:
 
 # $@ -- references to .o file, $< referneces the .cpp file
 objs/%.o: src/%.cpp 
-	$(CC) -c $< -I$(INCLUDE) -o $@ $(CFLAGS)
+	$(CC) -c $< -I$(INCLUDE) -o $@ $(CFLAGS) -g -gdwarf-2
 
 clean:
 	rm -f objs/*.o

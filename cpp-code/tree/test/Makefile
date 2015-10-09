@@ -8,9 +8,6 @@ OBJS = ../objs/tree.o test.o
 
 all: build
 
-tt:
-	@echo "$(OBJS)"
-
 build: $(OBJS) 
 
 TAGS:
@@ -21,11 +18,10 @@ TAGS:
 	$(CC) -c $< -I$(INCLUDE) -o $@ $(CFLAGS)
 
 ../objs/tree.o: ../src/tree.o
-	$(MAKE) -C ../src build
+1	$(MAKE) -C ../src build
 
-test1: $(OBJS)
+test: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@	
-
 
 clean:
 	rm -f ../objs/*.o
