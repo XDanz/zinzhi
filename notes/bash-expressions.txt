@@ -153,3 +153,10 @@ for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i";
 undeploy-application nextgen-market-ngm
 
 cat out_ch[1-5].txt | sed 's/<\/Instrument>/<\/Instrument>\n/g' > sum_out.txt
+
+
+monitor connections:
+while [ true ]; do sudo netstat --tcp -np -d | egrep "88.131.115.39\:3030[0-4]"; echo  ""; sleep 2; done
+
+mvn -Dmaven.repo.local=./maven_repository clean install -T 1C
+
