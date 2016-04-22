@@ -412,3 +412,15 @@ find . -type f -exec sudo rm -rf {} \;
 
 
 grep "^i;.*" nextgen-support/nextgen-soupbin/gcf_3.1.0_output.log | awk -F ";" '{ print $3 }' | sort | uniq
+
+git log --format='%H %an' |  grep "David Olsson"  |    cut -d ' ' -f1 | xargs -n1 git log -1
+
+
+/var/log/quickfix/omx-genium-inet-fixed-income/order-entry/recv0411.log
+
+
+jstack 217986 | grep -A 10 `echo "obase=16;231608" | bc | tr '[:upper:]' '[:lower:]'`
+
+
+
+
