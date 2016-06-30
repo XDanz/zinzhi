@@ -68,3 +68,7 @@ Run individual integration test (single method):
 
 $ mvn surefire:test -Dtest=com.so4it.nextgen.integration.test.api.account.StandardAccountIntegrationTest#\
   testCreateStandardAccount
+
+install custom jar to m2 repository:
+
+$ mvn install:install-file -Dfile=quickfixj-all-1.0.5.1.jar -DgroupId=com.so4it.nextgen -DartifactId=nextgen-quickfixj -Dversion=0.8.0 -Dpackaging=jar
