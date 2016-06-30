@@ -263,6 +263,7 @@ cat out_ch[1-5].txt | sed 's/<\/Instrument>/<\/Instrument>\n/g' > sum_out.txt
 
 
 monitor connections:
+--------------------
 while [ true ]; do sudo netstat --tcp -np -d | egrep "185.39.146.163\:3030[0-4]"; echo  ""; sleep 2; doneo
 
 watch -n0 'sudo netstat --tcp -np -d | egrep "185.39.146.163\:3050[0-4]"'
@@ -352,9 +353,12 @@ ps -ef | grep GSC | sed 's/ /\n/g' | grep prop
 
 ./nextgen-environment-scripts/src/main/resources/scripts/deploy/templates/tgw-ngm-zone.properties
 
-
-
+Block UDP traffic
+----------------
 sudo iptables -A INPUT -d 224.4.4.224 -p udp -m multiport --dports 61300 -j DROP
+sudo iptables -A OUTPUT -p tcp -m multiport --dport 30500 -j DROP
+
+
 
 
 for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
