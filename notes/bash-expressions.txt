@@ -453,6 +453,14 @@ Print only line 282106
 ---------------------
 sed '282106!d' gcf_3.1.0_output.log
 
+write image to disk.
+---------------------
+sudo dd if=xubuntu-14.04-desktop-i386.iso of=/dev/sdb bs=1M
+
+
+
+
+
 
 
 
