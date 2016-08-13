@@ -52,7 +52,7 @@ jps -v | grep "com.gs.zones=${NIC_ADDR}_$ENV" | cut -d' ' -f1 | xargs kill
 
 channelConnectionStateInfoRepository
 
-ps aux | egrep ".*services=GSC$" --color | cut -d ' ' -f3 | wc -l
+
 
 
 tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-support/nextgen-jenkins/src
@@ -63,9 +63,6 @@ sudo su -c "Your command right here" -s /bin/sh otheruser
 
 http://openstack02.test.aza.se:8081/nextgen/client/
 
-for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
-
-pstree -H <pid> gspaces
 
 netstat -tan --inet
  -t = tcp
@@ -73,7 +70,7 @@ netstat -tan --inet
  -c = continues show
 
 
-ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
+
 
 
 Network

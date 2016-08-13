@@ -1,0 +1,9 @@
+ps aux | egrep ".*services=GSC$" --color | cut -d ' ' -f3 | wc -l
+
+
+for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
+
+pstree -H <pid> gspaces
+
+
+ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan

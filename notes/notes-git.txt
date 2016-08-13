@@ -6,3 +6,7 @@ rebase:
 
 git checkout <branch-name>
 git rebase master
+
+git log --format='%H %an' |  grep "David Olsson"  |    cut -d ' ' -f1 | xargs -n1 git log -1
+
+git show <commit-hash> --summary
