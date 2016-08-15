@@ -1,0 +1,15 @@
+Portscan and only print success:
+
+$ nc -z -v <host> startport-endport 2>&1 | grep "success"
+
+Show process listen on port
+
+$ netstat -tulpn | grep :<port>
+
+netstat -tan --inet
+ -t = tcp
+ -u = udp
+ -n = numerical
+ -p = PID and name of the program to which each socket belongs
+ -a = show all listening and none-listening
+ -c = continues show
