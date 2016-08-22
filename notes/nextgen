@@ -1,0 +1,11 @@
+nextgen-market-pu-ngm-mdi
+
+nextgen-shell
+------------
+loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.common.ngm.api
+
+loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.mdi.ngm.service.listener
+loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.mdi.ngm.service.recovery.handler
+loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.mdi.ngm.service.recovery
+
+loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.market.mdi.oslo.service.handler.realtime
