@@ -1,2 +1,9 @@
 malloc[1-2]
 .#*
+.idea/
+CMakeLists.txt
+ch03/.idea/
+ch03/CMakeCache.txt
+ch03/CMakeFiles/
+ch03/Makefile
+ch03/cmake_install.cmake
