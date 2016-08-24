@@ -404,8 +404,11 @@ export PATH_TO_SCRIPT="~/nextgen-support/nextgen-environment-scripts/src/main/re
 export export SSH_CMD="sudo -u gssupervisor ssh -o StrictHostKeyChecking=no "
 export HOST_USER="gspaces"
 
+git --no-pager log --author="Daniel Terranova" | grep "commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | less
+git --no-pager log --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
+git --no-pager log --first-parent --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
 
-
+git --no-pager log --max-parents=1 --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
 
 curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumentId:442'
 curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumentName:SAS&pretty=1'
@@ -454,8 +457,9 @@ write image to disk.
 ---------------------
 sudo dd if=xubuntu-14.04-desktop-i386.iso of=/dev/sdb bs=1M
 
-
-
+show number of added lines in git
+---------------------
+git --no-pager log --max-parents=1 --author="Martin Andersson" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
 
 
 

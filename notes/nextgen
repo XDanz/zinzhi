@@ -9,3 +9,6 @@ loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it
 loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.mdi.ngm.service.recovery
 
 loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.market.mdi.oslo.service.handler.realtime
+
+
+NGM (nextver1.test.ngm.se) 185.39.146.163
