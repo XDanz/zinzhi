@@ -3,7 +3,7 @@
 
 void PrintVariant1 (int dim, int *pInt);
 void PrintVariant2 (int dim, int *pInt);
-void Printvariant3 (int dim, int *pInt);
+void PrintVariant3 (int dim, int *pInt);
 void
 ReadInts(int num, int a[]) {
   int i;
@@ -42,7 +42,7 @@ main (int argc, char** argv)
       PrintVariant2(dim , ia);
 
       printf ("Print backwards variant 3.! \n");
-      Printvariant3(dim , ia);
+      PrintVariant3 (dim, ia);
 
       free(ia);
     }
@@ -50,7 +50,7 @@ main (int argc, char** argv)
 }
 
 /// Print forward variant 3.
-void Printvariant3 (int dim, int *pInt)
+void PrintVariant3 (int dim, int *pInt)
 {
   /// print backwards
   while(dim--)
