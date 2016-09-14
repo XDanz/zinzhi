@@ -13,3 +13,7 @@ netstat -tan --inet
  -p = PID and name of the program to which each socket belongs
  -a = show all listening and none-listening
  -c = continues show
+
+TCP DUMP
+---------
+sudo tcpdump "host nextver1.test.ngm.se and (dst port 30400 or src port 30400)" -i eth0

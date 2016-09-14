@@ -10,5 +10,15 @@ loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it
 
 loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.market.mdi.oslo.service.handler.realtime
 
+- NGM CLIENT
+ mdi list-fast-cli  --key MDI-NGM-PUB-1
+ mdi list-con --key MDI-NGM-PUB-1
+ mdi list-logon-attempt-state --key MDI-NGM-PUB-1
 
 NGM (nextver1.test.ngm.se) 185.39.146.163
+
+
+
+Integration tests
+------------
+

@@ -1,0 +1,34 @@
+
+TickSizeList
+------------
+select count(*) from com.so4it.nextgen.reference.domain.instrument.SpaceTickSizeList where sourceSystemKey.id = 'NGM'
+mdi list-ticks --key MDI-NGM-PUB-1
+
+11140
+
+OrderBooks
+------------
+select count(*) from com.so4it.nextgen.reference.domain.orderbook.SpaceOrderBook where rownum < 100 and sourceSystemKey.id = 'NGM'
+select count(*) from com.so4it.nextgen.reference.domain.orderbook.SpaceOrderBook where rownum < 100 and ownerId.id = 'MDI-NGM'
+mdi list-orderbooks --key MDI-NGM-PUB-1
+
+11140
+
+
+mdi clear-orderbooks --key MDI-NGM-PUB-1
+
+mdi list-orderbooks --key MDI-NGM-PUB-1
+(11139)
+
+
+Markets
+------------
+select count(*) from com.so4it.nextgen.reference.domain.institution.SpaceMarket where rownum < 100 and sourceSystemKey.id = 'NGM'
+mdi list-markets --key MDI-NGM-PUB-1
+
+SubMarkets
+------------
+select count(*) from com.so4it.nextgen.reference.domain.institution.SpaceSubMarket where rownum < 100 and sourceSystemKey.id = 'NGM' and ownerId.id = 'MDI-NGM'
+mdi list-submarkets --key MDI-NGM-PUB-1
+
+
