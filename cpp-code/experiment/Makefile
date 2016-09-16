@@ -1,9 +1,9 @@
 # tests/test1 --
 CC = g++
-CFLAGS = -Wall -std=c++11
+CXXFLAGS = -Wall -std=c++11
 INCLUDES=includes
 SRC = $(wildcard src/*.cpp)
-OBJS = $(SRC:src/%.cpp=objs/%.o)
+#OBJS = $(SRC:src/%.cpp=objs/%.o)
   # ../../objs/date.o ../../objs/gregorian.o ../../objs/julian.o test.o
 # OBJS+= ../../objs/kattistime.o
 tt:
@@ -12,18 +12,25 @@ tt:
 all: $(OBJS)
 
 
-test_run: $(OBJS)
+test2: objs/test2.o
+	echo "DEBUG=${DEBUG}"
+	@echo $(OBJS)
 	$(CC) $(OBJS) -o $@
+
+debug: CXXFLAGS += -DDEBUG -g -gdwarf
+debug: test
 
 # $@ -- references to .o file, $< referneces the .cpp file
 objs/%.o: $(SRC)
-	$(CC) -c $< -o $@ $(CFLAGS) -I$(INCLUDES)
+	$(CC) -c $< -o $@ $(CXXFLAGS) -I$(INCLUDES)
 
 test: objs/test.o
-	$(CC) -o $@ $< $(CFLAGS)
+	$(CC) -o $@ $< $(CXXFLAGS)
 
 %.o: %.cpp
+	echo "dollar-star:" $*;
 	$(CC) -c $< $(CFLAGS)
 
 clean: 
 	rm -rf *.o *~
+	rm -f objs/*.o

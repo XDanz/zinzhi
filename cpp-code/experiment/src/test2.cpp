@@ -3,14 +3,13 @@
 namespace ABC {
     class A {
     public:
-      A(): _a{0},_b{0},_c{0} {
-        std::cout << "A::A() " << std::endl;
-      };
+        A(): _a{0},_b{0},_c{0} {
+            std::cout << "A::A() " << std::endl;
+        };
         A(const A& obj)            {
-            
-            std::cout << "A::A(const &A) =>" << std::endl;
+            std::cout << "(this= " << this << "A::A(const &A obj=(" << obj << ") =>" << std::endl;
             _a = obj._a; _b = obj._b; _c = obj._c;
-            std::cout << "A::A(const &A) => ok" << std::endl;
+            std::cout << "(this= " << this << ")A::A(const &A obj=(" << obj << ") => done" << std::endl;
         };
 
         A(A&& obj) {
@@ -23,12 +22,6 @@ namespace ABC {
             std::cout << "A::operator=(const &A) => ok" << std::endl;
             return *this;
         }
-
-        // virtual void adjust_values(int i) = 0;
-
-        // virtual int calc() const  = 0;
-
-        // virtual void toString(std::ostream&) const = 0;
 
         int getA() const { return _a; };
         int getB() const { return _b; };
