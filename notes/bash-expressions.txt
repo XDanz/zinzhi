@@ -85,6 +85,7 @@ $ sudo tcpdump -n -i wlan0 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
 listar arp cache
 $ arp -an
 
+$ ps -L --pid=8379 -o pid,tid,pcpu,state,nlwp,wchan:20,comm
 $ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
 $ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
