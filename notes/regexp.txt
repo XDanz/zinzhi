@@ -172,3 +172,11 @@ X, via zero-width positive lookbehind
 X, via zero-width negative lookbehind
 (?>X)
 X, as an independent, non-capturing group
+
+
+$ perl -ne 'print if /^BDt;i\d+;(\w+?;)+(ISn\w+?;){1}(\w+?);/' gcf_3.1.0_output.log
+
+
+$ sed  -n -e 's/^BDt;.*ISn\(\w*\).*/\1/p' gcf_3.1.0_output.log
+
+$ egrep "^BDt;.*ISn(\w+;)+" gcf_3.1.0_output.log
