@@ -17,6 +17,19 @@ loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it
 
 NGM (nextver1.test.ngm.se) 185.39.146.163
 
+./test2.awk bdui_UEt6.txt | xargs -I {} grep {} /home/danter/dev/nextgen/nextgen-support/nextgen-soupbin/gcf_3.1.0_output.log | grep "BDt"
+ ./test2.awk bdui_UEt6.txt | xargs  grep "BDt.*{}" gcf_output_prod.log
+ 
+./test2.awk bdui_UEt6.txt | sort | uniq | xargs -I {}  grep "BDt.*{}" gcf_output_prod.log
+
+awk -F ';' '{
+        for(i=1; i<=NF; i++) {
+                tmp=match($i, /ISn.*/)
+                if(tmp) {
+                        print $i
+                }
+        }
+}' $1
 
 
 Integration tests

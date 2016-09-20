@@ -458,3 +458,7 @@ find . -name *.java | xargs wc -l  | grep total | awk '
 
 
 
+grep "BDDe" gcf-log/gcf_3.1.0_output.log | awk -F ";" '{ print substr($2,2,length($2)) "," substr($8,4,length($8)); }' > nils.txt
+
+
+grep "ISn" bdui_UEt62.txt | awk -F ";" '{for(i=1;i<=NF;i++){if ($i ~ /^ISn/){print substr($i,4,length($i))}}}' | sort | uniq 
