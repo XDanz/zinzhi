@@ -10,6 +10,14 @@ loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it
 
 loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it.nextgen.market.mdi.oslo.service.handler.realtime
 
+
+OSLO
+----
+loglevel-jmx set --jmx-url service:jmx:rmi:///jndi/rmi://10.90.2.243:10166/jmxrmi --level WARNING --logger MITCH_TRACE
+--level FINE --logger com.so4it.nextgen.mitch.io.multicast
+
+loglevel-jmx set --jmx-url service:jmx:rmi:///jndi/rmi://10.90.2.243:10166/jmxrmi --level FINE --logger com.so4it.nextgen.mitch.io.multicast
+
 - NGM CLIENT
  mdi list-fast-cli  --key MDI-NGM-PUB-1
  mdi list-con --key MDI-NGM-PUB-1
@@ -35,3 +43,9 @@ awk -F ';' '{
 Integration tests
 ------------
 
+
+
+
+SPLUNK
+-----
+host=nextgen03.aza.se source=*oslo-mdi*  NOT "com.so4it.nextgen.market.api.listener.AbstractMarketConnectionStateHolder"

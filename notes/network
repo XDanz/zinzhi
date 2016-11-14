@@ -17,3 +17,7 @@ netstat -tan --inet
 TCP DUMP
 ---------
 sudo tcpdump "host nextver1.test.ngm.se and (dst port 30400 or src port 30400)" -i eth0
+
+UDP DUMP
+--------
+sudo tcpdump -n udp dst port 61300 -i eth0.510
