@@ -31,7 +31,7 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 "@Table\(name\s*=\s*.*\)"
 "@Embedded"
 
-
+SE0008374813
 
 "@AttributeOverride\(name\s*=\s*.\,\s*column\s*=\s*@Column\(name\s*=\s*.*\)\)"
 
@@ -462,3 +462,16 @@ grep "BDDe" gcf-log/gcf_3.1.0_output.log | awk -F ";" '{ print substr($2,2,lengt
 
 
 grep "ISn" bdui_UEt62.txt | awk -F ";" '{for(i=1;i<=NF;i++){if ($i ~ /^ISn/){print substr($i,4,length($i))}}}' | sort | uniq 
+
+start elastic search
+-------------------
+sudo bin/elasticsearch --config /etc/elasticsearch/elasticsearch.yml
+
+
+cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r  's/<?xml version="1.0" encoding="UTF-8"?>//g'
+
+
+cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' |  while read line ; do echo $line > $(echo $line | sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p').xml ;done
+
+
+cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' |  while read line1 ; do line=$line1; echo $line > gen/$(echo $line | sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p').xml ;done
