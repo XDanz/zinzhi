@@ -13,6 +13,12 @@ loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it
 
 OSLO
 ----
+on my local machine:
+./udp_server 6100 225.0.0.37 6130
+
+on the multicast site:
+./mc_proxy 224.4.4.224 61300 172.16.8.101 6100
+
 loglevel-jmx set --jmx-url service:jmx:rmi:///jndi/rmi://10.90.2.243:10166/jmxrmi --level WARNING --logger MITCH_TRACE
 --level FINE --logger com.so4it.nextgen.mitch.io.multicast
 
@@ -39,6 +45,10 @@ awk -F ';' '{
         }
 }' $1
 
+
+GCF
+---
+awk -F ";"  '/BDm;.*;s2.*/ {print substr($2, 2,length($2))}' ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log  | xargs -I {} egrep -c "s2;.*;Mk{}" ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log
 
 Integration tests
 ------------
