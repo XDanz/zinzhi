@@ -1,1 +1,4 @@
+Mongo queries (examples)
+-----------------------
 db.spaceSubMarket.find({"sourceSystemKey" : { "value" : "NGM"}}, {"sourceId": 1})
+
