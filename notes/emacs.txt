@@ -1,0 +1,3 @@
+open file as sudo:
+
+C-x C-f /sudo::/path/to/file
