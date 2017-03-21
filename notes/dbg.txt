@@ -1,0 +1,76 @@
+for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
+
+ pstree -H 118879 gspaces
+
+
+ netstat -tan --inet
+ -t = tcp
+ -a = show all listening and none-listening
+
+118580
+
+
+ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
+
+SpaceOrderBook 9374
+SpaceCombinationOrderBook 12
+SpaceStandardOrderBook 9362
+
+SpaceInstrument 19307
+
+
+http://openstack03:9200/_status?pretty=true
+
+http://testnextgen03:9200/_status?pretty=1
+
+curl http://openstack02.test.aza.se:9200/orderbooks/_search?pretty=1&q=*SE0005704053
+
+jps -v | grep "com.gs.zones=${NIC_ADDR}_$ENV" | cut -d' ' -f1 | xargs kill
+
+
+
+ps aux | egrep ".*services=GSC$" --color | cut -d ' ' -f3 | wc -l
+
+
+tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-support/nextgen-jenkins/src
+ | sudo -u gssupervisor ssh -o StrictHostKeyChecking=no gspaces@openstack03.test.aza.se "tar -zx -C ~/test"
+
+
+
+
+http://openstack02.test.aza.se:8081/nextgen/client/
+
+export PATH_TO_SCRIPT="~/nextgen-support/nextgen-environment-scripts/src/main/resources/scripts/"
+export export SSH_CMD="sudo -u gssupervisor ssh -o StrictHostKeyChecking=no "
+export HOST_USER="gspaces"
+
+sudo -u gspaces /usr/java/java8/bin/jmap -histo:live 5666 | grep "Total" | awk '{print $3}'
+sudo -u gspaces /usr/java/java8/bin/jmap -histo:live 5666
+
+
+
+Instructing agent 10.90.2.158_ACC1 to start 4 GSCs of zone account with options -Xmx10g -Xms10g -Darchaius.configurationSource.additionalUrls=file: -Dcom.gigaspaces.system.registryPort=1098
+Starting 4 containers with zone account on agent 10.90.2.158_ACC1
+Using VM arguments: -Dcom.gs.zones=account -Xmx10g -Xms10g -Darchaius.configurationSource.additionalUrls=file: -Dcom.gigaspaces.system.registryPort=1098
+
+nstructing agent 10.90.2.68_ACC1 to start 4 GSCs of zone account with options -Xmx10g -Xms10g -Darchaius.configurationSource.additionalUrls=file: -Dcom.gigaspaces.system.registryPort=1098
+Starting 4 containers with zone account on agent 10.90.2.68_ACC1
+Using VM arguments: -Dcom.gs.zones=account -Xmx10g -Xms10g -Darchaius.configurationSource.additionalUrls=file: -Dcom.gigaspaces.system.registryPort=1098
+
+
+curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumentId:442'
+curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumentName:SAS&pretty=1'
+
+
+
+
+
+016-03-30 14:16:08,031 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceOrderDropCopyExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.DropCopyExecutionReportHandler@4018b6ca'
+2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceDealCancelExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.DealCancelExecutionReportHandler@74ac80ba'
+2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceOrderEntryExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.OrderEntryExecutionReportHandler@3fb0fce3'
+2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceRejectedMarketOrder' : 'com.so4it.nextgen.tgw.service.handler.RejectedMarketOrderHandler@6b25d6dc'
+2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.combination.SpaceOrderEntryCombinationExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.OrderEntryExecutionReportHandler@3fb0fce3'
+
+8=FIXT.1.1|9=51|35=5|34=149=PUB-452=20160426-11:04:10.29156=NGM10=071
+this     - value: quickfix.Session #5
+ -> lastSessionLogon     - class: quickfix.Session, value: long 1462932964515

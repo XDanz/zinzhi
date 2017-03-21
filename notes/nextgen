@@ -36,7 +36,7 @@ NGM (nextver1.test.ngm.se) 185.39.146.163
  
 ./test2.awk bdui_UEt6.txt | sort | uniq | xargs -I {}  grep "BDt.*{}" gcf_output_prod.log
 
-awk -F ';' '{
+awk -F ';' '{             
         for(i=1; i<=NF; i++) {
                 tmp=match($i, /ISn.*/)
                 if(tmp) {
@@ -49,6 +49,10 @@ awk -F ';' '{
 GCF
 ---
 awk -F ";"  '/BDm;.*;s2.*/ {print substr($2, 2,length($2))}' ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log  | xargs -I {} egrep -c "s2;.*;Mk{}" ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log
+
+
+awk -F ";" '/^o;/ { print substr($2,2,length($2)) }' /home/danter/dev/nextgen/nextgen-support/nextgen-soupbin/gcf_3.1.0_output_tst4.log | sort | uniq -c
+awk -F ";" '/^o;/ { print substr($2,2,length($2)) }' /home/danter/dev/nextgen/nextgen-support/nextgen-soupbin/gcf_3.1.0_output_tst4.log | sort | uniq -c | sort -n -k1
 
 Integration tests
 ------------
