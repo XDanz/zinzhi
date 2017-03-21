@@ -51,14 +51,24 @@ GCF
 awk -F ";"  '/BDm;.*;s2.*/ {print substr($2, 2,length($2))}' ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log  | xargs -I {} egrep -c "s2;.*;Mk{}" ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log
 
 
+
 awk -F ";" '/^o;/ { print substr($2,2,length($2)) }' /home/danter/dev/nextgen/nextgen-support/nextgen-soupbin/gcf_3.1.0_output_tst4.log | sort | uniq -c
 awk -F ";" '/^o;/ { print substr($2,2,length($2)) }' /home/danter/dev/nextgen/nextgen-support/nextgen-soupbin/gcf_3.1.0_output_tst4.log | sort | uniq -c | sort -n -k1
 
+egrep "BDDe;.*;DTy([^4-5]|1[^0-1]);.*" ~/Dropbox/work/gcf-log/tst1/2017/03/15/gcf_3.1.0_output_tst1.log
+
+Tot:36951
+Option:33842 1
+Future: 1415 2
+Forward: 667 3
+FRA: 130     6
+SWAP: 108    7
+MiscDerivitive: 153  9
+RepoBuySellBack 636 14
+
+
 Integration tests
 ------------
-
-
-
 
 SPLUNK
 -----
