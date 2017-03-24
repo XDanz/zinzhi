@@ -46,8 +46,8 @@ awk -F ';' '{
 }' $1
 
 
-GCF
----
+1. GCF
+------
 awk -F ";"  '/BDm;.*;s2.*/ {print substr($2, 2,length($2))}' ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log  | xargs -I {} egrep -c "s2;.*;Mk{}" ~/Dropbox/work/gcf-log/tst2/2017/01/13/gcf_3.1.0_output_tst2.log
 
 
@@ -67,9 +67,93 @@ MiscDerivitive: 153  9
 RepoBuySellBack 636 14
 
 
+OrderBooks:
+
+i179 - WallenStam
+i291 - ABB Ltd
+i68 - Ericsson A
+i69 - Ericsson B
+
+
+NOIi:
+
+Ps - Paired Shares , The total number of shares that are eligable to be matched at the current reference price
+IMs - Imbalanced Shares , The total number of shares that are not paired at the Current Reference Price
+IMd - The Market side of the order imbalance
+    1. BuyImbalance
+    2. SellImbalance
+    3. NoImbalance
+    4. InsufficientOrderToCalculate
+
+APl - Ask price at level 1 
+Bpr - Bid price at level 1
+AVl - Ask volume at top of book, or aggregated at eq price if the order is crossed
+BVl - Bid volume
+EQp - Equilibrium price in call
+CRt  - Type of cross
+     1. OpeningCross
+     2. ClosingCross
+     3. CrossForHaltedSecurities
+     4. ScheduledIntradayAuction
+     5. AuctionOnDemand
+
+Algorithm:
+
+sufficient() {
+  return IMd != 3
+ }
+
+if (sufficient() && EQp > 0) {
+    sellSide = { EQp, imDir(SELL)}
+    buySide =  { EQp, imDir(BUY) }
+} else {
+    sellSide = { BPr, BVl}
+    buySide = { APl, AVl}
+}
+
+imDir(DIR) {
+  if (IMd == DIR) {
+    return Ps + IMs
+  } else {
+    return Ps
+  }
+}
+
+
+
+
+
+
 Integration tests
 ------------
 
 SPLUNK
 -----
 host=nextgen03.aza.se source=*oslo-mdi*  NOT "com.so4it.nextgen.market.api.listener.AbstractMarketConnectionStateHolder"
+
+
+Reference:
+  SpaceInstrument
+    SpaceExchangeTradedProduct
+    SpaceOtherAsset
+    SpaceShare
+    SpaceBond
+    SpaceDerivate
+    SpaceFund
+    SpaceIndex
+
+
+InstrumentClassification:
+  INSTRUMENT
+     EXCHANGE_TRADED_PRODUCTS
+          LEVERAGE_PRODUCT
+                LEVERAGE_PRODUCTS_WITHOUT_KNOCK_OUT
+                     WARRANT
+                     SPREAD_WARRANT
+                     MISCELLANEOUS_LEVERAGE_WITHOUT_KNOCK_OUT
+                     
+     OTHER_ASSETS
+          MORTGAGE_BACKED_SECURITIES
+     
+    
+                
