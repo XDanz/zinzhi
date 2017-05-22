@@ -480,3 +480,6 @@ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p
 Print All Securities on NGM
 
 cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' | while read line1 ; do line=$line1; echo $line| sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p'; done
+
+
+cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]/\n/p'
