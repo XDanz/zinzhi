@@ -57,6 +57,9 @@ awk -F ";" '/^o;/ { print substr($2,2,length($2)) }' /home/danter/dev/nextgen/ne
 
 egrep "BDDe;.*;DTy([^4-5]|1[^0-1]);.*" ~/Dropbox/work/gcf-log/tst1/2017/03/15/gcf_3.1.0_output_tst1.log
 
+
+ egrep -B 10 "SEVERE.*TIPBasicDataMessageDerivative" *.log | less
+ 
 Tot:36951
 Option:33842 1
 Future: 1415 2
