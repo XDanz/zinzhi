@@ -481,11 +481,10 @@ Print All Securities on NGM
 
 cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' | while read line1 ; do line=$line1; echo $line| sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p'; done
 
-<<<<<<< 9cb1ba55a15322f8497b4945ef55ea6d8b2cc792
 
 cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]/\n/p'
-=======
-3S6M
 
 jstat -gsutil 8038
->>>>>>> notes
+
+cat out_ch1.txt | sed  -n 's/.*RelatedSym/\n/g'
+
