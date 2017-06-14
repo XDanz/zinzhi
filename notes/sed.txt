@@ -13,4 +13,6 @@ sed -n '50000,$s/time spent/&/p' myfile.txt
 The format to specify the range is as follow: start,end We just instruct sed to work from line 50000 to $ which means last line.
 sed -n 's/pattern/&/p'
 
+    
+sed -s "s/\^A/\x01/g"
 
