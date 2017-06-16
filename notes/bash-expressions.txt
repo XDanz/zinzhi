@@ -488,3 +488,6 @@ jstat -gsutil 8038
 
 cat out_ch1.txt | sed  -n 's/.*RelatedSym/\n/g'
 
+sed -s 's/1185=/\n\n/g' /var/log/quickfix/ngm/price/FIXT.1.1-PUB-5-NGM.messages.log | sed -s 's/20036/\n/g' | egrep -a xml
+sed -s 's/\0x01/\n/g' pub5.log
+
