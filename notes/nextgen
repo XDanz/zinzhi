@@ -14,9 +14,11 @@ loglevel set --pu-name nextgen-market-pu-ngm-mdi --level FINE --logger com.so4it
 OSLO
 ----
 on my local machine:
+./udp_server <LISTENING-PORT> <FAKE-MULTICAST-GROUP> <FAKE-MULTICAST-PORT>
 ./udp_server 6100 225.0.0.37 6130
 
 on the multicast site:
+./mc_proxy <real-multicast-group> <PORT> <DESTINATION-IP> <DESTINATION-PORT>
 ./mc_proxy 224.4.4.224 61300 172.16.8.101 6100
 
 loglevel-jmx set --jmx-url service:jmx:rmi:///jndi/rmi://10.90.2.243:10166/jmxrmi --level WARNING --logger MITCH_TRACE
@@ -123,10 +125,13 @@ imDir(DIR) {
 }
 
 
+Openstack02:
+egrep "OrderBookStateCode{" *2017-08-28~13.23-gigaspaces-gsc_44-zone-10.90.2.243-157020* | awk -F " " '{ print $12 }' | sort | uniq | wc -l
 
+Openstack03:
+egrep "OrderBookStateCode" *2017-08-28~13.23-gigaspaces-gsc_53-zone-10.90.2.244* | awk -F " " '{ print $13 }' | sort | uniq | wc -l
 
-
-
+FILTER_LIST:482,356,54,490
 Integration tests
 ------------
 
@@ -159,4 +164,34 @@ InstrumentClassification:
           MORTGAGE_BACKED_SECURITIES
      
     
-                
+8=FIXT.1.1
+9=000403
+35=8
+49=GENIUM_TEST
+56=SEAVA^A34=6^A57=TRA01
+52=20170801-12:52:02.585
+37=5F7738C100030104
+11=OPN12002
+453=4
+448=AOR001
+447=D
+452=53
+448=1
+447=P
+452=3
+
+2376=24
+448=1
+447=P
+452=122
+
+2376=24
+448=1
+447=P
+452=12
+2376=24^A17=2^A150=0^A39
+=0^A1=10000340^A20009=10000340^A70=10000340^A55=OMXS307L1280^A48=88212410^A22=M^A54=1^A38=100.0000000^A40=2^A44=1.0000000^A59=0^A528=A^A151=100.0000000^A14=0^A6=0^A60=20170801-12:52:02.580959700^A10=069^A
+
+
+less results.txt.csv | awk '{print substr($1, 2,length($1))}' | awk '{print substr($1,1, length($1))-1}' | less
+awk 'FNR==NR {a[$0]++; next} !a[$0]' fromlog.txt results2.txt

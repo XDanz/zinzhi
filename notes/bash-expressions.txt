@@ -31,7 +31,6 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 "@Table\(name\s*=\s*.*\)"
 "@Embedded"
 
-SE0008374813
 
 "@AttributeOverride\(name\s*=\s*.\,\s*column\s*=\s*@Column\(name\s*=\s*.*\)\)"
 
@@ -50,11 +49,7 @@ curl http://openstack02.test.aza.se:9200/orderbooks/_search?pretty=1&q=*SE000570
 
 jps -v | grep "com.gs.zones=${NIC_ADDR}_$ENV" | cut -d' ' -f1 | xargs kill
 
-channelConnectionStateInfoRepository
-
-
 su jenkins -s /bin/bash
-
 
 tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-support/nextgen-jenkins/src
  | sudo -u gssupervisor ssh -o StrictHostKeyChecking=no gspaces@openstack03.test.aza.se "tar -zx -C ~/test"
@@ -62,41 +57,12 @@ tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-suppo
 
 sudo su -c "Your command right here" -s /bin/sh otheruser
 
-http://openstack02.test.aza.se:8081/nextgen/client/
-
-
-netstat -tan --inet
- -t = tcp
- -a = show all listening and none-listening
- -c = continues show
-
-
-
-
-
-Network
-------
-sniffar arp paket
-$ sudo tcpdump -n -i wlan0 arp
-
-
-$ sudo tcpdump -n -i wlan0 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
-
-listar arp cache
-$ arp -an
-
 $ ps -L --pid=8379 -o pid,tid,pcpu,state,nlwp,wchan:20,comm
 $ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
 $ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 
  pstree -H 118879 gspaces
-
-
- netstat -tan --inet
- -t = tcp
- -a = show all listening and none-listening
-
 
 
 Packge Management
@@ -173,38 +139,13 @@ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i |
 
 pstree -H <pid> gspaces
 
-netstat -tan --inet
- -t = tcp
- -a = show all listening and none-listening
- -c = continues show
-
-
 ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
-
-
-Network
-------
-sniffar arp paket
-$ sudo tcpdump -n -i wlan0 arp
-
-
-$ sudo tcpdump -n -i wlan0 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
-
-listar arp cache
-$ arp -an
 
 $ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
 $ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 
  pstree -H 118879 gspaces
-
-
- netstat -tan --inet
- -t = tcp
- -a = show all listening and none-listening
-
-
 
 Packge Management
 -----------------
@@ -342,7 +283,7 @@ mvn -Dmaven.repo.local=./maven_repository clean install -T 1C
 java -cp nextgen-market-common-mitch-0.6.0-SNAPSHOT-executable.jar com.so4it.nextgen.mitch.tools.Sniffer 224.4.4.224:61300
 
 
-
+sudo tcpdump -i bond0.510 udp port 61300 and host 224.4.5.226 -X
 
 
 
@@ -433,6 +374,7 @@ jstack 217986 | grep -A 10 `echo "obase=16;231608" | bc | tr '[:upper:]' '[:lowe
 // jstack on betatest
 watch -n0  'sudo -s -u gspaces /usr/java/java8/bin/jstack 161714 | grep -A 10 "FAST"'
 
+18013
 
 git show <commit-hash> --summary
 
@@ -484,10 +426,15 @@ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p
 
 cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]/\n/p'
 
+
 jstat -gsutil 8038
 
 cat out_ch1.txt | sed  -n 's/.*RelatedSym/\n/g'
 
 sed -s 's/1185=/\n\n/g' /var/log/quickfix/ngm/price/FIXT.1.1-PUB-5-NGM.messages.log | sed -s 's/20036/\n/g' | egrep -a xml
 sed -s 's/\0x01/\n/g' pub5.log
+
+3S6M
+
+jstat -gsutil 8038
 

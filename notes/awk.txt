@@ -1,0 +1,1 @@
+awk -F ';' '/^BDNt/ { print "\x27" substr($8,4,length($8)) "\x27"}'  /home/danter/dev/nextgen/nextgen-support/nextgen-soupbin/gcf_3.1.0_output_tst3.log

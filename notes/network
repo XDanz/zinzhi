@@ -21,3 +21,15 @@ sudo tcpdump "host nextver1.test.ngm.se and (dst port 30400 or src port 30400)" 
 UDP DUMP
 --------
 sudo tcpdump -n udp dst port 61300 -i eth0.510
+
+
+Network
+------
+sniffar arp paket
+
+$ sudo tcpdump -n -i wlan0 arp
+
+$ sudo tcpdump -n -i wlan0 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
+
+listar arp cache
+$ arp -an
