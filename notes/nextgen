@@ -195,3 +195,7 @@ InstrumentClassification:
 
 less results.txt.csv | awk '{print substr($1, 2,length($1))}' | awk '{print substr($1,1, length($1))-1}' | less
 awk 'FNR==NR {a[$0]++; next} !a[$0]' fromlog.txt results2.txt
+
+Lägg till om man ska köra:
+ReferenceInstrumentMarketRemoteService service = new ExecutorRemotingProxyConfigurer<>(referenceGigaSpace, ReferenceInstrumentMarketRemoteService.class).proxy();
+-Dhystrix.command.default.circuitBreaker.enabled=false -Dhystrix.command.default.execution.isolation.strategy=SEMAPHORE -Dhystrix.command.default.execution.isolation.semaphore.maxConcurrentRequests=100000 -Dhystrix.command.default.execution.timeout.enabled=false -Dhystrix.command.default.circuitBreaker.enabled=false -Dhystrix.command.default.fallback.enabled=false

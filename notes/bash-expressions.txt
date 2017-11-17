@@ -2,7 +2,6 @@ check for unadded java files:
 
 $ svn status | grep ^\?.*\.java
 
-er
 find out the model of your graphics card
 (NVIDIA Corporation GK107M [GeForce GT 755M])
 (lenovo Y510P)
@@ -347,11 +346,6 @@ export PATH_TO_SCRIPT="~/nextgen-support/nextgen-environment-scripts/src/main/re
 export export SSH_CMD="sudo -u gssupervisor ssh -o StrictHostKeyChecking=no "
 export HOST_USER="gspaces"
 
-git --no-pager log --author="Daniel Terranova" | grep "commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | less
-git --no-pager log --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
-git --no-pager log --first-parent --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
-
-git --no-pager log --max-parents=1 --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
 
 curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumentId:442'
 curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumentName:SAS&pretty=1'
@@ -374,7 +368,7 @@ jstack 217986 | grep -A 10 `echo "obase=16;231608" | bc | tr '[:upper:]' '[:lowe
 // jstack on betatest
 watch -n0  'sudo -s -u gspaces /usr/java/java8/bin/jstack 161714 | grep -A 10 "FAST"'
 
-18013
+18013o
 
 git show <commit-hash> --summary
 
@@ -438,3 +432,9 @@ sed -s 's/\0x01/\n/g' pub5.log
 
 jstat -gsutil 8038
 
+ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
+
+sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
+
+
+sed -r -n 's#.*<Instrument xmlns=\"http:\/\/www.ngm.se/ns/InstrumentSchema/1.16.3\" xmlns:xsi=\"http:\/\/www.w3.org/2001/XMLSchema\">(.*)<\/Instrument>.*#<Instrument>\1</Instrument>\n#p' FIXT.1.1-PUB-6-NGM.messages.log_2

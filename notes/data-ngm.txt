@@ -32,3 +32,13 @@ select count(*) from com.so4it.nextgen.reference.domain.institution.SpaceSubMark
 mdi list-submarkets --key MDI-NGM-PUB-1
 
 
+3R03 - SE0004548451 - InstrumentID: 420001, OrderbookID: 416001 , RENT MTF
+3T0L - SE0009690811 - InstrumentID: 481014, OrderBookID: 476002
+3TGT - SE0009696735 - InstrumentID: 
+
+3KNF - SE0009357536
+3SR9 - DE000CR7QNS2
+3SXX - DE000CR7QPS7 - InstrumentID: 471021, OrderbookID: 469010
+
+
+
