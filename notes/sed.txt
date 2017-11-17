@@ -16,3 +16,9 @@ sed -n 's/pattern/&/p'
     
 sed -s "s/\^A/\x01/g"
 
+
+Print all lines between two line numbers:
+
+sed -n '3,6p' /path/to/file
+
+
