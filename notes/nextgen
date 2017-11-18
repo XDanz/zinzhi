@@ -60,6 +60,10 @@ awk -F ";" '/^o;/ { print substr($2,2,length($2)) }' /home/danter/dev/nextgen/ne
 egrep "BDDe;.*;DTy([^4-5]|1[^0-1]);.*" ~/Dropbox/work/gcf-log/tst1/2017/03/15/gcf_3.1.0_output_tst1.log
 
 
+egrep "BDUi;.*;UEt1;.*ULt10" ~/Dropbox/work/gcf-log/tst1/2017/09/gcf_3.1.0_output_tst1.log | awk -F ';'  '{ print substr($5,4,length($5))}' | sort | uniq
+
+
+
  egrep -B 10 "SEVERE.*TIPBasicDataMessageDerivative" *.log | less
  
 Tot:36951
