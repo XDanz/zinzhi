@@ -65,6 +65,11 @@ egrep "BDUi;.*;UEt1;.*ULt10" ~/Dropbox/work/gcf-log/tst1/2017/09/gcf_3.1.0_outpu
 
 
  egrep -B 10 "SEVERE.*TIPBasicDataMessageDerivative" *.log | less
+
+
+2. NGM
+egrep -a "35=y"  FIXT.1.1-PUB-1-NGM.messages.log | sed -s 's/10=\d+/\n\n/g' | sed -s 's/\x01/\x01\n/g' | less
+
  
 Tot:36951
 Option:33842 1
@@ -77,6 +82,7 @@ RepoBuySellBack 636 14
 
 
 OrderBooks:
+-----------
 
 i179 - WallenStam
 i291 - ABB Ltd
