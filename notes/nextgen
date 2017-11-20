@@ -70,6 +70,8 @@ egrep "BDUi;.*;UEt1;.*ULt10" ~/Dropbox/work/gcf-log/tst1/2017/09/gcf_3.1.0_outpu
 2. NGM
 egrep -a "35=y"  FIXT.1.1-PUB-1-NGM.messages.log | sed -s 's/10=\d+/\n\n/g' | sed -s 's/\x01/\x01\n/g' | less
 
+egrep -a "35=y" FIXT.1.1-PUB-1-NGM.messages.log | sed -s 's/10=\d+/\n\n/g' | egrep -a "2X7" | sed -n '1p' 
+
  
 Tot:36951
 Option:33842 1
