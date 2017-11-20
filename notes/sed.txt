@@ -21,4 +21,10 @@ Print all lines between two line numbers:
 
 sed -n '3,6p' /path/to/file
 
+sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
+
+sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
+
+
+
 
