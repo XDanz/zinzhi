@@ -64,13 +64,16 @@ curl -XGET 'http://testnextgen02.test.aza.se:9200/orderbooks/_search?q=instrumen
 
 
 
+alias ij='/home/danter/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/172.4343.14/bin/idea.sh'
+alias ij='/home/danter/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/172.4343.14/bin/idea.sh'
 
-016-03-30 14:16:08,031 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceOrderDropCopyExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.DropCopyExecutionReportHandler@4018b6ca'
-2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceDealCancelExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.DealCancelExecutionReportHandler@74ac80ba'
-2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceOrderEntryExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.OrderEntryExecutionReportHandler@3fb0fce3'
-2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.SpaceRejectedMarketOrder' : 'com.so4it.nextgen.tgw.service.handler.RejectedMarketOrderHandler@6b25d6dc'
-2016-03-30 14:16:08,367 nextgen-market-pu-omx-tgw-inet.1 [1] INFO[GS-LRMI Connection-pool-1-thread-2-80] [com.so4it.nextgen.tgw.service.listener.ExecutionReportFifoListener] - 'class com.so4it.nextgen.tgw.domain.order.combination.SpaceOrderEntryCombinationExecutionReport' : 'com.so4it.nextgen.tgw.service.handler.OrderEntryExecutionReportHandler@3fb0fce3'
-
-8=FIXT.1.1|9=51|35=5|34=149=PUB-452=20160426-11:04:10.29156=NGM10=071
-this     - value: quickfix.Session #5
- -> lastSessionLogon     - class: quickfix.Session, value: long 1462932964515
+db.spaceAccontSettings.aggregate(
+    { $group: { 
+        _id: { accountId: "$accountId", settingDefinitionId: "$settingDefinitionId" },
+        count: { $sum:  1 },
+        docs: { $push: "$_id" }
+    }},
+    { $match: {
+        count: { $gt : 1 }
+    }}
+)

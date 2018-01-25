@@ -8,6 +8,9 @@ find out the model of your graphics card
 
 $ lspci -vnn | grep -i VGA -A 12
 
+check ubuntu version:
+$ lsb_release -a
+
 
 find occurance and print filename and linenum:
 
@@ -435,7 +438,7 @@ jstat -gsutil 8038
  sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
 
 sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
-
+sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*<CFI>(.*)<\/CFI>.*/\1 \2 \3/p'
 
 sed -r -n 's#.*<Instrument xmlns=\"http:\/\/www.ngm.se/ns/InstrumentSchema/1.16.3\" xmlns:xsi=\"http:\/\/www.w3.org/2001/XMLSchema\">(.*)<\/Instrument>.*#<Instrument>\1</Instrument>\n#p' FIXT.1.1-PUB-6-NGM.messages.log_2
 

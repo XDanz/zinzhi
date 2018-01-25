@@ -1,8 +1,8 @@
 Alternatively you can use sed. sed can be used to mimic grep like this:
 
-sed -n 's/pattern/&/p'
+$ sed -n 's/pattern/&/p'
 
-By default sed prints every line even if no substitution occurs. The combinations of -n and /p makes sed
+By default sed prints every line even if no substitution occurs. The combinations of '-n' and '/p' makes sed
 print only the lines where a substitution has occured.
 Finally, we replace pattern by & which means replace pattern by itself. Result: we just mimicked grep.
 
@@ -13,9 +13,14 @@ sed -n '50000,$s/time spent/&/p' myfile.txt
 The format to specify the range is as follow: start,end We just instruct sed to work from line 50000 to $ which means last line.
 sed -n 's/pattern/&/p'
 
+
+Start from line 2 and print all lines to end
+$ sed  '2,$!d' my_ip.pl
+
+Print only 1 line
+$ sed  '1!d' my_ip.pl
     
 sed -s "s/\^A/\x01/g"
-
 
 Print all lines between two line numbers:
 
@@ -26,5 +31,9 @@ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
 sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
 
 
+Print only line 282106
+---------------------
+sed '282106!d' gcf_3.1.0_output.log
 
-
+sed -r -n 's/.*1185=(.*)<\/Instrument>/\1<\/Instrument>\n/gp' FIXT.1.1-PUB-4-NGM.messages.log | egrep -a -v "2003|FIXT" 
+>>>>>>> stuff

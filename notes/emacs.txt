@@ -1,0 +1,13 @@
+C-x C-f - Läsa in en fil
+C-x C-s - Spara
+C-x s   - Spara med fråga
+C-x i   - Sätt in innehållet i en annan fil i bufferten
+C-x C-v - Läs in en ny fil i bufferten
+C-x C-w - skriv buffertens innehåll på en namngiven fil
+
+
+Help
+
+C-h help
+C-l ta bort hjälpfönstret
+
