@@ -3,6 +3,7 @@ git checkout -b <branch-name>
 
 
 rebase:
+------
 
 git checkout <branch-name>
 git rebase master
@@ -29,3 +30,6 @@ git show <commit-hash> --summary
 show number of added lines in git
 ---------------------
 git --no-pager log --max-parents=1 --author="Martin Andersson" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
+
+
+git rev-parse --short <long-commit-hash>
