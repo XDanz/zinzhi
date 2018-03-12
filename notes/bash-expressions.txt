@@ -18,6 +18,10 @@ $ find -name *.java -exec grep -Hn "@Inheritance" {} \;
 
 $ find -name *.java -exec egrep -Hn "@Inheritance\(strategy\s*=\s*InheritanceType\..*\)" {} \; | wc -l
 
+$ find $TE_HOME -name FwConfiguration.xml | xargs sed -i -- 's/maxActiveQuotesByMember="1500"/maxActiveQuotesByMember="150000"/g'
+
+
+
 # -H --with-filename  print the file name for each match
 # -n --line-number    print the line number with output lines
 $ find . -name *.java -exec egrep -i -Hn 'transaction' {} \;
