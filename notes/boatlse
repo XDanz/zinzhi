@@ -1,0 +1,84 @@
+
+ssh $host 'cd ~/deployments/BOAT/system/current/pat; cat classpath.txt'
+
+
+'cd $TE_HOME/cmd;./daemon_start.sh d1;./start_all_daemons.sh;\
+./start_where.sh server vs;\
+./start_where.sh server cd1;\
+./start_where.sh server trq1;\
+./start_where.sh server trq2;\
+./start_where.sh server hsr1a;\
+./start_where.sh server hsw1;\
+./start_where.sh server dssg1;\
+./start_where.sh server dssg2;\
+./start_where.sh server gtpg1;\
+./start_where.sh server gtpg2;\
+./start_where.sh server rpe1;\
+./start_where.sh server tax1;\
+./start_where.sh server ufe1;\
+./start_where.sh server srr1;\
+./start_where.sh server srr2;\
+./start_where.sh server sfe1;\
+./start_where.sh server shw1;\
+./start_where.sh server shw2;\
+./start_where.sh server shr1a;\
+./start_where.sh server shr2a;\
+./start_where.sh server leag1;\
+./start_where.sh server batsg1;\
+./start_where.sh server twg1;'
+
+
+TradeReportandQuotingengine
+queueStatistics="true"
+queueStatisticsInterval="10000"
+
+
+
+We have investigate this issue for a while now and run a setup of ~ 4 M instruments, 10% TRs and 90 % Quotes , 10 users with a rate of 2500 tps.
+The test randomized instrumentsIds for each TR or Quote and we actually found a issue relating to quotes.
+As of consequence we did a small patch that should fix the bottleneck related to our test scenario. We are not sure if it will solve the bottleneck so we would like you to try our patch
+in your test setup with your tests and see if you could see some improvement.
+
+Performance improvement: Added compound index MassquoteId,MemberId,InstrumentId for a Quote.
+
+PEAK_SRR_PERSIST_ONLY_5000_TPS.xml PEAK_SRR_DIRECT_PUBLIC_5000_TPS.xml PEAK_SRR_DEFERRED_PUBLIC_5000_TPS.xml
+
+../srr1/SRR-Migration-2.10.5.jar
+
+../trq1/TRQ-Migration-2.10.5.jar
+
+../hsw1/HSW-Migration-2.10.5.jar
+
+
+123124113
+
+667925 - Telia
+
+ID678oelBw667925Bid
+
+ID678oelBw667925Bid
+
+ID678oelBw667925Bid
+
+Quotes only on Gtp
+
+123124112 EZVV76Z2WT42 (Bond Option) Rates Option Debt_Option Call EZ36WLLN14
+123124994 GB00B0V3WX43 (Sovereign Bonds)
+
+123124113 EZ4FRCTDFKT8
+
+CHF
+
+1934 = 13
+
+set transaction time 3 days
+
+
+publicationTime = 2018-04-19T06:43:55.203Z
+instrumentId = 123123123
+notationalAmmount = 1000000
+price = 10000000 (100)
+qty = 1000 (10)
+bdxDateTime = 2018-04-19T06:43:55.203Z
+
+

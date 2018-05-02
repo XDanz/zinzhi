@@ -450,3 +450,10 @@ notes-git.t
 
 
 sed -s 's/1185=/\n/g' FIXT.1.1-PUB-5-NGM.messages.log | sed -r -n 's/<?xml version="1.0" encoding="UTF-8"?\>(.*\<Instrument>).*/\1/p' | sed -s 's/<?"?>//g'
+
+change system date on linux (xubuntu)
+------------------------------------
+
+$ sudo service systemd-timesyncd stop
+
+$ sudo date --set='+2 days'
