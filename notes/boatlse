@@ -81,4 +81,41 @@ price = 10000000 (100)
 qty = 1000 (10)
 bdxDateTime = 2018-04-19T06:43:55.203Z
 
+$ cd $TE_HOME/cmd
+$ rlwrap ./queryengine_start.sh hsw1
+
+
+SELECT TRANSACTIONID FROM TRADEREPORTS WHERE
+DATE >= '2018-05-02' AND DATE <= '2018-05-02' AND MEMBERPARTITION IN ('I') AND EXECUTINGFIRM IN ('IONTRDB') AND APARECEIVEDDATETIME >= 1525219200000000 AND APARECEIVEDDATETIME <= 1525305599999000 AND COUNTERPARTYFIRM IN ('BBB_FUNC','AAA_FUNC') ORDER BY APARECEIVEDDATETIME ASC
+
+show columns from TRADEREPORTS
+
+DSS/GTP
+------
+
+Component Port
+DSSG1	1337
+DSSG2	1339
+GTPG1	31337
+GTPG2	31339
+
+$ -thb
+
+$ -logon 1
+
+
+
+select APPLYSUPPLEMENTARYDEFERRAL from TRADEREPORTS where FIRMTRADEID='FICls10005'
+select APPLYSUPPLEMENTARYDEFERRAL from TRADEREPORTS where FIRMTRADEID='SECls10005'
+
+ven().get("test/triggerAggregation?regime=DATFULA&aggregationDateTime=" +BoatDateTime.now().plus(Duration.ofDays(1)).toString() )
+
+
+2018-04-19T06:43:55.203Z
+
+QUERY_STRING = test/triggerAggregation?regime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00Z
+
+http://localhost:4568/api/test/triggerAggregation?regime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00Z
+
+
 

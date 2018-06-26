@@ -4,3 +4,8 @@ print character representation of 52
 $1 = 52 '4'
 (gdb) p/c 52
 $2 = 52 '4'
+
+print binary representation of 52
+
+(gdb) print /t 52                                                                                                                     
+$5 = 110100

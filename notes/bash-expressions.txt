@@ -457,3 +457,5 @@ change system date on linux (xubuntu)
 $ sudo service systemd-timesyncd stop
 
 $ sudo date --set='+2 days'
+
+$ sudo date --set="16 MAY 2018 09:00:00"

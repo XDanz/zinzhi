@@ -28,4 +28,8 @@ Ctrl+Shift - Close terminal (Quit)
 Ctrl+Alt+l - Lock screen
 Ctrl+Alt+Arrow - switch workspace
 
-
+Ctrl+f8
+Ctrl+shift+f8 condintional
+Ctrl+shift+f8 när du är på en vanlig linje för att visa alla breakpoints
+Ctrl+shift+f8 sen delete tar bort alla breakpoints
+så jäkla skönt
