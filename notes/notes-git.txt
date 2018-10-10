@@ -33,3 +33,6 @@ git --no-pager log --max-parents=1 --author="Martin Andersson" | grep "^commit" 
 
 
 git rev-parse --short <long-commit-hash>
+
+
+git status --short -u | cut -d " " -f2 | xargs rm

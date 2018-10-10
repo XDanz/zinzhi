@@ -49,7 +49,8 @@ PEAK_SRR_PERSIST_ONLY_5000_TPS.xml PEAK_SRR_DIRECT_PUBLIC_5000_TPS.xml PEAK_SRR_
 
 ../hsw1/HSW-Migration-2.10.5.jar
 
-
+Instruments:
+------------
 123124113
 
 667925 - Telia
@@ -93,7 +94,7 @@ show columns from TRADEREPORTS
 DSS/GTP
 ------
 
-Component Port
+Component Port  
 DSSG1	1337
 DSSG2	1339
 GTPG1	31337
@@ -115,7 +116,56 @@ ven().get("test/triggerAggregation?regime=DATFULA&aggregationDateTime=" +BoatDat
 
 QUERY_STRING = test/triggerAggregation?regime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00Z
 
-http://localhost:4568/api/test/triggerAggregation?regime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00Z
+http://localhost:4568/api/test/triggerAggregation?regime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00OZ0O
 
 
 
+http://localhost:4568/api/test/triggerAggregation?ererregime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00Z
+http://applejack:4568/api/test/triggerAggregation?regime=FWAFFULJ&aggregationDateTime=2018-07-03T08:00:00Z
+
+DATFVOLOFULV
+
+http://localhost:4568/api/test/triggerAggregation?regime=DATFVOLOFULV&aggregationDateTime=2018-09-06T07:30:00Z
+
+Installera TE manuellt ponnies/tintin
+------------------------------------
+
+$ ssh-twilightsparkle
+
+$ cd ~/remote_deployment/
+
+$ export SITECONFIG="site_poniestintin";./install_from_jenkins.sh
+
+$ cd ~/remote_deployment/TradesimBoat-2.13.0-SNAPSHOT/refdata/GENERATED_4M_INSTR--500K_LEI
+
+$ cp *.xml $TE_HOME/cd1/data/
+
+$ cp -r referenceArea $TE_HOME/cd1/data/
+
+
+
+
+
+org.mockito.exceptions.misusing.WrongTypeOfReturnValue: 
+TeNonStandardDayWrapper$MockitoMock$1354969851 cannot be returned by toString()
+toString() should return String
+***
+If you're unsure why you're getting above error read on.
+Due to the nature of the syntax above problem might occur because:
+1. This exception *might* occur in wrongly written multi-threaded tests.
+   Please refer to Mockito FAQ on limitations of concurrency testing.
+2. A spy is stubbed using when(spy.foo()).then() syntax. It is safer to stub spies - 
+   - with doReturn|Throw() family of methods. More in javadocs for Mockito.spy() method.
+
+
+9=85487=31041=c7690f9b-7e29-4e36-ae8a-002ea6b9bde21934=1925000=22668=12669=12670=710=135
+
+8=FIXT.1.1|9=717|35=AE|49=SRRECHO|56=SD_SE_FIX|34=0005|52=20180917-08:49:17.339000|1128=9|1003=4Ni4xEwZBA|571=IOa7xEwZBA|1041=c7690f9b-7e29-4e36-ae8a-002ea6b9bde2|25000=1|25008=4Ni4xEwZBA|25011=XLON|25018=0|22=8|48=999999990|470=GB|15=EUR|150=F|32=15|854=0|31=100|423=2|25014=100|25015=CHF|1147=100|60=20180917-08:49:14.953000|64=20180917|25001=1|25002=0|25003=N|25016=N|1924=0|7596=N|7570=20180917-08:49:13.326000|1430=O|574=9|487=3|2405=0|2667=0|1390=2|570=N|25019=6|2668=1|2669=1|2670=7|552=2|54=2|29=4|1=execAccount|581=3|453=3|448=SD_DATX_SE|447=D|452=1|448=SE_LEI|447=N|452=1|448=SINT|447=G|452=63|54=1|453=3|448=SRR_FUNC_2|447=D|452=17|448=SRR_FUNC_2_TEST_LEI|447=N|452=17|448=SRR_F2_FIX|447=D|452=55|20200=Y|1934=13|20201=101|10=230|
+
+
+
+Bond CFDs (10074)
+-----------------
+888820074
+888810074
+999999990
