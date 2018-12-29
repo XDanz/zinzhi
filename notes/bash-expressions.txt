@@ -1,4 +1,5 @@
 check for unadded java files:
+-----------------------------
 
 $ svn status | grep ^\?.*\.java
 
@@ -9,10 +10,13 @@ find out the model of your graphics card
 $ lspci -vnn | grep -i VGA -A 12
 
 check ubuntu version:
+---------------------
+
 $ lsb_release -a
 
 
 find occurance and print filename and linenum:
+----------------------------------------------
 
 $ find -name *.java -exec grep -Hn "@Inheritance" {} \;
 
@@ -20,11 +24,12 @@ $ find -name *.java -exec egrep -Hn "@Inheritance\(strategy\s*=\s*InheritanceTyp
 
 $ find $TE_HOME -name FwConfiguration.xml | xargs sed -i -- 's/maxActiveQuotesByMember="1500"/maxActiveQuotesByMember="150000"/g'
 
-
-
 # -H --with-filename  print the file name for each match
 # -n --line-number    print the line number with output lines
+
 $ find . -name *.java -exec egrep -i -Hn 'transaction' {} \;
+
+----------------------------------------------
 
 
 diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java) <(cat ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java)
@@ -68,13 +73,10 @@ $ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
 $ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 
- pstree -H 118879 gspaces
-
-
 Packge Management
 -----------------
-$ dpkg --list  Listar alla paket som är installerade med beskrivning
 
+$ dpkg --list  Listar alla paket som är installerade med beskrivning
 
 check for unadded java files:
 
@@ -89,6 +91,7 @@ $ lspci -vnn | grep -i VGA -A 12
 
 
 find occurance and print filename and linenum:
+----------------------------------------------
 
 $ find -name *.java -exec grep -Hn "@Inheritance" {} \;
 
@@ -99,7 +102,7 @@ $ find -name *.java -exec egrep -Hn "@Inheritance\(strategy\s*=\s*InheritanceTyp
 $ find . -name *.java -exec egrep -i -Hn 'transaction' {} \;
 
 
-diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java) <(cat ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java)
+$ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java) <(cat ./nextgen-party/nextgen-party-domain-gs/src/main/java/com/so4it/nextgen/party/domain/SpaceParty.java)
 
 
 "@ElementCollection\(fetch\s*=\s*FetchType\..*\)"
@@ -109,12 +112,9 @@ diff <(sed -r "s#@Inheritance\(strategy\s*=\s*InheritanceType\..*\)##g" < ./next
 "@Table\(name\s*=\s*.*\)"
 "@Embedded"
 
-
-
 "@AttributeOverride\(name\s*=\s*.\,\s*column\s*=\s*@Column\(name\s*=\s*.*\)\)"
 
 "@CollectionTable\(name\s*=\s*.*\)"
-
 
 "@Column\(name\s*=\s*.*\)"
 
@@ -128,204 +128,99 @@ curl http://openstack02.test.aza.se:9200/orderbooks/_search?pretty=1&q=*SE000570
 
 jps -v | grep "com.gs.zones=${NIC_ADDR}_$ENV" | cut -d' ' -f1 | xargs kill
 
-
-
 ps aux | egrep ".*services=GSC$" --color | cut -d ' ' -f3 | wc -l
-
 
 tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-support/nextgen-jenkins/src
  | sudo -u gssupervisor ssh -o StrictHostKeyChecking=no gspaces@openstack03.test.aza.se "tar -zx -C ~/test"
 
 
-
-
 http://openstack02.test.aza.se:8081/nextgen/client/
 
-for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
+$ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 
 pstree -H <pid> gspaces
-
-ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
 $ ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
 
 $ for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
 
- pstree -H 118879 gspaces
-
-Packge Management
------------------
-$ dpkg --list  Listar alla paket som är installerade med beskrivning
-             ( går även med globbing dpkg --list 'foo*' )
-
-$ dpkg --get-selection  Lista alla paket som är installerade
-
-$ dpkg --list openjdk-7-jdk:amd64
-
-visar vilka filer som ingår i ett paket
-$ dpkg-query --listfiles openjdk-7-jdk:amd64
-$ dpkg --listfiles openjdk-7-jdk
-
-$ dpkg-query --search openjdk-7-jdk
-
-$ dpkg -L <paket>  Listar vad ett paket har installerat
+$ pstree -H 118879 gspaces
 
 
-
-visar vilka installerade paket
-$ dpkg --get-selections | grep -v deinstall
-
-Avinstallerar paket, tar bort paket
-$ dpkg --remove foo
-
-Raderar även konf filer 
-$ dpkg --purge foo
-
-installerar paket
-$ dpkg --install foo_2.0.deb 
-
-sudo update-alternatives --config java
 
 An alternative way to install your public key in the remote machine's authorized_keys:
 ------------------------------------------------------------------------
-cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
+
+$ cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
 
 java -jar FastProxy.jar --local_port=10901 --remote_port=30501 --remote_host=nextver1.test.ngm.se --fast_templates=f│ERROR (out): java.net.SocketException: Socket closed
 ile:////home/danter/dev/nextgen/nextgen-market/nextgen-market-common/nextgen-market-common-ngm/src/main/resources/FAST_templates_1.13.1│Accepting connection on: 0.0.0.0/0.0.0.0:10900
 .xml --input_text_file=in_ch2.txt --output_text_file=out_ch2.txt
 
 
-for i in $(ls); do sed -i 's#file:///home/gspaces/deploy/grid/hystrix.properties#file:///home/gspaces/nextgen-support/nextgen-environment-scripts/src/main/resources/scripts/deploy/hystrix.properties#g' "$i" ; done
+$ for i in $(ls); do sed -i 's#file:///home/gspaces/deploy/grid/hystrix.properties#file:///home/gspaces/nextgen-support/nextgen-environment-scripts/src/main/resources/scripts/deploy/hystrix.properties#g' "$i" ; done
 
+$ for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i"; done
 
-for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i"; done
+$ undeploy-application nextgen-market-ngm
 
-
-
-
-undeploy-application nextgen-market-ngm
-
-cat out_ch[1-5].txt | sed 's/<\/Instrument>/<\/Instrument>\n/g' > sum_out.txt
+$ cat out_ch[1-5].txt | sed 's/<\/Instrument>/<\/Instrument>\n/g' > sum_out.txt
 
 
 monitor connections:
 --------------------
-while [ true ]; do sudo netstat --tcp -np -d | egrep "185.39.146.163\:3030[0-4]"; echo  ""; sleep 2; doneo
 
-watch -n0 'sudo netstat --tcp -np -d | egrep "185.39.146.163\:3050[0-4]"'
+$ while [ true ]; do sudo netstat --tcp -np -d | egrep "185.39.146.163\:3030[0-4]"; echo  ""; sleep 2; doneo
 
-mvn -Dmaven.repo.local=./maven_repository clean install -T 1C
+$ watch -n0 'sudo netstat --tcp -np -d | egrep "185.39.146.163\:3050[0-4]"'
+
+$ mvn -Dmaven.repo.local=./maven_repository clean install -T 1C
 
 -hystrix.threadpool.default.coreSize = 30
 
 
-java -cp nextgen-market-common-mitch-0.6.0-SNAPSHOT-executable.jar com.so4it.nextgen.mitch.tools.Sniffer 224.4.4.224:61300
+$ java -cp nextgen-market-common-mitch-0.6.0-SNAPSHOT-executable.jar com.so4it.nextgen.mitch.tools.Sniffer 224.4.4.224:61300
 
 
-watch -d -n 0 'sudo netstat --tcp -np -d | egrep "62.119.230.226"'
+$ watch -d -n 0 'sudo netstat --tcp -np -d | egrep "62.119.230.226"'
 
 ( går även med globbing dpkg --list 'foo*' )
 
-$ dpkg --get-selection  Lista alla paket som är installerade
+$ sudo tcpdump -i bond0.510 udp port 61300 and host 224.4.5.226 -X
 
-$ dpkg --list openjdk-7-jdk:amd64
+Block UDP traffic:
+-----------------
 
-visar vilka filer som ingår i ett paket
-$ dpkg-query --listfiles openjdk-7-jdk:amd64
-$ dpkg --listfiles openjdk-7-jdk
+$ sudo iptables -A INPUT -d 224.4.4.224 -p udp -m multiport --dports 61300 -j DROP
 
-$ dpkg-query --search openjdk-7-jdk
-
-$ dpkg -L <paket>  Listar vad ett paket har installerat
-
-
-
-visar vilka installerade paket
-$ dpkg --get-selections | grep -v deinstall
-
-Avinstallerar paket, tar bort paket
-$ dpkg --remove foo
-
-Raderar även konf filer 
-$ dpkg --purge foo
-
-installerar paket
-$ dpkg --install foo_2.0.deb 
-
-sudo update-alternatives --config java
+$ sudo iptables -A OUTPUT -p tcp -m multiport --dport 30500 -j DROP
 
 An alternative way to install your public key in the remote machine's authorized_keys:
-------------------------------------------------------------------------
-cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
+-------------------------------------------------------------------------------------
+$ cat ~/.ssh/id_rsa.pub | ssh USER@HOST "cat >> ~/.ssh/authorized_keys"
 
-java -jar FastProxy.jar --local_port=10901 --remote_port=30501 --remote_host=nextver1.test.ngm.se --fast_templates=f│ERROR (out): java.net.SocketException: Socket closed
+$ java -jar FastProxy.jar --local_port=10901 --remote_port=30501 --remote_host=nextver1.test.ngm.se --fast_templates=f│ERROR (out): java.net.SocketException: Socket closed
 ile:////home/danter/dev/nextgen/nextgen-market/nextgen-market-common/nextgen-market-common-ngm/src/main/resources/FAST_templates_1.13.1│Accepting connection on: 0.0.0.0/0.0.0.0:10900
 .xml --input_text_file=in_ch2.txt --output_text_file=out_ch2.txt
 
 
-for i in $(ls); do sed -i 's#file:///home/gspaces/deploy/grid/hystrix.properties#file:///home/gspaces/nextgen-support/nextgen-environment-scripts/src/main/resources/scripts/deploy/hystrix.properties#g' "$i" ; done
+$ for i in $(ls); do sed -i 's#file:///home/gspaces/deploy/grid/hystrix.properties#file:///home/gspaces/nextgen-support/nextgen-environment-scripts/src/main/resources/scripts/deploy/hystrix.properties#g' "$i" ; done
 
-
-for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i"; done
-
-
-
+$ for i in $(ls); do sed -i 's#hystrix.properties#grid/hystrix.properties#g' "$i"; done
 
 undeploy-application nextgen-market-ngm
 
 cat out_ch[1-5].txt | sed 's/<\/Instrument>/<\/Instrument>\n/g' > sum_out.txt
 
-
-monitor connections:
-while [ true ]; do sudo netstat --tcp -np -d | egrep "88.131.115.39\:3030[0-4]"; echo  ""; sleep 2; done
-
-watch -d -n 0 'sudo netstat --tcp -np -d | egrep "62.119.230.226"'
-
-mvn -Dmaven.repo.local=./maven_repository clean install -T 1C
-
--hystrix.threadpool.default.coreSize = 30
-
-
-java -cp nextgen-market-common-mitch-0.6.0-SNAPSHOT-executable.jar com.so4it.nextgen.mitch.tools.Sniffer 224.4.4.224:61300
-
-
-sudo tcpdump -i bond0.510 udp port 61300 and host 224.4.5.226 -X
-
-
-
-ps aux | grep "omx-mdi" | sed 's/ /\n/g'
-ps -ef | grep "ngm-tgw" | sed 's/ /\n/g'
-ps -ef | grep GSC | sed 's/ /\n/g' | grep prop
-
 ./nextgen-environment-scripts/src/main/resources/scripts/deploy/templates/tgw-ngm-zone.properties
-
-Block UDP traffic
-----------------
-sudo iptables -A INPUT -d 224.4.4.224 -p udp -m multiport --dports 61300 -j DROP
-sudo iptables -A OUTPUT -p tcp -m multiport --dport 30500 -j DROP
-
-
 
 
 for i in `jps -lm | grep ".*esb" | awk '{print $1}'`; do echo $i; pstree -p $i | wc -l  ; done
-
- pstree -H 118879 gspaces
 
 
  netstat -tan --inet
  -t = tcp
  -a = show all listening and none-listening
-
-118580
-
-
-ps -L --pid=140400 -o pid,tid,pcpu,state,nlwp,wchan
-
-SpaceOrderBook 9374
-SpaceCombinationOrderBook 12
-SpaceStandardOrderBook 9362
-
-SpaceInstrument 19307
 
 
 http://openstack03:9200/_status?pretty=true
@@ -336,16 +231,8 @@ curl http://openstack02.test.aza.se:9200/orderbooks/_search?pretty=1&q=*SE000570
 
 jps -v | grep "com.gs.zones=${NIC_ADDR}_$ENV" | cut -d' ' -f1 | xargs kill
 
-
-
-ps aux | egrep ".*services=GSC$" --color | cut -d ' ' -f3 | wc -l
-
-
 tar -zc /opt/jenkins/jobs/prepare-environment-for-deploy/workspace/nextgen-support/nextgen-jenkins/src
  | sudo -u gssupervisor ssh -o StrictHostKeyChecking=no gspaces@openstack03.test.aza.se "tar -zx -C ~/test"
-
-
-
 
 http://openstack02.test.aza.se:8081/nextgen/client/
 
@@ -363,9 +250,6 @@ find . -type f -exec sudo rm -rf {} \;
 
 grep "^i;.*" nextgen-support/nextgen-soupbin/gcf_3.1.0_output.log | awk -F ";" '{ print $3 }' | sort | uniq
 
-git log --format='%H %an' |  grep "David Olsson"  |    cut -d ' ' -f1 | xargs -n1 git log -1
-
-
 /var/log/quickfix/omx-genium-inet-fixed-income/order-entry/recv0411.log
 
 jstack
@@ -375,83 +259,58 @@ jstack 217986 | grep -A 10 `echo "obase=16;231608" | bc | tr '[:upper:]' '[:lowe
 // jstack on betatest
 watch -n0  'sudo -s -u gspaces /usr/java/java8/bin/jstack 161714 | grep -A 10 "FAST"'
 
-18013o
-
-git show <commit-hash> --summary
-
 show available cores
 --------------------
-nproc
-lscpu
 
-Print only line 282106
----------------------
-sed '282106!d' gcf_3.1.0_output.log
+$ nproc
+
+$ lscpu
 
 write image to disk.
 ---------------------
-sudo dd if=xubuntu-14.04-desktop-i386.iso of=/dev/sdb bs=1M
 
-show number of added lines in git
----------------------
-git --no-pager log --max-parents=1 --author="Martin Andersson" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
-
+$ sudo dd if=xubuntu-14.04-desktop-i386.iso of=/dev/sdb bs=1M
 
 find . -name *.java | xargs wc -l  | grep total | awk '
 
+$ grep "BDDe" gcf-log/gcf_3.1.0_output.log | awk -F ";" '{ print substr($2,2,length($2)) "," substr($8,4,length($8)); }' > nils.txt
+
+$ grep "ISn" bdui_UEt62.txt | awk -F ";" '{for(i=1;i<=NF;i++){if ($i ~ /^ISn/){print substr($i,4,length($i))}}}' | sort | uniq 
+
+start elastic search:
+--------------------
+$ sudo bin/elasticsearch --config /etc/elasticsearch/elasticsearch.yml
+
+$ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r  's/<?xml version="1.0" encoding="UTF-8"?>//g'
 
 
-grep "BDDe" gcf-log/gcf_3.1.0_output.log | awk -F ";" '{ print substr($2,2,length($2)) "," substr($8,4,length($8)); }' > nils.txt
+$ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' |  while read line ; do echo $line > $(echo $line | sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p').xml ;done
+
+$ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' |  while read line1 ; do line=$line1; echo $line > gen/$(echo $line | sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p').xml ;done
 
 
-grep "ISn" bdui_UEt62.txt | awk -F ";" '{for(i=1;i<=NF;i++){if ($i ~ /^ISn/){print substr($i,4,length($i))}}}' | sort | uniq 
+Print All Securities on NGM:
+----------------------------
 
-start elastic search
--------------------
-sudo bin/elasticsearch --config /etc/elasticsearch/elasticsearch.yml
-
-
-cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r  's/<?xml version="1.0" encoding="UTF-8"?>//g'
+$ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' | while read line1 ; do line=$line1; echo $line| sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p'; done
 
 
-cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' |  while read line ; do echo $line > $(echo $line | sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p').xml ;done
+$ cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]/\n/p'
 
+$ cat out_ch1.txt | sed  -n 's/.*RelatedSym/\n/g'
 
-cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' |  while read line1 ; do line=$line1; echo $line > gen/$(echo $line | sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p').xml ;done
+$ jstat -gsutil 8038
 
+$ date --date '@1523100781'
 
-Print All Securities on NGM
+bring down broken link:
+-----------------------
 
-cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]//p' | sed -r 's/<?xml version="1.0" encoding="UTF-8"?>//g' | while read line1 ; do line=$line1; echo $line| sed -r -n 's/.*<OrderbookID>(.*)<\/OrderbookID>.*/\1/p'; done
-
-
-cat out_ch1.txt |  sed -r -n 's/.*SecurityXML=(<.*>)/\1/p' | sed -r -n 's/]]]/\n/p'
-
-
-jstat -gsutil 8038
-
-cat out_ch1.txt | sed  -n 's/.*RelatedSym/\n/g'
-
-sed -s 's/1185=/\n\n/g' /var/log/quickfix/ngm/price/FIXT.1.1-PUB-5-NGM.messages.log | sed -s 's/20036/\n/g' | egrep -a xml
-sed -s 's/\0x01/\n/g' pub5.log
-
-3S6M
-
-jstat -gsutil 8038
-
- sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
-
-sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
-sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*<CFI>(.*)<\/CFI>.*/\1 \2 \3/p'
-
-sed -r -n 's#.*<Instrument xmlns=\"http:\/\/www.ngm.se/ns/InstrumentSchema/1.16.3\" xmlns:xsi=\"http:\/\/www.w3.org/2001/XMLSchema\">(.*)<\/Instrument>.*#<Instrument>\1</Instrument>\n#p' FIXT.1.1-PUB-6-NGM.messages.log_2
-
-notes-git.t
-
+$ sudo ip link delete tunsnx
 
 sed -s 's/1185=/\n/g' FIXT.1.1-PUB-5-NGM.messages.log | sed -r -n 's/<?xml version="1.0" encoding="UTF-8"?\>(.*\<Instrument>).*/\1/p' | sed -s 's/<?"?>//g'
 
-change system date on linux (xubuntu)
+Change system date on linux (xubuntu)
 ------------------------------------
 
 $ sudo service systemd-timesyncd stop

@@ -1,38 +1,45 @@
-branch: 
-git checkout -b <branch-name>
+Change branch:
+--------------
+
+$ git checkout -b <branch-name>
 
 
-rebase:
-------
+Rebase:
+-------
 
-git checkout <branch-name>
-git rebase master
+$ git checkout <branch-name>
+$ git rebase master
 
-git log --format='%H %an' |  grep "David Olsson"  |    cut -d ' ' -f1 | xargs -n1 git log -1
+$ git log --format='%H %an' |  grep "David Olsson"  | cut -d ' ' -f1 | xargs -n1 git log -1
 
-git show <commit-hash> --summary
+$ git show <commit-hash> --summary
 
-git branch --contains 693d91e
-
-
-git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
+$ git branch --contains 693d91e
 
 
-git --no-pager log --author="Daniel Terranova" | grep "commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | less
-git --no-pager log --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
-git --no-pager log --first-parent --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
-
-git --no-pager log --max-parents=1 --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
+$ git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
 
 
-git show <commit-hash> --summary
+$ git --no-pager log --author="Daniel Terranova" | grep "commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | less
 
-show number of added lines in git
----------------------
-git --no-pager log --max-parents=1 --author="Martin Andersson" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
+$ git --no-pager log --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
+
+$ git --no-pager log --first-parent --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
+
+$ git --no-pager log --max-parents=1 --author="Daniel Terranova" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
 
 
-git rev-parse --short <long-commit-hash>
+Show number of added lines in git:
+----------------------------------
+
+$ git --no-pager log --max-parents=1 --author="Martin Andersson" | grep "^commit" | awk '{ print $2 }' | xargs -I {} git --no-pager show {} --numstat | grep "^[0-9]" | awk '{ added += $1 } END { print  added }'
 
 
-git status --short -u | cut -d " " -f2 | xargs rm
+$ git status --short -u | cut -d " " -f2 | xargs rm
+
+Long commit hash to short:
+--------------------------
+
+$ git rev-parse --short <long-commit-hash>
+
+$ git log --format='%H %an' |  grep "David Olsson"  |    cut -d ' ' -f1 | xargs -n1 git log -1

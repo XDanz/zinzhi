@@ -1,4 +1,5 @@
-Alternatively you can use sed. sed can be used to mimic grep like this:
+Alternatively you can use sed. Sed can be used to mimic grep like this:
+-----------------------------------------------------------------------
 
 $ sed -n 's/pattern/&/p'
 
@@ -8,32 +9,49 @@ Finally, we replace pattern by & which means replace pattern by itself. Result: 
 
 Now sed can take a range of lines on which to act. In your case:
 
-sed -n '50000,$s/time spent/&/p' myfile.txt
+$ sed -n '50000,$s/time spent/&/p' myfile.txt
 
 The format to specify the range is as follow: start,end We just instruct sed to work from line 50000 to $ which means last line.
-sed -n 's/pattern/&/p'
 
+$ sed -n 's/pattern/&/p'
 
-Start from line 2 and print all lines to end
+Start from line 2 and print all lines to end:
+---------------------------------------------
+
 $ sed  '2,$!d' my_ip.pl
 
-Print only 1 line
+Print only 1 line:
+------------------
+
 $ sed  '1!d' my_ip.pl
     
-sed -s "s/\^A/\x01/g"
+$ sed -s "s/\^A/\x01/g"
 
 Print all lines between two line numbers:
 
-sed -n '3,6p' /path/to/file
+$ sed -n '3,6p' /path/to/file
 
-sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
+$ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
 
-sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
+$ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
 
+Print only line '282106':
+-------------------------
 
-Print only line 282106
----------------------
-sed '282106!d' gcf_3.1.0_output.log
+$ sed '282106!d' gcf_3.1.0_output.log
 
-sed -r -n 's/.*1185=(.*)<\/Instrument>/\1<\/Instrument>\n/gp' FIXT.1.1-PUB-4-NGM.messages.log | egrep -a -v "2003|FIXT" 
->>>>>>> stuff
+$ sed -r -n 's/.*1185=(.*)<\/Instrument>/\1<\/Instrument>\n/gp' FIXT.1.1-PUB-4-NGM.messages.log | egrep -a -v "2003|FIXT"
+
+$ sed -s 's/1185=/\n\n/g' /var/log/quickfix/ngm/price/FIXT.1.1-PUB-5-NGM.messages.log | sed -s 's/20036/\n/g' | egrep -a xml
+
+$ sed -s 's/\0x01/\n/g' pub5.log
+
+$ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*/\1/p' orderbooks2.txt
+
+$ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*/\1 \2/p' orderbooks2.txt
+
+$ sed -r -n 's/.*<OrderbookID>(....)<\/OrderbookID>.*<ISIN>([a-zA-Z]{2}[0-9]{10})<\/ISIN>.*<CFI>(.*)<\/CFI>.*/\1 \2 \3/p'
+
+$ sed -r -n 's#.*<Instrument xmlns=\"http:\/\/www.ngm.se/ns/InstrumentSchema/1.16.3\" xmlns:xsi=\"http:\/\/www.w3.org/2001/XMLSchema\">(.*)<\/Instrument>.*#<Instrument>\1</Instrument>\n#p' FIXT.1.1-PUB-6-NGM.messages.log_2
+
+$ sed -s 's/1185=/\n/g' FIXT.1.1-PUB-5-NGM.messages.log | sed -r -n 's/<?xml version="1.0" encoding="UTF-8"?\>(.*\<Instrument>).*/\1/p' | sed -s 's/<?"?>//g'

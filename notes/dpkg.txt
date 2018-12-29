@@ -1,0 +1,50 @@
+Package Management:
+------------------
+
+$ dpkg --list  Listar alla paket som är installerade med beskrivning
+             ( går även med globbing dpkg --list 'foo*' )
+
+$ dpkg --get-selection  Lista alla paket som är installerade
+
+$ dpkg --list openjdk-7-jdk:amd64
+
+visar vilka filer som ingår i ett paket:
+---------------------------------------
+
+$ dpkg-query --listfiles openjdk-7-jdk:amd64
+
+$ dpkg --listfiles openjdk-7-jdk
+
+$ dpkg-query --search openjdk-7-jdk
+
+Listar vad ett paket har installerat:
+------------------------------------
+
+$ dpkg -L <paket>  
+
+visar vilka installerade paket:
+------------------------------
+
+$ dpkg --get-selections | grep -v deinstall
+
+Avinstallerar paket, tar bort paket:
+-----------------------------------
+$ dpkg --remove foo
+
+Raderar även konf filer:
+-----------------------
+$ dpkg --purge foo
+
+Installerar paket:
+------------------
+
+$ dpkg --install foo_2.0.deb 
+
+sudo update-alternatives --config java
+
+Lista alla paket som är installerade:
+-------------------------------------
+
+$ dpkg --get-selection
+
+$ dpkg --list openjdk-7-jdk:amd64
