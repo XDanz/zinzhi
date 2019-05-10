@@ -211,3 +211,25 @@ awk 'FNR==NR {a[$0]++; next} !a[$0]' fromlog.txt results2.txt
 Lägg till om man ska köra:
 ReferenceInstrumentMarketRemoteService service = new ExecutorRemotingProxyConfigurer<>(referenceGigaSpace, ReferenceInstrumentMarketRemoteService.class).proxy();
 -Dhystrix.command.default.circuitBreaker.enabled=false -Dhystrix.command.default.execution.isolation.strategy=SEMAPHORE -Dhystrix.command.default.execution.isolation.semaphore.maxConcurrentRequests=100000 -Dhystrix.command.default.execution.timeout.enabled=false -Dhystrix.command.default.circuitBreaker.enabled=false -Dhystrix.command.default.fallback.enabled=false
+
+
+
+
+
+
+
+ @Test
+    public void dummy() {
+        String locators = "10.42.100.44,10.42.100.45,10.42.100.46";
+        IJSpace systemSpace =
+                new UrlSpaceConfigurer("jini://*/*/voucherSpace3")
+                        .lookupLocators(locators)
+                        .lookupGroups("xap-12.3.1")
+                        .space();
+        GigaSpace gigaSpace = new GigaSpaceConfigurer(systemSpace).gigaSpace();
+        SpaceVoucher[] vouchers = gigaSpace.readMultiple(new SpaceVoucher());
+        for (SpaceVoucher voucher : vouchers) {
+            System.out.println("voucher = " + voucher);
+        }
+
+    }
